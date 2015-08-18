@@ -3734,6 +3734,12 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
+         *  Whether to show the music visualizer on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
+
+        /**
          * Wether to show the location in the detailed weather view
          * @hide
          */
