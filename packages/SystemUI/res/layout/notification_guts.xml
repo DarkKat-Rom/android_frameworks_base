@@ -148,7 +148,7 @@
                     android:thumbTint="@color/notification_guts_slider_color"
                     android:progressTint="@color/notification_guts_slider_color"
                     style="@android:style/Widget.Material.SeekBar.Discrete"
-                    android:tickMarkTint="@android:color/black" />
+                    android:tickMarkTint="@color/notification_guts_seekbar_tick_mark_tint" />
 
         </FrameLayout>
     </LinearLayout>

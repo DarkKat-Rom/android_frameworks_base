@@ -115,6 +115,8 @@ public class AlertDialog extends Dialog implements DialogInterface {
     @Deprecated
     public static final int THEME_DEVICE_DEFAULT_LIGHT = 5;
 
+    public static final int THEME_MATERIAL_DAYNIGHT = 6;
+
     /**
      * No layout hint.
      * @hide
@@ -212,9 +214,11 @@ public class AlertDialog extends Dialog implements DialogInterface {
         } else if (themeResId == THEME_HOLO_LIGHT) {
             return R.style.Theme_Holo_Light_Dialog_Alert;
         } else if (themeResId == THEME_DEVICE_DEFAULT_DARK) {
-            return R.style.Theme_DeviceDefault_Dialog_Alert;
+            return R.style.Theme_Material_DayNight_Dialog_Alert;
         } else if (themeResId == THEME_DEVICE_DEFAULT_LIGHT) {
-            return R.style.Theme_DeviceDefault_Light_Dialog_Alert;
+            return R.style.Theme_Material_DayNight_Dialog_Alert;
+        } else if (themeResId == THEME_MATERIAL_DAYNIGHT) {
+            return R.style.Theme_Material_DayNight_Dialog_Alert;
         } else if (themeResId >= 0x01000000) {   // start of real resource IDs.
             return themeResId;
         } else {
