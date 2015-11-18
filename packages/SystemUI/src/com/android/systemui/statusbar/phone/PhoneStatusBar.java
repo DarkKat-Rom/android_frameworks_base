@@ -40,6 +40,7 @@ import android.app.IActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.StatusBarManager;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
@@ -4376,7 +4377,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         Trace.beginSection("PhoneStatusBar#updateDozingState");
         boolean animate = !mDozing && mDozeScrimController.isPulsing();
         mNotificationPanel.setDozing(mDozing, animate);
-        mStackScroller.setDark(mDozing, animate, mWakeUpTouchLocation);
+        mStackScroller.setDark(mDozing && isThemeLight(), animate, mWakeUpTouchLocation);
         mScrimController.setDozing(mDozing);
 
         // Immediately abort the dozing from the doze scrim controller in case of wake-and-unlock
@@ -4385,6 +4386,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mFingerprintUnlockController.getMode()
                         != FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING, animate);
         Trace.endSection();
+    }
+
+    private boolean isThemeLight() {
+        final UiModeManager uiManager = (UiModeManager) mContext.getSystemService(
+                Context.UI_MODE_SERVICE);
+        return uiManager.getNightMode() == 1;
     }
 
     public void updateStackScrollerState(boolean goingToFullShade, boolean fromShadeLocked) {

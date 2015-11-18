@@ -19,7 +19,6 @@ import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -85,6 +84,7 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
     private boolean mAccessibilityMoving;
     private int mAccessibilityFromIndex;
     private QSTileHost mHost;
+    private final QSItemDecoration mDecoration;
 
     public TileAdapter(Context context) {
         mContext = context;
@@ -469,12 +469,9 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
         private final ColorDrawable mDrawable;
 
         private TileItemDecoration(Context context) {
-            TypedArray ta =
-                    context.obtainStyledAttributes(new int[]{android.R.attr.colorSecondary});
-            mDrawable = new ColorDrawable(ta.getColor(0, 0));
-            ta.recycle();
+            mDrawable = new ColorDrawable(context.getResources().getColor(
+                    R.color.qs_tile_adapter_bg));
         }
-
 
         @Override
         public void onDraw(Canvas c, RecyclerView parent, State state) {
@@ -500,7 +497,7 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
                 break;
             }
         }
-    };
+    }
 
     private final ItemTouchHelper.Callback mCallbacks = new ItemTouchHelper.Callback() {
 

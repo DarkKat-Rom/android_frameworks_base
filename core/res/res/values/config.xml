@@ -764,7 +764,7 @@
              1 - MODE_NIGHT_NO
              2 - MODE_NIGHT_YES
     -->
-    <integer name="config_defaultNightMode">1</integer>
+    <integer name="config_defaultNightMode">2</integer>
 
     <!-- Control whether Night display is available. This should only be enabled on devices
          with HWC 2.0 or higher. -->

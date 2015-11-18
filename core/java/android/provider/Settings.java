@@ -5983,6 +5983,12 @@ public final class Settings {
         public static final String UI_NIGHT_MODE = "ui_night_mode";
 
         /**
+         * Auto theme mode which switches based on lightsensor
+         * @hide
+         */
+        public static final String UI_NIGHT_AUTO_MODE = "ui_night_auto_mode";
+
+        /**
          * Whether screensavers are enabled.
          * @hide
          */
