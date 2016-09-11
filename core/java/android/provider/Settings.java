@@ -3551,6 +3551,43 @@ public final class Settings {
          */
         public static final String POWER_MENU_SHOW_ADVANCED_REBOOT = "power_menu_show_advanced_reboot";
 
+        /**
+         * Color of the text on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_TEXT_COLOR = "status_bar_text_color";
+
+        /**
+         * Color of the icons on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_ICON_COLOR = "status_bar_icon_color";
+
+        /**
+         * Color of the text on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_TEXT_COLOR_DARK_MODE = "status_bar_text_color_dark_mode";
+
+        /**
+         * Color of the icons on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_ICON_COLOR_DARK_MODE = "status_bar_icon_color_dark_mode";
+
+        /**
+         * Color of the battery status text on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_TEXT_COLOR = "status_bar_battery_text_color";
+
+        /**
+         * Color of the battery status text on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE =
+                "status_bar_battery_text_color_dark_mode";
+
         // DarkKat additions end
 
         /**

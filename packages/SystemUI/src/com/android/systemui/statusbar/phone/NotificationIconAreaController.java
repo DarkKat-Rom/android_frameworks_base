@@ -31,13 +31,16 @@ public class NotificationIconAreaController {
     private int mIconTint = Color.WHITE;
 
     private PhoneStatusBar mPhoneStatusBar;
+    private StatusBarIconController mStatusBarIconController;
     protected View mNotificationIconArea;
     private IconMerger mNotificationIcons;
     private ImageView mMoreIcon;
     private final Rect mTintArea = new Rect();
 
-    public NotificationIconAreaController(Context context, PhoneStatusBar phoneStatusBar) {
+    public NotificationIconAreaController(Context context, PhoneStatusBar phoneStatusBar,
+                StatusBarIconController iconController) {
         mPhoneStatusBar = phoneStatusBar;
+        mStatusBarIconController = iconController;
         mNotificationColorUtil = NotificationColorUtil.getInstance(context);
 
         initializeNotificationAreaViews(context);
@@ -204,7 +207,7 @@ public class NotificationIconAreaController {
             boolean colorize = !isPreL || NotificationUtils.isGrayscale(v, mNotificationColorUtil);
             if (colorize) {
                 v.setImageTintList(ColorStateList.valueOf(
-                        StatusBarIconController.getTint(mTintArea, v, mIconTint)));
+                        mStatusBarIconController.getTint(mTintArea, v, mIconTint)));
             }
         }
     }

@@ -94,8 +94,8 @@ public class SystemUIFactory {
     }
 
     public NotificationIconAreaController createNotificationIconAreaController(Context context,
-            PhoneStatusBar phoneStatusBar) {
-        return new NotificationIconAreaController(context, phoneStatusBar);
+            PhoneStatusBar phoneStatusBar, StatusBarIconController iconController) {
+        return new NotificationIconAreaController(context, phoneStatusBar, iconController);
     }
 
     public QSTileHost createQSTileHost(Context context, PhoneStatusBar statusBar,

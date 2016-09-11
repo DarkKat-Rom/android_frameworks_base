@@ -51,6 +51,10 @@ public class BatteryMeterDrawable extends Drawable implements
     private static final float BOLT_LEVEL_THRESHOLD = 0.3f;  // opaque bolt below this fraction
 
     private final int[] mColors;
+    private int mIconTint = Color.WHITE;
+    private int mFrameColor;
+    private int mTextColor = Color.WHITE;
+
     private final int mIntrinsicWidth;
     private final int mIntrinsicHeight;
 
@@ -58,17 +62,14 @@ public class BatteryMeterDrawable extends Drawable implements
     private float mButtonHeightFraction;
     private float mSubpixelSmoothingLeft;
     private float mSubpixelSmoothingRight;
-    private final Paint mFramePaint, mBatteryPaint, mWarningTextPaint, mTextPaint, mBoltPaint,
+    private final Paint mFramePaint, mFillPaint, mWarningTextPaint, mTextPaint, mBoltPaint,
             mPlusPaint;
     private float mTextHeight, mWarningTextHeight;
-    private int mIconTint = Color.WHITE;
-    private float mOldDarkIntensity = 0f;
 
     private int mHeight;
     private int mWidth;
     private String mWarningString;
     private final int mCriticalLevel;
-    private int mChargeColor;
     private final float[] mBoltPoints;
     private final Path mBoltPath = new Path();
     private final float[] mPlusPoints;
@@ -116,6 +117,9 @@ public class BatteryMeterDrawable extends Drawable implements
         }
         levels.recycle();
         colors.recycle();
+
+        mFrameColor = frameColor;
+
         updateShowPercent();
         mWarningString = context.getString(R.string.battery_meter_very_low_overlay_symbol);
         mCriticalLevel = mContext.getResources().getInteger(
@@ -128,15 +132,14 @@ public class BatteryMeterDrawable extends Drawable implements
                 R.fraction.battery_subpixel_smoothing_right, 1, 1);
 
         mFramePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mFramePaint.setColor(frameColor);
         mFramePaint.setDither(true);
         mFramePaint.setStrokeWidth(0);
         mFramePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-        mBatteryPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBatteryPaint.setDither(true);
-        mBatteryPaint.setStrokeWidth(0);
-        mBatteryPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mFillPaint.setDither(true);
+        mFillPaint.setStrokeWidth(0);
+        mFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         Typeface font = Typeface.create("sans-serif-condensed", Typeface.BOLD);
@@ -149,10 +152,7 @@ public class BatteryMeterDrawable extends Drawable implements
         mWarningTextPaint.setTypeface(font);
         mWarningTextPaint.setTextAlign(Paint.Align.CENTER);
 
-        mChargeColor = context.getColor(R.color.batterymeter_charge_color);
-
         mBoltPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBoltPaint.setColor(context.getColor(R.color.batterymeter_bolt_color));
         mBoltPoints = loadBoltPoints(res);
 
         mPlusPaint = new Paint(mBoltPaint);
@@ -274,7 +274,7 @@ public class BatteryMeterDrawable extends Drawable implements
 
         // If we are in power save mode, always use the normal color.
         if (mPowerSaveEnabled) {
-            return mColors[mColors.length-1];
+            return mIconTint;
         }
         int thresh, color = 0;
         for (int i=0; i<mColors.length; i+=2) {
@@ -293,28 +293,62 @@ public class BatteryMeterDrawable extends Drawable implements
         return color;
     }
 
-    public void setDarkIntensity(float darkIntensity) {
-        if (darkIntensity == mOldDarkIntensity) {
-            return;
+    private int getTextColorForLevel(int percent) {
+
+        // If we are in power save mode, always use the normal color.
+        if (mPowerSaveEnabled) {
+            return mTextColor;
         }
-        int backgroundColor = getBackgroundColor(darkIntensity);
-        int fillColor = getFillColor(darkIntensity);
+        int thresh, color = 0;
+        for (int i=0; i<mColors.length; i+=2) {
+            thresh = mColors[i];
+            color = mColors[i+1];
+            if (percent <= thresh) {
+
+                // Respect tinting for "normal" level
+                if (i == mColors.length-2) {
+                    return mTextColor;
+                } else {
+                    return color;
+                }
+            }
+        }
+        return color;
+    }
+
+    public void setIconColor(int fillColor) {
+        mFrameColor = (mFrameColor & 0xff000000) | (fillColor & 0x00ffffff);
         mIconTint = fillColor;
-        mFramePaint.setColor(backgroundColor);
-        mBoltPaint.setColor(fillColor);
-        mChargeColor = fillColor;
         invalidateSelf();
-        mOldDarkIntensity = darkIntensity;
     }
 
-    private int getBackgroundColor(float darkIntensity) {
-        return getColorForDarkIntensity(
-                darkIntensity, mLightModeBackgroundColor, mDarkModeBackgroundColor);
+    public void setTextColor(int textColor) {
+        mTextColor = textColor;
+        invalidateSelf();
     }
 
-    private int getFillColor(float darkIntensity) {
-        return getColorForDarkIntensity(
-                darkIntensity, mLightModeFillColor, mDarkModeFillColor);
+
+    public void setDarkIntensity(float darkIntensity, int fillColor, int fillColorDark,
+            int textColor, int textColorDark) {
+        int backgroundTint = getBackgroundColor(darkIntensity, fillColor, fillColorDark);
+        int fillTint = getFillOrTextColor(darkIntensity, fillColor, fillColorDark);
+        int textTint = getFillOrTextColor(darkIntensity, textColor, textColorDark);
+        mFrameColor = backgroundTint;
+        mIconTint = fillTint;
+        mTextColor = textTint;
+        invalidateSelf();
+    }
+
+    private int getBackgroundColor(float darkIntensity, int lightColor, int darkColor) {
+        int lightModeColor = (mLightModeBackgroundColor & 0xff000000) | (lightColor & 0x00ffffff);
+        int darkModeColor = (mDarkModeBackgroundColor & 0xff000000) | (darkColor & 0x00ffffff);
+        return getColorForDarkIntensity(darkIntensity, lightModeColor, darkModeColor);
+    }
+
+    private int getFillOrTextColor(float darkIntensity, int lightColor, int darkColor) {
+        int lightModeColor = (mLightModeFillColor & 0xff000000) | (lightColor & 0x00ffffff);
+        int darkModeColor = (mDarkModeFillColor & 0xff000000) | (darkColor & 0x00ffffff);
+        return getColorForDarkIntensity(darkIntensity, lightModeColor, darkModeColor);
     }
 
     private int getColorForDarkIntensity(float darkIntensity, int lightColor, int darkColor) {
@@ -355,8 +389,16 @@ public class BatteryMeterDrawable extends Drawable implements
         mFrame.right -= mSubpixelSmoothingRight;
         mFrame.bottom -= mSubpixelSmoothingRight;
 
-        // set the battery charging color
-        mBatteryPaint.setColor(mPluggedIn ? mChargeColor : getColorForLevel(level));
+        // apply frame tint
+        mFramePaint.setColor(mFrameColor);
+        // apply battery tint
+        mFillPaint.setColor(getColorForLevel(mPluggedIn ? 50 : level));
+        // apply text tint
+        mTextPaint.setColor(getTextColorForLevel(mPluggedIn ? 50 : level));
+        // apply bolt tint, (indicates charging, always use normal text color)
+        mBoltPaint.setColor(getTextColorForLevel(50));
+        // apply plus tint, (indicates power saving mode, always use normal text color)
+        mPlusPaint.setColor(getTextColorForLevel(50));
 
         if (level >= FULL) {
             drawFrac = 1f;
@@ -451,7 +493,6 @@ public class BatteryMeterDrawable extends Drawable implements
         float pctX = 0, pctY = 0;
         String pctText = null;
         if (!mPluggedIn && !mPowerSaveEnabled && level > mCriticalLevel && mShowPercent) {
-            mTextPaint.setColor(getColorForLevel(level));
             mTextPaint.setTextSize(height *
                     (SINGLE_DIGIT_PERCENT ? 0.75f
                             : (mLevel == 100 ? 0.38f : 0.5f)));
@@ -476,7 +517,7 @@ public class BatteryMeterDrawable extends Drawable implements
         mClipPath.reset();
         mClipPath.addRect(mFrame,  Path.Direction.CCW);
         mShapePath.op(mClipPath, Path.Op.INTERSECT);
-        c.drawPath(mShapePath, mBatteryPaint);
+        c.drawPath(mShapePath, mFillPaint);
 
         if (!mPluggedIn && !mPowerSaveEnabled) {
             if (level <= mCriticalLevel) {

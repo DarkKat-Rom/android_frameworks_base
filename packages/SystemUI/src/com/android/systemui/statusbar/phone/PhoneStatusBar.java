@@ -29,6 +29,7 @@ import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -58,6 +59,7 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -450,6 +452,40 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     };
 
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR))) {
+                updateStatusBarTextColor(true);
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR))) {
+                updateStatusBarIconColor(true);
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR))) {
+                updateStatusBarBatteryTextColor(true);
+            }
+        }
+    }
+
     private int mInteractingWindows;
     private boolean mAutohideSuspended;
     private int mStatusBarMode;
@@ -662,6 +698,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // in session state
 
         addNavigationBar();
+
+        // Status bar settings observer
+        SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe();
 
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController, mCastController,
@@ -952,6 +992,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // Private API call to make the shadows look better for Recents
         ThreadedRenderer.overrideProperty("ambientRatio", String.valueOf(1.5f));
+
+        updateSettings();
 
         return mStatusBarView;
     }
@@ -2216,6 +2258,31 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     }
                 }
             }
+        }
+    }
+
+    private void updateSettings() {
+        updateStatusBarTextColor(false);
+        updateStatusBarIconColor(false);
+        updateStatusBarBatteryTextColor(false);
+    }
+
+    private void updateStatusBarTextColor(boolean animate) {
+        if (mIconController != null) {
+            mIconController.updateTextColor(animate);
+        }
+    }
+
+    private void updateStatusBarIconColor(boolean animate) {
+        if (mIconController != null) {
+            mIconController.updateIconColor(animate);
+        }
+    }
+
+
+    private void updateStatusBarBatteryTextColor(boolean animate) {
+        if (mIconController != null) {
+            mIconController.updateBatteryTextColor(animate);
         }
     }
 

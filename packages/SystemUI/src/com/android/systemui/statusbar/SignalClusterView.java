@@ -64,6 +64,7 @@ public class SignalClusterView
 
     NetworkControllerImpl mNC;
     SecurityController mSC;
+    StatusBarIconController mSIC = null;
 
     private boolean mNoSimsVisible = false;
     private boolean mVpnVisible = false;
@@ -81,6 +82,8 @@ public class SignalClusterView
     private String mEthernetDescription;
     private ArrayList<PhoneState> mPhoneStates = new ArrayList<PhoneState>();
     private int mIconTint = Color.WHITE;
+    private int mIconTintDark = 0x99000000;
+    private int mIconTintDarkOpaque = Color.BLACK;
     private float mDarkIntensity;
     private final Rect mTintArea = new Rect();
 
@@ -165,6 +168,11 @@ public class SignalClusterView
         mSC.addCallback(this);
         mVpnVisible = mSC.isVpnEnabled();
     }
+
+    public void setIconController(StatusBarIconController sic) {
+        mSIC = sic;
+    }
+
 
     @Override
     protected void onFinishInflate() {
@@ -527,10 +535,25 @@ public class SignalClusterView
         }
     }
 
-    public void setIconTint(int tint, float darkIntensity, Rect tintArea) {
+    public void setIconTint(int tint, int tintDark, float darkIntensity, Rect tintArea) {
+        if (mSIC == null) {
+            return;
+        }
         boolean changed = tint != mIconTint || darkIntensity != mDarkIntensity
                 || !mTintArea.equals(tintArea);
         mIconTint = tint;
+        mIconTintDark = tintDark;
+        if (mIconTintDark != 0) {
+            // Dark mode mobile- and wifi signal icons are already using the right transparency.
+            // Setting the alpha channel of the icon tint dark color to fully opaque,
+            // to prevent a wrong alpha channel of the mobile- and wifi signal icons.
+            mIconTintDarkOpaque = (0xffffffff & 0xff000000) | (tintDark & 0x00ffffff);
+        } else {
+            // We are currently using the light mode of the status bar,
+            // or the dark color didn`t changed.
+            // Setting the icon tint dark color to "0" to prevent applying the same color again.
+            mIconTintDarkOpaque = 0;
+        }
         mDarkIntensity = darkIntensity;
         mTintArea.set(tintArea);
         if (changed && isAttachedToWindow()) {
@@ -539,8 +562,20 @@ public class SignalClusterView
     }
 
     private void applyIconTint() {
-        setTint(mVpn, StatusBarIconController.getTint(mTintArea, mVpn, mIconTint));
-        setTint(mAirplane, StatusBarIconController.getTint(mTintArea, mAirplane, mIconTint));
+        if (mSIC == null) {
+            return;
+        }
+        setTint(mVpn, mSIC.getTint(mTintArea, mVpn, mIconTint));
+        setTint(mAirplane, mSIC.getTint(mTintArea, mAirplane, mIconTint));
+
+        setTint(mNoSims, mSIC.getTint(mTintArea, mNoSims, mIconTint));
+        setTint(mWifi, mSIC.getTint(mTintArea, mWifi, mIconTint));
+        if (mIconTintDark != 0) {
+            setTint(mNoSimsDark, mSIC.getTint(mTintArea, mNoSimsDark, mIconTintDarkOpaque));
+            setTint(mWifiDark, mSIC.getTint(mTintArea, mWifiDark, mIconTintDarkOpaque));
+            setTint(mEthernetDark, mSIC.getTint(mTintArea, mEthernetDark, mIconTintDarkOpaque));
+        }
+
         applyDarkIntensity(
                 StatusBarIconController.getDarkIntensity(mTintArea, mNoSims, mDarkIntensity),
                 mNoSims, mNoSimsDark);
@@ -551,7 +586,7 @@ public class SignalClusterView
                 StatusBarIconController.getDarkIntensity(mTintArea, mEthernet, mDarkIntensity),
                 mEthernet, mEthernetDark);
         for (int i = 0; i < mPhoneStates.size(); i++) {
-            mPhoneStates.get(i).setIconTint(mIconTint, mDarkIntensity, mTintArea);
+            mPhoneStates.get(i).setIconTint(mIconTint, mIconTintDarkOpaque, mDarkIntensity, mTintArea);
         }
     }
 
@@ -677,11 +712,18 @@ public class SignalClusterView
             }
         }
 
-        public void setIconTint(int tint, float darkIntensity, Rect tintArea) {
+        public void setIconTint(int tint, int tintDark, float darkIntensity, Rect tintArea) {
+            if (mSIC == null) {
+                return;
+            }
+            setTint(mMobile, mSIC.getTint(tintArea, mMobile, tint));
+            if (tintDark != 0) {
+                setTint(mMobileDark, mSIC.getTint(tintArea, mMobileDark, tintDark));
+            }
             applyDarkIntensity(
                     StatusBarIconController.getDarkIntensity(tintArea, mMobile, darkIntensity),
                     mMobile, mMobileDark);
-            setTint(mMobileType, StatusBarIconController.getTint(tintArea, mMobileType, tint));
+            setTint(mMobileType, mSIC.getTint(tintArea, mMobileType, tint));
         }
     }
 }

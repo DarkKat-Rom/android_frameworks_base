@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -38,6 +40,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.internal.util.darkkat.ColorHelper;
+import com.android.internal.util.darkkat.StatusBarColorHelper;
+import com.android.keyguard.CarrierText;
 import com.android.systemui.BatteryMeterView;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.Interpolators;
@@ -61,40 +66,45 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     public static final long DEFAULT_TINT_ANIMATION_DURATION = 120;
     public static final String ICON_BLACKLIST = "icon_blacklist";
-    public static final int DEFAULT_ICON_TINT = Color.WHITE;
 
     private Context mContext;
     private PhoneStatusBar mPhoneStatusBar;
     private DemoStatusIcons mDemoStatusIcons;
 
+    private CarrierText mCarrierTextKeyguard;
     private LinearLayout mSystemIconArea;
     private LinearLayout mStatusIcons;
-    private SignalClusterView mSignalCluster;
     private LinearLayout mStatusIconsKeyguard;
+    private SignalClusterView mSignalCluster;
+    private SignalClusterView mSignalClusterKeyguard;
+    private BatteryMeterView mBatteryMeterView;
+    private BatteryMeterView mBatteryMeterViewKeyguard;
+    private TextView mBatteryLevelKeyguard;
+    private TextView mClock;
 
     private NotificationIconAreaController mNotificationIconAreaController;
     private View mNotificationIconAreaInner;
 
-    private BatteryMeterView mBatteryMeterView;
-    private BatteryMeterView mBatteryMeterViewKeyguard;
-    private TextView mClock;
-
     private int mIconSize;
     private int mIconHPadding;
 
-    private int mIconTint = DEFAULT_ICON_TINT;
     private float mDarkIntensity;
+    private int mTextColor;
+    private int mIconColor;
+    private int mBatteryTextColor;
     private final Rect mTintArea = new Rect();
     private static final Rect sTmpRect = new Rect();
     private static final int[] sTmpInt2 = new int[2];
+
+    private boolean mAnimateTextColor = false;
+    private boolean mAnimateIconColor = false;
+    private boolean mAnimateBatteryTextColor = false;
 
     private boolean mTransitionPending;
     private boolean mTintChangePending;
     private float mPendingDarkIntensity;
     private ValueAnimator mTintAnimator;
-
-    private int mDarkModeIconColorSingleTone;
-    private int mLightModeIconColorSingleTone;
+    private Animator mColorTransitionAnimator;
 
     private final Handler mHandler;
     private boolean mTransitionDeferring;
@@ -114,33 +124,38 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
             PhoneStatusBar phoneStatusBar) {
         mContext = context;
         mPhoneStatusBar = phoneStatusBar;
+        mCarrierTextKeyguard = (CarrierText) keyguardStatusBar.findViewById(R.id.keyguard_carrier_text);
         mSystemIconArea = (LinearLayout) statusBar.findViewById(R.id.system_icon_area);
         mStatusIcons = (LinearLayout) statusBar.findViewById(R.id.statusIcons);
-        mSignalCluster = (SignalClusterView) statusBar.findViewById(R.id.signal_cluster);
-
-        mNotificationIconAreaController = SystemUIFactory.getInstance()
-                .createNotificationIconAreaController(context, phoneStatusBar);
-        mNotificationIconAreaInner =
-                mNotificationIconAreaController.getNotificationInnerAreaView();
-
-        ViewGroup notificationIconArea =
-                (ViewGroup) statusBar.findViewById(R.id.notification_icon_area);
-        notificationIconArea.addView(mNotificationIconAreaInner);
-
         mStatusIconsKeyguard = (LinearLayout) keyguardStatusBar.findViewById(R.id.statusIcons);
-
+        mSignalCluster = (SignalClusterView) statusBar.findViewById(R.id.signal_cluster);
+        mSignalClusterKeyguard = (SignalClusterView) keyguardStatusBar.findViewById(R.id.signal_cluster);
         mBatteryMeterView = (BatteryMeterView) statusBar.findViewById(R.id.battery);
         mBatteryMeterViewKeyguard = (BatteryMeterView) keyguardStatusBar.findViewById(R.id.battery);
-        scaleBatteryMeterViews(context);
-
+        mBatteryLevelKeyguard = (TextView) keyguardStatusBar.findViewById(R.id.battery_level);
         mClock = (TextView) statusBar.findViewById(R.id.clock);
-        mDarkModeIconColorSingleTone = context.getColor(R.color.dark_mode_icon_color_single_tone);
-        mLightModeIconColorSingleTone = context.getColor(R.color.light_mode_icon_color_single_tone);
+        mNotificationIconAreaController = SystemUIFactory.getInstance()
+                .createNotificationIconAreaController(context, phoneStatusBar, this);
+        mNotificationIconAreaInner =
+                mNotificationIconAreaController.getNotificationInnerAreaView();
+        ViewGroup notificationIconArea =
+                (ViewGroup) statusBar.findViewById(R.id.notification_icon_area);
+
+        mSignalCluster.setIconController(this);
+        mSignalClusterKeyguard.setIconController(this);
+        scaleBatteryMeterViews(context);
+        notificationIconArea.addView(mNotificationIconAreaInner);
+
+        mTextColor = StatusBarColorHelper.getTextColor(mContext);
+        mIconColor = StatusBarColorHelper.getIconColor(mContext);
+        mBatteryTextColor = StatusBarColorHelper.getBatteryTextColor(mContext);
+
         mHandler = new Handler();
         defineSlots();
         loadDimens();
 
         TunerService.get(mContext).addTunable(this, ICON_BLACKLIST);
+        mColorTransitionAnimator = createColorTransitionAnimator(0, 1);
     }
 
     public void setSignalCluster(SignalClusterView signalCluster) {
@@ -462,9 +477,17 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     private void setIconTintInternal(float darkIntensity) {
         mDarkIntensity = darkIntensity;
-        mIconTint = (int) ArgbEvaluator.getInstance().evaluate(darkIntensity,
-                mLightModeIconColorSingleTone, mDarkModeIconColorSingleTone);
-        mNotificationIconAreaController.setIconTint(mIconTint);
+        mTextColor = (int) ArgbEvaluator.getInstance().evaluate(darkIntensity,
+                StatusBarColorHelper.getTextColor(mContext),
+                StatusBarColorHelper.getTextColorDarkMode(mContext));
+        mIconColor = (int) ArgbEvaluator.getInstance().evaluate(darkIntensity,
+                StatusBarColorHelper.getIconColor(mContext),
+                StatusBarColorHelper.getIconColorDarkMode(mContext));
+        mBatteryTextColor = (int) ArgbEvaluator.getInstance().evaluate(darkIntensity,
+                StatusBarColorHelper.getBatteryTextColor(mContext),
+                StatusBarColorHelper.getBatteryTextColorDarkMode(mContext));
+
+        mNotificationIconAreaController.setIconTint(mIconColor);
         applyIconTint();
     }
 
@@ -480,11 +503,19 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
      * @return the tint to apply to {@param view} depending on the desired tint {@param color} and
      *         the screen {@param tintArea} in which to apply that tint
      */
-    public static int getTint(Rect tintArea, View view, int color) {
-        if (isInArea(tintArea, view)) {
+    public int getTint(Rect tintArea, View view, int color) {
+        if (isInArea(tintArea, view) || mDarkIntensity == 0f) {
             return color;
         } else {
-            return DEFAULT_ICON_TINT;
+            return StatusBarColorHelper.getIconColor(mContext);
+        }
+    }
+
+    private int getTextTint(Rect tintArea, View view, int color) {
+        if (isInArea(tintArea, view) || mDarkIntensity == 0f) {
+            return color;
+        } else {
+            return StatusBarColorHelper.getTextColor(mContext);
         }
     }
 
@@ -524,12 +555,22 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private void applyIconTint() {
         for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
             StatusBarIconView v = (StatusBarIconView) mStatusIcons.getChildAt(i);
-            v.setImageTintList(ColorStateList.valueOf(getTint(mTintArea, v, mIconTint)));
+            v.setImageTintList(ColorStateList.valueOf(getTint(mTintArea, v, mIconColor)));
         }
-        mSignalCluster.setIconTint(mIconTint, mDarkIntensity, mTintArea);
+        applyStatusIconKeyguardTint();
+        mSignalCluster.setIconTint(mIconColor, StatusBarColorHelper.getIconColorDarkMode(mContext),
+                mDarkIntensity, mTintArea);
         mBatteryMeterView.setDarkIntensity(
-                isInArea(mTintArea, mBatteryMeterView) ? mDarkIntensity : 0);
-        mClock.setTextColor(getTint(mTintArea, mClock, mIconTint));
+                isInArea(mTintArea, mBatteryMeterView) ? mDarkIntensity : 0,
+                StatusBarColorHelper.getIconColor(mContext),
+                isInArea(mTintArea, mBatteryMeterView)
+                        ? StatusBarColorHelper.getIconColorDarkMode(mContext)
+                        : StatusBarColorHelper.getIconColor(mContext),
+                StatusBarColorHelper.getBatteryTextColor(mContext),
+                isInArea(mTintArea, mBatteryMeterView)
+                        ? StatusBarColorHelper.getBatteryTextColorDarkMode(mContext)
+                        : StatusBarColorHelper.getBatteryTextColor(mContext));
+        mClock.setTextColor(getTextTint(mTintArea, mClock, mTextColor));
     }
 
     public void appTransitionPending() {
@@ -607,5 +648,90 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                 mContext.getResources().getDimensionPixelSize(
                         R.dimen.status_bar_clock_end_padding),
                 0);
+    }
+
+    private ValueAnimator createColorTransitionAnimator(float start, float end) {
+        ValueAnimator animator = ValueAnimator.ofFloat(start, end);
+
+        animator.setDuration(300);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+            @Override public void onAnimationUpdate(ValueAnimator animation) {
+                float position = animation.getAnimatedFraction();
+                if (mAnimateTextColor) {
+                    final int blended = ColorHelper.getBlendColor(mTextColor,
+                            StatusBarColorHelper.getTextColor(mContext), position);
+                    mClock.setTextColor(blended);
+                }
+                if (mAnimateIconColor) {
+                    final int blended = ColorHelper.getBlendColor(mIconColor,
+                            StatusBarColorHelper.getIconColor(mContext), position);
+                    for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
+                        StatusBarIconView v = (StatusBarIconView) mStatusIcons.getChildAt(i);
+                        v.setImageTintList(ColorStateList.valueOf(blended));
+                    }
+                    mSignalCluster.setIconTint(blended, 0, mDarkIntensity, mTintArea);
+                    mBatteryMeterView.setIconColor(blended);
+                    mNotificationIconAreaController.setIconTint(blended);
+                }
+                if (mAnimateBatteryTextColor) {
+                    final int blended = ColorHelper.getBlendColor(mBatteryTextColor,
+                            StatusBarColorHelper.getBatteryTextColor(mContext), position);
+                    mBatteryMeterView.setTextColor(blended);
+                }
+            }
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (mAnimateTextColor) {
+                    mTextColor = StatusBarColorHelper.getTextColor(mContext);
+                    mAnimateTextColor = false;
+                }
+                if (mAnimateIconColor) {
+                    mIconColor = StatusBarColorHelper.getIconColor(mContext);
+                    mAnimateIconColor = false;
+                }
+                if (mAnimateBatteryTextColor) {
+                    mBatteryTextColor = StatusBarColorHelper.getBatteryTextColor(mContext);
+                    mAnimateBatteryTextColor = false;
+                }
+            }
+        });
+        return animator;
+    }
+
+    public void updateTextColor(boolean animate) {
+        mAnimateTextColor = animate;
+        if (!mAnimateBatteryTextColor && !mAnimateIconColor && mAnimateTextColor) {
+            mColorTransitionAnimator.start();
+        }
+        mCarrierTextKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+        mBatteryLevelKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+    }
+
+    public void updateIconColor(boolean animate) {
+        mAnimateIconColor = animate;
+        if (!mAnimateTextColor && !mAnimateBatteryTextColor && mAnimateIconColor) {
+            mColorTransitionAnimator.start();
+        }
+        applyStatusIconKeyguardTint();
+        mSignalClusterKeyguard.setIconTint(StatusBarColorHelper.getIconColor(mContext), 0,
+                mDarkIntensity, new Rect());
+        mBatteryMeterViewKeyguard.setIconColor(StatusBarColorHelper.getIconColor(mContext));
+    }
+
+    public void updateBatteryTextColor(boolean animate) {
+        mAnimateBatteryTextColor = animate;
+        if (!mAnimateTextColor && !mAnimateIconColor && mAnimateBatteryTextColor) {
+            mColorTransitionAnimator.start();
+        }
+        mBatteryMeterViewKeyguard.setTextColor(StatusBarColorHelper.getBatteryTextColor(mContext));
+    }
+
+    private void applyStatusIconKeyguardTint() {
+        for (int i = 0; i < mStatusIconsKeyguard.getChildCount(); i++) {
+            StatusBarIconView v = (StatusBarIconView) mStatusIconsKeyguard.getChildAt(i);
+            v.setImageTintList(ColorStateList.valueOf(StatusBarColorHelper.getIconColor(mContext)));
+        }
     }
 }
