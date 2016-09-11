@@ -103,7 +103,16 @@ public class BatteryMeterView extends ImageView implements
         mDrawable.setBatteryController(mBatteryController);
     }
 
-    public void setDarkIntensity(float f) {
-        mDrawable.setDarkIntensity(f);
+    public void setIconColor(int fillColor) {
+        mDrawable.setIconColor(fillColor);
+    }
+
+    public void setTextColor(int textColor) {
+        mDrawable.setTextColor(textColor);
+    }
+
+    public void setDarkIntensity(float darkIntensity, int fillColor, int fillColorDark,
+            int textColor, int textColorDark) {
+        mDrawable.setDarkIntensity(darkIntensity, fillColor, fillColorDark, textColor, textColorDark);
     }
 }
