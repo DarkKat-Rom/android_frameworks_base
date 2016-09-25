@@ -211,4 +211,8 @@ public class NotificationIconAreaController {
             }
         }
     }
+
+    public void setCenteredClock(boolean centered) {
+        mNotificationIcons.setCenteredClock(centered);
+    }
 }

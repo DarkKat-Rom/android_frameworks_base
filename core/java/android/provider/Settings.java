@@ -3696,6 +3696,69 @@ public final class Settings {
         public static final String DETAILED_WEATHER_CONDITION_ICON = "detailed_weather_condition_icon";
 
         /**
+         * Clock and date position on the status bar
+         * 0: Right clock
+         * 1: Center clock
+         * 2: Hidden clock
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_DATE_POSITION = "status_bar_clock_date_position";
+
+        /**
+         * Show/hide date
+         * 0: Hide
+         * 1: Show
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_SHOW_DATE = "status_bar_show_date";
+
+        /**
+         * Show/hide seconds
+         * 0: Hide
+         * 1: Show
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_SHOW_SECONDS = "status_bar_show_seconds";
+
+        /**
+         * Display style of AM/PM next to clock in status bar
+         * 0: Normal display (Eclair stock)
+         * 1: Small display (Froyo stock)
+         * 2: No display (Gingerbread/ICS stock)
+         * default: 2
+         * @hide
+         */
+        public static final String STATUS_BAR_AM_PM = "status_bar_am_pm";
+
+        /**
+         * Whether to show the date small in status bar
+         * 0: Normal
+         * 1: Small
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_DATE_SIZE = "status_bar_date_size";
+
+        /**
+         * Sets the date string style
+         * 0 - Regular style
+         * 1 - Lowercase
+         * 2 - Uppercase
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_DATE_STYLE = "status_bar_date_style";
+
+        /**
+         * Stores the java DateFormat string for the date
+         * @hide
+         */
+        public static final String STATUS_BAR_DATE_FORMAT = "status_bar_date_format";
+
+        /**
          * Whether to include advanced reboot options in power menu for 
          * quick rebooting, rebooting into recovery and rebooting into bootloader
          * @hide
