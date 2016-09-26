@@ -175,6 +175,14 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     public void setSignalCluster(SignalClusterView signalCluster) {
         mSignalCluster = signalCluster;
+        mSignalCluster.setIconController(this);
+        mSignalCluster.setIconTint(mIconColor, 0, mDarkIntensity, mTintArea);
+    }
+
+    public void setSignalClusterKeyguard(SignalClusterView signalCluster) {
+        mSignalClusterKeyguard = signalCluster;
+        mSignalClusterKeyguard.setIconController(this);
+        mSignalClusterKeyguard.setIconTint(mIconColor, 0, mDarkIntensity, new Rect());
     }
 
     /**

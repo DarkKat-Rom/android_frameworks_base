@@ -1145,8 +1145,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private void inflateSignalClusters() {
         SignalClusterView signalClusterView = reinflateSignalCluster(mStatusBarView);
+        SignalClusterView signalClusterViewKeyguard = reinflateSignalCluster(mKeyguardStatusBar);
         mIconController.setSignalCluster(signalClusterView);
-        reinflateSignalCluster(mKeyguardStatusBar);
+        mIconController.setSignalClusterKeyguard(signalClusterViewKeyguard);
     }
 
     private SignalClusterView reinflateSignalCluster(View view) {
