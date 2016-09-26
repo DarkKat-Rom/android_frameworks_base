@@ -168,6 +168,9 @@
     <!-- shortcut manager -->
     <uses-permission android:name="android.permission.RESET_SHORTCUT_MANAGER_THROTTLING" />
 
+    <!-- Weather -->
+    <uses-permission android:name="net.darkkatroms.weather.READ_WEATHER" />
+
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"

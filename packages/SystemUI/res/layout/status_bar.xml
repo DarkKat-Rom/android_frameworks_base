@@ -47,6 +47,33 @@
         android:orientation="horizontal"
         >
 
+        <com.android.systemui.darkkat.statusbar.StatusBarWeather
+            android:id="@+id/status_bar_weather_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="@dimen/weather_layout_start_padding"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/status_bar_weather_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.StatusBar.Clock"
+                android:singleLine="true"
+                />
+
+            <ImageView
+                android:id="@+id/status_bar_weather_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/status_bar_icon_size"
+                android:paddingTop="@dimen/weather_icon_top_bottom_padding"
+                android:paddingBottom="@dimen/weather_icon_top_bottom_padding"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                />
+        </com.android.systemui.darkkat.statusbar.StatusBarWeather>
+
         <!-- The alpha of this area is controlled from both PhoneStatusBarTransitions and
              PhoneStatusBar (DISABLE_NOTIFICATION_ICONS). -->
         <com.android.systemui.statusbar.AlphaOptimizedFrameLayout
