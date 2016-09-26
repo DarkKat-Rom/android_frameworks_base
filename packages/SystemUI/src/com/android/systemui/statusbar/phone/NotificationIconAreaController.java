@@ -212,6 +212,10 @@ public class NotificationIconAreaController {
         }
     }
 
+    public int getNotificationIconsCount() {
+        return mNotificationIcons.getChildCount();
+    }
+
     public void setCenteredClock(boolean centered) {
         mNotificationIcons.setCenteredClock(centered);
     }
