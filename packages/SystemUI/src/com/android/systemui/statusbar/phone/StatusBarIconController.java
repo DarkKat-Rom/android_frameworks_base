@@ -48,6 +48,7 @@ import com.android.systemui.FontSizeUtils;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.SystemUIFactory;
+import com.android.systemui.darkkat.statusbar.NetworkTraffic;
 import com.android.systemui.darkkat.statusbar.StatusBarWeather;
 import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.SignalClusterView;
@@ -79,6 +80,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     private CarrierText mCarrierTextKeyguard;
     private StatusBarWeather mWeatherLayout;
+    private NetworkTraffic mNetworkTraffic;
+    private NetworkTraffic mNetworkTrafficKeyguard;
     private LinearLayout mSystemIconArea;
     private LinearLayout mStatusIcons;
     private LinearLayout mStatusIconsKeyguard;
@@ -139,6 +142,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mPhoneStatusBar = phoneStatusBar;
         mCarrierTextKeyguard = (CarrierText) keyguardStatusBar.findViewById(R.id.keyguard_carrier_text);
         mWeatherLayout = (StatusBarWeather) statusBar.findViewById(R.id.status_bar_weather_layout);
+        mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.network_traffic);
+        mNetworkTrafficKeyguard = (NetworkTraffic) keyguardStatusBar.findViewById(
+                R.id.keyguard_network_traffic);
         mSystemIconArea = (LinearLayout) statusBar.findViewById(R.id.system_icon_area);
         mStatusIcons = (LinearLayout) statusBar.findViewById(R.id.statusIcons);
         mStatusIconsKeyguard = (LinearLayout) keyguardStatusBar.findViewById(R.id.statusIcons);
@@ -600,6 +606,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private void applyIconTint() {
         mWeatherLayout.setTextColor(getTextTint(mTintArea, mWeatherLayout, mTextColor));
         mWeatherLayout.setIconColor(getTint(mTintArea, mWeatherLayout, mIconColor));
+        mNetworkTraffic.setTextColor(getTextTint(mTintArea, mNetworkTraffic, mTextColor));
+        mNetworkTraffic.setIconColor(getTint(mTintArea, mNetworkTraffic, mIconColor));
         for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
             StatusBarIconView v = (StatusBarIconView) mStatusIcons.getChildAt(i);
             v.setImageTintList(ColorStateList.valueOf(getTint(mTintArea, v, mIconColor)));
@@ -671,6 +679,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         loadDimens();
         mWeatherLayout.onDensityOrFontScaleChanged();
         mNotificationIconAreaController.onDensityOrFontScaleChanged(mContext);
+        mNetworkTraffic.onDensityOrFontScaleChanged();
+        mNetworkTrafficKeyguard.onDensityOrFontScaleChanged();
         updateClock();
         for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
             View child = mStatusIcons.getChildAt(i);
@@ -718,6 +728,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                     final int blended = ColorHelper.getBlendColor(mTextColor,
                             StatusBarColorHelper.getTextColor(mContext), position);
                     mWeatherLayout.setTextColor(blended);
+                    mNetworkTraffic.setTextColor(blended);
                     if (mClockStyle == CLOCK_STYLE_DEFAULT) {
                         mClockDefault.setTextColor(blended);
                     }
@@ -729,6 +740,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                     final int blended = ColorHelper.getBlendColor(mIconColor,
                             StatusBarColorHelper.getIconColor(mContext), position);
                     mWeatherLayout.setIconColor(blended);
+                    mNetworkTraffic.setIconColor(blended);
                     for (int i = 0; i < mStatusIcons.getChildCount(); i++) {
                         StatusBarIconView v = (StatusBarIconView) mStatusIcons.getChildAt(i);
                         v.setImageTintList(ColorStateList.valueOf(blended));
@@ -776,6 +788,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
             mClockDefault.setTextColor(StatusBarColorHelper.getTextColor(mContext));
         }
         mCarrierTextKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+        mNetworkTrafficKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
         mBatteryLevelKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
     }
 
@@ -787,6 +800,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         applyStatusIconKeyguardTint();
         mSignalClusterKeyguard.setIconTint(StatusBarColorHelper.getIconColor(mContext), 0,
                 mDarkIntensity, new Rect());
+        mNetworkTrafficKeyguard.setIconColor(StatusBarColorHelper.getIconColor(mContext));
         mBatteryMeterViewKeyguard.setIconColor(StatusBarColorHelper.getIconColor(mContext));
     }
 
@@ -816,6 +830,34 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     public void updateWeatherType(int type) {
         mWeatherLayout.setType(type);
+    }
+
+    public void updateShowNetworkTraffic(boolean show) {
+        mNetworkTraffic.setShow(show);
+    }
+
+    public void updateShowNetworkTrafficOnKeyguard(boolean show) {
+        mNetworkTrafficKeyguard.setShow(show);
+    }
+
+    public void updateNetworkTrafficActivity(int activity) {
+        mNetworkTraffic.setActivity(activity);
+        mNetworkTrafficKeyguard.setActivity(activity);
+    }
+
+    public void updateNetworkTrafficType(int type) {
+        mNetworkTraffic.setType(type);
+        mNetworkTrafficKeyguard.setType(type);
+    }
+
+    public void updateNetworkTrafficIsBit(boolean isBit) {
+        mNetworkTraffic.setIsBit(isBit);
+        mNetworkTrafficKeyguard.setIsBit(isBit);
+    }
+
+    public void updateNetworkTrafficHideTraffic(boolean hide, int threshold, boolean iconAsIndicator) {
+        mNetworkTraffic.setHide(hide, threshold, iconAsIndicator);
+        mNetworkTrafficKeyguard.setHide(hide, threshold, iconAsIndicator);
     }
 
     public void updateClockStyle(int clockStyle) {

@@ -64,6 +64,31 @@
             android:importantForAccessibility="noHideDescendants"/>
     </LinearLayout>
 
+    <com.android.systemui.darkkat.statusbar.NetworkTraffic
+        android:id="@+id/keyguard_network_traffic"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/system_icons_super_container"
+        android:gravity="center_vertical"
+        systemui:isOnKeyguard="true">
+
+        <TextView
+            android:id="@+id/network_traffic_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/network_traffic_text_end_margin"
+            android:singleLine="false"
+            android:gravity="end"
+            />
+
+        <ImageView
+            android:id="@+id/network_traffic_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            />
+    </com.android.systemui.darkkat.statusbar.NetworkTraffic>
+
     <com.android.keyguard.CarrierText
         android:id="@+id/keyguard_carrier_text"
         android:layout_width="match_parent"

@@ -141,6 +141,8 @@ import com.android.systemui.R;
 import com.android.systemui.SystemUIFactory;
 import com.android.systemui.classifier.FalsingLog;
 import com.android.systemui.classifier.FalsingManager;
+import com.android.systemui.darkkat.NetworkTrafficControllerImpl;
+import com.android.systemui.darkkat.statusbar.NetworkTraffic;
 import com.android.systemui.darkkat.statusbar.StatusBarWeather;
 import com.android.systemui.doze.DozeHost;
 import com.android.systemui.doze.DozeLog;
@@ -309,6 +311,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     protected BatteryController mBatteryController;
     LocationControllerImpl mLocationController;
     NetworkControllerImpl mNetworkController;
+    NetworkTrafficControllerImpl mNetworkTrafficController;
     HotspotControllerImpl mHotspotController;
     RotationLockControllerImpl mRotationLockController;
     UserInfoController mUserInfoController;
@@ -494,6 +497,30 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_WEATHER_NUMBER_OF_NOTIFICATION_ICONS),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW_ON_LOCK_SCREEN),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ACTIVITY),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_TYPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_BIT_BYTE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_HIDE_TRAFFIC),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_THRESHOLD),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ICON_AS_INDICATOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CLOCK_DATE_POSITION),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -540,6 +567,28 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_TYPE))) {
                 updateWeatherType();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW))) {
+                updateShowNetworkTraffic();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW_ON_LOCK_SCREEN))) {
+                updateShowNetworkTrafficOnKeyguard();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ACTIVITY))) {
+                updateNetworkTrafficActivity();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_TYPE))) {
+                updateNetworkTrafficType();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_BIT_BYTE))) {
+                updateNetworkTrafficIsBit();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_HIDE_TRAFFIC))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_THRESHOLD))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ICON_AS_INDICATOR))) {
+                updateNetworkTrafficHideTraffic();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CLOCK_DATE_POSITION))) {
                 updateClockStyle();
@@ -591,6 +640,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private ImageView mBackdropFront, mBackdropBack;
     private PorterDuffXfermode mSrcXferMode = new PorterDuffXfermode(PorterDuff.Mode.SRC);
     private PorterDuffXfermode mSrcOverXferMode = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
+
+    private boolean mScreenOn;
 
     private MediaSessionManager mMediaSessionManager;
     private MediaController mMediaController;
@@ -1001,6 +1052,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         ((StatusBarWeather) mStatusBarView.findViewById(R.id.status_bar_weather_layout))
                 .setWeatherController(new WeatherServiceControllerImpl(mContext));
+
+        mNetworkTrafficController = new NetworkTrafficControllerImpl(mContext);
+        ((NetworkTraffic) mStatusBarView.findViewById(R.id.network_traffic))
+                .setNetworkTrafficController(mNetworkTrafficController);
+        mKeyguardStatusBar.setNetworkTrafficController(mNetworkTrafficController);
 
         // Set up the quick settings tile panel
         AutoReinflateContainer container = (AutoReinflateContainer) mStatusBarWindow.findViewById(
@@ -2442,6 +2498,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateStatusBarBatteryTextColor(false);
         updateWeatherVisibility();
         updateWeatherType();
+        updateShowNetworkTraffic();
+        updateShowNetworkTrafficOnKeyguard();
+        updateNetworkTrafficActivity();
+        updateNetworkTrafficType();
+        updateNetworkTrafficIsBit();
+        updateNetworkTrafficHideTraffic();
         updateClockStyle();
         updateClockSettings();
     }
@@ -2490,6 +2552,63 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
+    private void updateShowNetworkTraffic() {
+        final boolean show = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW, 0) == 1;
+
+        if (mIconController != null) {
+            mIconController.updateShowNetworkTraffic(show);
+        }
+    }
+
+    private void updateShowNetworkTrafficOnKeyguard() {
+        final boolean show = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_SHOW_ON_LOCK_SCREEN, 0) == 1;
+
+        if (mIconController != null) {
+            mIconController.updateShowNetworkTrafficOnKeyguard(show);
+        }
+    }
+
+    private void updateNetworkTrafficActivity() {
+        final int activity = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ACTIVITY, 2);
+
+        if (mIconController != null) {
+            mIconController.updateNetworkTrafficActivity(activity);
+        }
+    }
+
+    private void updateNetworkTrafficType() {
+        final int type = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_TYPE, 2);
+
+        if (mIconController != null) {
+            mIconController.updateNetworkTrafficType(type);
+        }
+    }
+
+    private void updateNetworkTrafficIsBit() {
+        final boolean isBit = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_BIT_BYTE, 0) == 1;
+
+        if (mIconController != null) {
+            mIconController.updateNetworkTrafficIsBit(isBit);
+        }
+    }
+
+    private void updateNetworkTrafficHideTraffic() {
+        final boolean hide = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_HIDE_TRAFFIC, 1) == 1;
+        final int threshold = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_THRESHOLD, 0);
+        final boolean iconAsIndicator = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NETWORK_TRAFFIC_ICON_AS_INDICATOR, 1) == 1;
+
+        if (mIconController != null) {
+            mIconController.updateNetworkTrafficHideTraffic(hide, threshold, iconAsIndicator);
+        }
+    }
 
     private void updateClockStyle() {
         ContentResolver resolver = mContext.getContentResolver();
@@ -3719,12 +3838,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 }
             }
             else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                mScreenOn = false;
+                if (mNetworkTrafficController != null) {
+                    mNetworkTrafficController.setScreenState(mScreenOn);
+                }
                 notifyNavigationBarScreenOn(false);
                 notifyHeadsUpScreenOff();
                 finishBarAnimations();
                 resetUserExpandedStates();
             }
             else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                mScreenOn = true;
+                if (mNetworkTrafficController != null) {
+                    mNetworkTrafficController.setScreenState(mScreenOn);
+                }
                 notifyNavigationBarScreenOn(true);
             }
         }
