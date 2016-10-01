@@ -541,6 +541,19 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_DATE_FORMAT),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
+
 
         }
 
@@ -605,6 +618,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_DATE_FORMAT))) {
                 updateClockSettings();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_PORTRAIT))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_PORTRAIT))) {
+                updateQSRowsColumnsPortrait();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_LANDSCAPE))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_LANDSCAPE))) {
+                updateQSRowsColumnsLandscape();
             }
         }
     }
@@ -2634,6 +2657,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     mIconController.updateNotificationIcons(mNotificationData);
                 }
             }
+        }
+    }
+
+    private void updateQSRowsColumnsPortrait() {
+        Resources res = mContext.getResources();
+        if (res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            updateResources();
+        }
+    }
+
+    private void updateQSRowsColumnsLandscape() {
+        Resources res = mContext.getResources();
+        if (res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            updateResources();
         }
     }
 
