@@ -3611,13 +3611,15 @@ public final class Settings {
          * Wether to customize the detailed weather view colors
          * @hide
          */
-        public static final String DETAILED_WEATHER_CUSTOMIZE_COLORS = "detailed_weather_customize_colors";
+        public static final String DETAILED_WEATHER_CUSTOMIZE_COLORS =
+                "detailed_weather_customize_colors";
 
         /**
          * Detailed weather view status bar background color
          * @hide
          */
-        public static final String DETAILED_WEATHER_STATUS_BAR_BG_COLOR = "detailed_weather_status_bar_bg_color";
+        public static final String DETAILED_WEATHER_STATUS_BAR_BG_COLOR =
+                "detailed_weather_status_bar_bg_color";
 
         /**
          * Detailed weather view accent color
@@ -3629,13 +3631,15 @@ public final class Settings {
          * Detailed weather view action bar background color
          * @hide
          */
-        public static final String DETAILED_WEATHER_ACTION_BAR_BG_COLOR = "detailed_weather_action_bar_bg_color";
+        public static final String DETAILED_WEATHER_ACTION_BAR_BG_COLOR =
+                "detailed_weather_action_bar_bg_color";
 
         /**
          * Detailed weather view content background color
          * @hide
          */
-        public static final String DETAILED_WEATHER_CONTENT_BG_COLOR = "detailed_weather_content_bg_color";
+        public static final String DETAILED_WEATHER_CONTENT_BG_COLOR =
+                "detailed_weather_content_bg_color";
 
         /**
          * Detailed weather view cards background color
@@ -3647,37 +3651,43 @@ public final class Settings {
          * Detailed weather view action bar text color
          * @hide
          */
-        public static final String DETAILED_WEATHER_ACTION_BAR_TEXT_COLOR = "detailed_weather_action_bar_text_color";
+        public static final String DETAILED_WEATHER_ACTION_BAR_TEXT_COLOR =
+                "detailed_weather_action_bar_text_color";
 
         /**
          * Detailed weather view cards text color
          * @hide
          */
-        public static final String DETAILED_WEATHER_CARDS_TEXT_COLOR = "detailed_weather_cards_text_color";
+        public static final String DETAILED_WEATHER_CARDS_TEXT_COLOR =
+                "detailed_weather_cards_text_color";
 
         /**
          * Detailed weather view action bar icon color
          * @hide
          */
-        public static final String DETAILED_WEATHER_ACTION_BAR_ICON_COLOR = "detailed_weather_action_bar_icon_color";
+        public static final String DETAILED_WEATHER_ACTION_BAR_ICON_COLOR =
+                "detailed_weather_action_bar_icon_color";
 
         /**
          * Detailed weather view cards icon color
          * @hide
          */
-        public static final String DETAILED_WEATHER_CARDS_ICON_COLOR = "detailed_weather_cards_icon_color";
+        public static final String DETAILED_WEATHER_CARDS_ICON_COLOR =
+                "detailed_weather_cards_icon_color";
 
         /**
          * Detailed weather view action bar ripple color
          * @hide
          */
-        public static final String DETAILED_WEATHER_ACTION_BAR_RIPPLE_COLOR = "detailed_weather_action_bar_ripple_color";
+        public static final String DETAILED_WEATHER_ACTION_BAR_RIPPLE_COLOR =
+                "detailed_weather_action_bar_ripple_color";
 
         /**
          * Detailed weather view cards ripple color
          * @hide
          */
-        public static final String DETAILED_WEATHER_CARDS_RIPPLE_COLOR = "detailed_weather_cards_ripple_color";
+        public static final String DETAILED_WEATHER_CARDS_RIPPLE_COLOR =
+                "detailed_weather_cards_ripple_color";
 
         /**
          * Wether to show the location in the detailed weather view
@@ -3729,7 +3739,8 @@ public final class Settings {
          * default: 1
          * @hide
          */
-        public static final String STATUS_BAR_WEATHER_NUMBER_OF_NOTIFICATION_ICONS = "status_bar_weather_number_of_notification_icons";
+        public static final String STATUS_BAR_WEATHER_NUMBER_OF_NOTIFICATION_ICONS =
+                "status_bar_weather_number_of_notification_icons";
 
         /**
          *  Whether to show the Network traffic on the status bar
