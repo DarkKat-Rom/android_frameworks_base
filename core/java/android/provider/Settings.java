@@ -3880,6 +3880,15 @@ public final class Settings {
         public static final String STATUS_BAR_DATE_FORMAT = "status_bar_date_format";
 
         /**
+         * Show/hide the ticker
+         * 0: Hide
+         * 1: Show
+         * default: 0
+         * @hide
+         */
+        public static final String STATUS_BAR_SHOW_TICKER = "status_bar_show_ticker";
+
+        /**
          * Number of rows used for the Quick Settings (portrait)
          *
          * @hide

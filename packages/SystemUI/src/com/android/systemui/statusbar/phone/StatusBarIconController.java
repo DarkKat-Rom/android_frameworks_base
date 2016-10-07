@@ -30,12 +30,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -75,9 +80,11 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private static final int CLOCK_STYLE_HIDDEN   = 2;
 
     private Context mContext;
+    private View mStatusBar;
     private PhoneStatusBar mPhoneStatusBar;
     private DemoStatusIcons mDemoStatusIcons;
 
+    private LinearLayout mStatusBarContents;
     private CarrierText mCarrierTextKeyguard;
     private StatusBarWeather mWeatherLayout;
     private NetworkTraffic mNetworkTraffic;
@@ -93,6 +100,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private Clock mClockDefault;
     private Clock mClockCentered;
     private LinearLayout mCenterClockLayout;
+    private View mTickerLayout;
+    private Ticker mTicker;
 
     private NotificationIconAreaController mNotificationIconAreaController;
     private View mNotificationIconAreaInner;
@@ -125,6 +134,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     private long mTransitionDeferringStartTime;
     private long mTransitionDeferringDuration;
 
+    private boolean mShowTicker = false;
+    private boolean mTicking;
+
     private final ArraySet<String> mIconBlacklist = new ArraySet<>();
 
     private final Runnable mTransitionDeferringDoneRunnable = new Runnable() {
@@ -139,7 +151,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         super(context.getResources().getStringArray(
                 com.android.internal.R.array.config_statusBarIcons));
         mContext = context;
+        mStatusBar = statusBar;
         mPhoneStatusBar = phoneStatusBar;
+        mStatusBarContents = (LinearLayout) statusBar.findViewById(R.id.status_bar_contents);
         mCarrierTextKeyguard = (CarrierText) keyguardStatusBar.findViewById(R.id.keyguard_carrier_text);
         mWeatherLayout = (StatusBarWeather) statusBar.findViewById(R.id.status_bar_weather_layout);
         mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.network_traffic);
@@ -587,7 +601,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
      *         otherwise
      */
     private static boolean isInArea(Rect area, View view) {
-        if (area.isEmpty()) {
+        if (area.isEmpty() || view == null) {
             return true;
         }
         sTmpRect.set(area);
@@ -627,6 +641,11 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                         : StatusBarColorHelper.getBatteryTextColor(mContext));
         mClockDefault.setTextColor(getTextTint(mTintArea, mClockDefault, mTextColor));
         mClockCentered.setTextColor(getTextTint(mTintArea, mClockCentered, mTextColor));
+        if (mTicker != null && mTickerLayout != null) {
+            mTicker.setTextColor(getTextTint(mTintArea, getTickerTextView(), mTextColor));
+            mTicker.setIconColorTint(ColorStateList.valueOf(getTint(
+                    mTintArea, getTickerIconView(), mIconColor)));
+        }
     }
 
     public void appTransitionPending() {
@@ -696,6 +715,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
             child.setLayoutParams(lp);
         }
         scaleBatteryMeterViews(mContext);
+        inflateTickerLayout();
     }
 
     private void updateClock() {
@@ -776,6 +796,22 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         return animator;
     }
 
+    private View getTickerTextView() {
+        if (mTickerLayout != null) {
+            return mTickerLayout.findViewById(R.id.tickerText);
+        } else {
+            return null;
+        }
+    }
+
+    private View getTickerIconView() {
+        if (mTickerLayout != null) {
+            return mTickerLayout.findViewById(R.id.tickerIcon);
+        } else {
+            return null;
+        }
+    }
+
     public void updateTextColor(boolean animate) {
         mAnimateTextColor = animate;
         if (!mAnimateBatteryTextColor && !mAnimateIconColor && mAnimateTextColor) {
@@ -790,6 +826,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mCarrierTextKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
         mNetworkTrafficKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
         mBatteryLevelKeyguard.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+        if (mTicker != null && mTickerLayout != null) {
+            mTicker.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+        }
     }
 
     public void updateIconColor(boolean animate) {
@@ -802,6 +841,9 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                 mDarkIntensity, new Rect());
         mNetworkTrafficKeyguard.setIconColor(StatusBarColorHelper.getIconColor(mContext));
         mBatteryMeterViewKeyguard.setIconColor(StatusBarColorHelper.getIconColor(mContext));
+        if (mTicker != null && mTickerLayout != null) {
+            mTicker.setIconColorTint(ColorStateList.valueOf(StatusBarColorHelper.getIconColor(mContext)));
+        }
     }
 
     public void updateBatteryTextColor(boolean animate) {
@@ -886,5 +928,124 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     public void updateClockSettings() {
         mClockDefault.updateSettings();
         mClockCentered.updateSettings();
+    }
+
+    public void updateShowTicker(boolean show) {
+        mShowTicker = show;
+        if (mShowTicker && (mTicker == null || mTickerLayout == null)) {
+            inflateTickerLayout();
+        }
+    }
+
+    private void inflateTickerLayout() {
+        if (mTickerLayout != null) {
+            if (mTicker!= null) {
+                mTicker = null;
+            }
+            ((ViewGroup) mStatusBar).removeView(mTickerLayout);
+            mTickerLayout = null;
+        }
+        LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mTickerLayout = inflater.inflate(R.layout.status_bar_ticker, null);
+        ((ViewGroup) mStatusBar).addView(mTickerLayout);
+        mTicker = new MyTicker(mContext, mTickerLayout);
+
+        TickerText tickerText = (TickerText) mTickerLayout.findViewById(R.id.tickerText);
+        tickerText.mTicker = mTicker;
+        mTicker.setTextColor(StatusBarColorHelper.getTextColor(mContext));
+        mTicker.setIconColorTint(ColorStateList.valueOf(StatusBarColorHelper.getIconColor(mContext)));
+    }
+
+    public void addTickerEntry(StatusBarNotification n) {
+        mTicker.addEntry(n);
+    }
+
+    public void removeTickerEntry(StatusBarNotification n) {
+        mTicker.removeEntry(n);
+    }
+
+    public void haltTicker() {
+        if (mTicking) {
+            mTicker.halt();
+        }
+    }
+
+    private class MyTicker extends Ticker {
+        MyTicker(Context context, View sb) {
+            super(context, sb);
+        }
+
+        @Override
+        public void tickerStarting() {
+            if (!mShowTicker) return;
+            mTicking = true;
+            mStatusBarContents.setVisibility(View.GONE);
+            if (mClockStyle == CLOCK_STYLE_CENTERED) {
+                mCenterClockLayout.setVisibility(View.GONE);
+            }
+            mTickerLayout.setVisibility(View.VISIBLE);
+            mTickerLayout.startAnimation(loadAnim(com.android.internal.R.anim.push_up_in, null));
+            mStatusBarContents.startAnimation(loadAnim(com.android.internal.R.anim.push_up_out, null));
+            if (mClockStyle == CLOCK_STYLE_CENTERED) {
+                mCenterClockLayout.startAnimation(loadAnim(com.android.internal.R.anim.push_up_out, null));
+            }
+        }
+
+        @Override
+        public void tickerDone() {
+            if (!mShowTicker) return;
+
+            mStatusBarContents.setVisibility(View.VISIBLE);
+            if (mClockStyle == CLOCK_STYLE_CENTERED) {
+                mCenterClockLayout.setVisibility(View.VISIBLE);
+            }
+            mTickerLayout.setVisibility(View.GONE);
+            mStatusBarContents.startAnimation(loadAnim(com.android.internal.R.anim.push_down_in, null));
+            if (mClockStyle == CLOCK_STYLE_CENTERED) {
+                mCenterClockLayout.startAnimation(loadAnim(com.android.internal.R.anim.push_down_in, null));
+            }
+            mTickerLayout.startAnimation(loadAnim(com.android.internal.R.anim.push_down_out,
+                        mTickingDoneListener));
+        }
+
+        public void tickerHalting() {
+            if (!mShowTicker) return;
+
+            if (mStatusBarContents.getVisibility() != View.VISIBLE) {
+                mStatusBarContents.setVisibility(View.VISIBLE);
+                mStatusBarContents
+                        .startAnimation(loadAnim(com.android.internal.R.anim.fade_in, null));
+            }
+            if (mClockStyle == CLOCK_STYLE_CENTERED) {
+                if (mCenterClockLayout.getVisibility() != View.VISIBLE) {
+                    mCenterClockLayout.setVisibility(View.VISIBLE);
+                    mStatusBarContents
+                            .startAnimation(loadAnim(com.android.internal.R.anim.fade_in, null));
+                }
+            }
+
+            mTickerLayout.setVisibility(View.GONE);
+            // we do not animate the ticker away at this point, just get rid of it (b/6992707)
+
+        }
+    }
+
+    Animation.AnimationListener mTickingDoneListener = new Animation.AnimationListener() {;
+        public void onAnimationEnd(Animation animation) {
+            mTicking = false;
+        }
+        public void onAnimationRepeat(Animation animation) {
+        }
+        public void onAnimationStart(Animation animation) {
+        }
+    };
+
+    private Animation loadAnim(int id, Animation.AnimationListener listener) {
+        Animation anim = AnimationUtils.loadAnimation(mContext, id);
+        if (listener != null) {
+            anim.setAnimationListener(listener);
+        }
+        return anim;
     }
 }
