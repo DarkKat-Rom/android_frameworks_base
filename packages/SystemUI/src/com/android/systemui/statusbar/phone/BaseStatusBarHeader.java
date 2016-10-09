@@ -46,4 +46,7 @@ public abstract class BaseStatusBarHeader extends RelativeLayout implements
     public abstract void setNextAlarmController(NextAlarmController nextAlarmController);
     public abstract void setUserInfoController(UserInfoController userInfoController);
     public abstract void setCallback(Callback qsPanelCallback);
+    public abstract void setTextColor();
+    public abstract void setIconColor();
+    public abstract void setRippleColor();
 }

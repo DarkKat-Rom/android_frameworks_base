@@ -19,6 +19,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -29,6 +30,8 @@ import android.support.v7.widget.RecyclerView.ItemDecoration;
 import android.support.v7.widget.RecyclerView.State;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +44,7 @@ import android.widget.TextView;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.qs.QSIconView;
 import com.android.systemui.qs.customize.TileAdapter.Holder;
 import com.android.systemui.qs.customize.TileQueryHelper.TileInfo;
@@ -71,7 +75,7 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
     private final Handler mHandler = new Handler();
     private final List<TileInfo> mTiles = new ArrayList<>();
     private final ItemTouchHelper mItemTouchHelper;
-    private final ItemDecoration mDecoration;
+    private final TileItemDecoration mDecoration;
     private final AccessibilityManager mAccessibilityManager;
     private int mEditIndex;
     private int mTileDividerIndex;
@@ -84,13 +88,12 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
     private boolean mAccessibilityMoving;
     private int mAccessibilityFromIndex;
     private QSTileHost mHost;
-    private final QSItemDecoration mDecoration;
 
     public TileAdapter(Context context) {
         mContext = context;
         mAccessibilityManager = context.getSystemService(AccessibilityManager.class);
         mItemTouchHelper = new ItemTouchHelper(mCallbacks);
-        mDecoration = new TileItemDecoration(context);
+        mDecoration = new TileItemDecoration(mContext);
     }
 
     public void setHost(QSTileHost host) {
@@ -103,6 +106,12 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
 
     public ItemDecoration getItemDecoration() {
         return mDecoration;
+    }
+
+    public void updateDecorationBgColor(ColorStateList color) {
+        if (mDecoration != null) {
+            mDecoration.setBackgroundColor(color);
+        }
     }
 
     public void saveSpecs(QSTileHost host) {
@@ -210,12 +219,15 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
         if (holder.getItemViewType() == TYPE_DIVIDER) {
             holder.itemView.setVisibility(mTileDividerIndex < mTiles.size() - 1 ? View.VISIBLE
                     : View.INVISIBLE);
+            holder.itemView.setBackgroundTintList(QSColorHelper.getIconTintList(mContext));
             return;
         }
         if (holder.getItemViewType() == TYPE_EDIT) {
             ((TextView) holder.itemView.findViewById(android.R.id.title)).setText(
                     mCurrentDrag != null ? R.string.drag_to_remove_tiles
                     : R.string.drag_to_add_tiles);
+            ((TextView) holder.itemView.findViewById(android.R.id.title)).setTextColor(
+                    QSColorHelper.getAccentColor(mContext));
             return;
         }
         if (holder.getItemViewType() == TYPE_ACCESSIBLE_DROP) {
@@ -262,6 +274,11 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
                     R.string.accessibility_qs_edit_tile_label, position + 1, info.state.label);
         }
         holder.mTileView.onStateChanged(info.state);
+        if (info.appLabel != null) {
+            info.appLabel = new SpannableStringBuilder().append(info.appLabel,
+                    new ForegroundColorSpan(getTextColor(info.state.disabledByPolicy)),
+                    SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE);
+        }
         holder.mTileView.setAppLabel(info.appLabel);
         holder.mTileView.setShowAppLabel(position > mEditIndex && !info.isSystem);
 
@@ -410,6 +427,14 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
         notifyItemMoved(from, to);
     }
 
+    private int getTextColor(boolean disabled) {
+        if (disabled) {
+            return QSColorHelper.getTextDisabledColor(mContext);
+        } else {
+            return QSColorHelper.getTextColorSecondary(mContext);
+        }
+    }
+
     public class Holder extends ViewHolder {
         private CustomizeTileView mTileView;
 
@@ -496,6 +521,10 @@ public class TileAdapter extends RecyclerView.Adapter<Holder> implements TileSta
                 mDrawable.draw(c);
                 break;
             }
+        }
+
+        public void setBackgroundColor(ColorStateList color) {
+            mDrawable.setTintList(color);
         }
     }
 

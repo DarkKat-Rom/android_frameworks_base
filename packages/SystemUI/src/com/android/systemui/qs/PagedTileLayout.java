@@ -246,6 +246,10 @@ public class PagedTileLayout extends ViewPager implements QSTileLayout {
                 + (mDecorGroup.getVisibility() != View.GONE ? mDecorGroup.getMeasuredHeight() : 0));
     }
 
+    public void setIconColor() {
+        mPageIndicator.setIconColor();
+    }
+
     private final Runnable mDistribute = new Runnable() {
         @Override
         public void run() {

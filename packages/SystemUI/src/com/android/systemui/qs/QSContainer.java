@@ -19,8 +19,10 @@ package com.android.systemui.qs;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.qs.customize.QSCustomizer;
 import com.android.systemui.statusbar.phone.BaseStatusBarHeader;
 import com.android.systemui.statusbar.phone.NotificationPanelView;
@@ -50,6 +53,7 @@ public class QSContainer extends FrameLayout {
     protected QSPanel mQSPanel;
     private QSDetail mQSDetail;
     protected BaseStatusBarHeader mHeader;
+    private QuickQSPanel mQuickQSPanel;
     protected float mQsExpansion;
     private boolean mQsExpanded;
     private boolean mHeaderAnimating;
@@ -72,9 +76,9 @@ public class QSContainer extends FrameLayout {
         mQSPanel = (QSPanel) findViewById(R.id.quick_settings_panel);
         mQSDetail = (QSDetail) findViewById(R.id.qs_detail);
         mHeader = (BaseStatusBarHeader) findViewById(R.id.header);
+        mQuickQSPanel = (QuickQSPanel) mHeader.findViewById(R.id.quick_qs_panel);
         mQSDetail.setQsPanel(mQSPanel, mHeader);
-        mQSAnimator = new QSAnimator(this, (QuickQSPanel) mHeader.findViewById(R.id.quick_qs_panel),
-                mQSPanel);
+        mQSAnimator = new QSAnimator(this, mQuickQSPanel, mQSPanel);
         mQSCustomizer = (QSCustomizer) findViewById(R.id.qs_customize);
         mQSCustomizer.setQsContainer(this);
     }
@@ -319,5 +323,49 @@ public class QSContainer extends FrameLayout {
 
     public int getQsMinExpansionHeight() {
         return mHeader.getHeight();
+    }
+
+    public void setPrimaryBgColor(ColorStateList color) {
+        setBackgroundTintList(color);
+        mQSCustomizer.setBackgroundTintList(color);
+        ((TransitionDrawable) mQSDetail.getBackground()).findDrawableByLayerId(
+                R.id.qs_detail_transition_background).setTintList(color);
+        mQSPanel.updateBrightnessThumbBgColor();
+        mQSPanel.updateDndModePanelBgColor();
+    }
+
+    public void updateSecondaryBgColor(ColorStateList color) {
+        mQSCustomizer.updateDecorationBgColor(color);
+    }
+
+    public void updateAccentColor() {
+        mQSPanel.updateAccentColor();
+        mQSDetail.setAccentColor();
+    }
+
+    public void updateTextColor() {
+        mQSPanel.updateTextColor();
+        mHeader.setTextColor();
+        mQuickQSPanel.updateTextColor();
+        mQSDetail.setTextColor();
+        mQSCustomizer.setActionBarTextColor();
+    }
+
+    public void updateIconColor() {
+        ((TransitionDrawable) mQSDetail.getBackground()).findDrawableByLayerId(
+                R.id.qs_detail_transition_color).setTintList(QSColorHelper.getIconTintList(mContext));
+        mQSPanel.updateIconColor();
+        mHeader.setIconColor();
+        mQSDetail.setIconColor();
+        mQuickQSPanel.updateIconColor();
+        mQSCustomizer.setActionBarIconColor();
+    }
+
+    public void updateRippleColor() {
+        mQSPanel.updateRippleColor();
+        mHeader.setRippleColor();
+        mQSDetail.setRippleColor();
+        mQuickQSPanel.updateRippleColor();
+        mQSCustomizer.setActionBarRippleColor();
     }
 }

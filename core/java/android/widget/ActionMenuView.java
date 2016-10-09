@@ -19,8 +19,10 @@ import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.StyleRes;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
@@ -562,6 +564,16 @@ public class ActionMenuView extends LinearLayout implements MenuBuilder.ItemInvo
         return mPresenter.getOverflowIcon();
     }
 
+    /**
+     * Return the current overflow button.
+     * @hide
+     */
+    @Nullable
+    public View getOverflowButton() {
+        getMenu();
+        return mPresenter.getOverflowButton();
+    }
+
     /** @hide */
     public boolean isOverflowReserved() {
         return mReserveOverflow;
@@ -648,6 +660,26 @@ public class ActionMenuView extends LinearLayout implements MenuBuilder.ItemInvo
         }
 
         return mMenu;
+    }
+
+    /** @hide */
+    public void setMenuItemIconTintList(ColorStateList color) {
+        for (int i = 0; i < getChildCount(); i++) {
+            if (getChildAt(i) instanceof TextView) {
+                ((TextView) getChildAt(i)).setCompoundDrawableTintList(color);
+            }
+        }
+    }
+
+    /** @hide */
+    public void setMenuItemRippleColor(ColorStateList color) {
+        for (int i = 0; i < getChildCount(); i++) {
+            if (getChildAt(i) instanceof TextView) {
+                if (getChildAt(i).getBackground() instanceof RippleDrawable) {
+                    ((RippleDrawable) getChildAt(i).getBackground().mutate()).setColor(color);
+                }
+            }
+        }
     }
 
     /**

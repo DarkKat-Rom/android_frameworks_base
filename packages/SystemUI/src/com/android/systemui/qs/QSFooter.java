@@ -31,6 +31,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.systemui.darkkat.util.QSColorHelper;
+
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -61,13 +63,15 @@ public class QSFooter implements OnClickListener, DialogInterface.OnClickListene
     private int mFooterIconId;
 
     public QSFooter(QSPanel qsPanel, Context context) {
+        mContext = context;
         mRootView = LayoutInflater.from(context)
                 .inflate(R.layout.quick_settings_footer, qsPanel, false);
         mRootView.setOnClickListener(this);
         mFooterText = (TextView) mRootView.findViewById(R.id.footer_text);
+        mFooterText.setTextColor(QSColorHelper.getLabelTintList(mContext));
         mFooterIcon = (ImageView) mRootView.findViewById(R.id.footer_icon);
         mFooterIconId = R.drawable.ic_qs_vpn;
-        mContext = context;
+        mFooterIcon.setImageTintList(QSColorHelper.getIconTintList(mContext));
         mMainHandler = new Handler();
     }
 
@@ -213,6 +217,14 @@ public class QSFooter implements OnClickListener, DialogInterface.OnClickListene
             mFooterIcon.setImageResource(mFooterIconId);
         }
     };
+
+    public void setTextColor() {
+        mFooterText.setTextColor(QSColorHelper.getLabelTintList(mContext));
+    }
+
+    public void setIconColor() {
+        mFooterIcon.setImageTintList(QSColorHelper.getIconTintList(mContext));
+    }
 
     private final Runnable mUpdateDisplayState = new Runnable() {
         @Override

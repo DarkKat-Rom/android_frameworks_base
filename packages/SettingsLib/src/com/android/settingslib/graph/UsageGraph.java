@@ -62,6 +62,7 @@ public class UsageGraph extends View {
     private float mMaxY = 100;
 
     private float mMiddleDividerLoc = .5f;
+    private int mBottomDividerTint = -1;
     private int mMiddleDividerTint = -1;
     private int mTopDividerTint = -1;
 
@@ -109,7 +110,16 @@ public class UsageGraph extends View {
         mMiddleDividerLoc = 1 - height / mMaxY;
     }
 
+    void setDividersColor(int color) {
+        setDividerColors(color, color, color);
+    }
+
     void setDividerColors(int middleColor, int topColor) {
+        setDividerColors(-1, middleColor, topColor);
+    }
+
+    void setDividerColors(int bottomColor, int middleColor, int topColor) {
+        mBottomDividerTint = bottomColor;
         mMiddleDividerTint = middleColor;
         mTopDividerTint = topColor;
     }
@@ -128,6 +138,10 @@ public class UsageGraph extends View {
         mLinePaint.setColor(mAccentColor);
         updateGradient();
         postInvalidate();
+    }
+
+    void setProjectionColor(int color) {
+        mDottedPaint.setColor(color);
     }
 
     void setShowProjection(boolean showProjection, boolean projectUp) {
@@ -205,7 +219,7 @@ public class UsageGraph extends View {
         }
         drawDivider((int) ((canvas.getHeight() - mDividerSize) * mMiddleDividerLoc), canvas,
                 mMiddleDividerTint);
-        drawDivider(canvas.getHeight() - mDividerSize, canvas, -1);
+        drawDivider(canvas.getHeight() - mDividerSize, canvas, mBottomDividerTint);
 
         if (mLocalPaths.size() == 0) {
             return;

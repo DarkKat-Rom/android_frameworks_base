@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import libcore.util.Objects;
 
 /** View that represents a standard quick settings tile. **/
@@ -86,6 +87,7 @@ public class QSTileView extends QSTileBaseView {
     protected void createLabel() {
         View view = LayoutInflater.from(mContext).inflate(R.layout.qs_tile_label, null);
         mLabel = (TextView) view.findViewById(R.id.tile_label);
+        mLabel.setTextColor(QSColorHelper.getLabelTintList(mContext));
         mPadLock = (ImageView) view.findViewById(R.id.restricted_padlock);
         addView(view);
     }
@@ -98,5 +100,10 @@ public class QSTileView extends QSTileBaseView {
         }
         mLabel.setEnabled(!state.disabledByPolicy);
         mPadLock.setVisibility(state.disabledByPolicy ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setTextColor() {
+        mLabel.setTextColor(QSColorHelper.getLabelTintList(mContext));
     }
 }

@@ -3598,6 +3598,60 @@ public final class Settings {
                 "status_bar_battery_text_color_dark_mode";
 
         /**
+         * Wether to use expanded status bar color values from global theme 
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_USE_THEME_COLORS =
+                "status_bar_expanded_use_theme_colors";
+
+        /**
+         * Color of the primary background on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_PRIMARY_BACKGROUND_COLOR =
+                "status_bar_expanded_primary_background_color";
+
+        /**
+         * Color of the secondary background on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_SECONDARY_BACKGROUND_COLOR =
+                "status_bar_expanded_secondary_background_color";
+
+        /**
+         * Color of the accent on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_ACCENT_COLOR =
+                "status_bar_expanded_accent_color";
+
+        /**
+         * Color of the text on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_TEXT_COLOR = "status_bar_expanded_text_color";
+
+        /**
+         * Color of the battery text and charge icon on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR =
+                "status_bar_expanded_battery_text_color";
+
+        /**
+         * Color of the icons on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_ICON_COLOR = "status_bar_expanded_icon_color";
+
+        /**
+         * Color of the ripple effect on the expanded status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_RIPPLE_COLOR =
+                "status_bar_expanded_ripple_color";
+
+        /**
          * Detailed weather view theme
          * 0 = Material
          * 1 = Darkkat

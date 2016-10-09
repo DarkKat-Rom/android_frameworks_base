@@ -367,4 +367,20 @@ public class BrightnessController implements ToggleSlider.Listener {
                     com.android.systemui.R.drawable.ic_qs_brightness_auto_off);
         }
     }
+
+    public void updateBrightnessThumbBgColor() {
+        mControl.setBrightnessThumbBgColor();
+    }
+
+    public void updateAccentColor() {
+        mControl.setAccentColor();
+    }
+
+    public void updateIconColor() {
+        mControl.setIconColor();
+    }
+
+    public void updateRippleColor() {
+        mControl.setRippleColor();
+    }
 }

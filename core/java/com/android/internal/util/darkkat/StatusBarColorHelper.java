@@ -22,44 +22,43 @@ import android.provider.Settings;
 
 public class StatusBarColorHelper {
 
-    private static final int LIGHT_MODE_COLOR_SINGLE_TONE = 0xffffffff;
-    private static final int DARK_MODE_COLOR_SINGLE_TONE  = 0x99000000;
-    private static final int LIGHT_MODE_ALPHA_SINGLE_TONE = 255;
-    private static final int DARK_MODE_ALPHA_SINGLE_TONE  = 153;
-
     public static int getTextColor(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_TEXT_COLOR,  LIGHT_MODE_COLOR_SINGLE_TONE);
-        return (LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_TEXT_COLOR, ColorConstants.LIGHT_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 
     public static int getBatteryTextColor(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR, LIGHT_MODE_COLOR_SINGLE_TONE);
-        return (LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR,
+                ColorConstants.LIGHT_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 
     public static int getIconColor(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_ICON_COLOR, LIGHT_MODE_COLOR_SINGLE_TONE);
-        return (LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_ICON_COLOR, ColorConstants.LIGHT_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.LIGHT_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 
     public static int getTextColorDarkMode(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_TEXT_COLOR_DARK_MODE,  DARK_MODE_COLOR_SINGLE_TONE);
-        return (DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_TEXT_COLOR_DARK_MODE,
+                ColorConstants.DARK_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 
     public static int getBatteryTextColorDarkMode(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE, DARK_MODE_COLOR_SINGLE_TONE);
-        return (DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE,
+                ColorConstants.DARK_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 
     public static int getIconColorDarkMode(Context context) {
         int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUS_BAR_ICON_COLOR_DARK_MODE, DARK_MODE_COLOR_SINGLE_TONE);
-        return (DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
+                Settings.System.STATUS_BAR_ICON_COLOR_DARK_MODE,
+                ColorConstants.DARK_MODE_COLOR_SINGLE_TONE);
+        return (ColorConstants.DARK_MODE_ALPHA_SINGLE_TONE << 24) | (color & 0x00ffffff);
     }
 }

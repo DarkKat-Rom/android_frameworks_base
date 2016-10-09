@@ -25,14 +25,16 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.android.settingslib.Utils;
+
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.R;
 
 public class DataUsageGraph extends View {
 
-    private final int mTrackColor;
-    private final int mUsageColor;
+    private int mTrackColor;
+    private int mUsageColor;
     private final int mOverlimitColor;
-    private final int mWarningColor;
+    private int mWarningColor;
     private final int mMarkerWidth;
     private final RectF mTmpRect = new RectF();
     private final Paint mTmpPaint = new Paint();
@@ -98,5 +100,19 @@ public class DataUsageGraph extends View {
         r.set(warningLeft, 0, warningLeft + mMarkerWidth, h);
         p.setColor(mWarningColor);
         canvas.drawRect(r, p);
+    }
+
+    public void setAccentColor() {
+        mUsageColor = (mUsageColor & 0xff000000)
+                | (QSColorHelper.getAccentColor(mContext));
+        postInvalidate();
+    }
+
+    public void setIconColor() {
+        mTrackColor = (mTrackColor & 0xff000000)
+                | (QSColorHelper.getIconColor(mContext) & 0x00ffffff);
+        mWarningColor = (mWarningColor & 0xff000000)
+                | (QSColorHelper.getIconColor(mContext) & 0x00ffffff);
+        postInvalidate();
     }
 }

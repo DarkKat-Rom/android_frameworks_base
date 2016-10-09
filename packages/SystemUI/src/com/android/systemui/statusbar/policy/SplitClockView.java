@@ -142,4 +142,8 @@ public class SplitClockView extends LinearLayout {
         return hasAmPm ? 0 : -1;
     }
 
+    public void setTextColor(int color) {
+        mTimeView.setTextColor(color);
+        mAmPmView.setTextColor(color);
+    }
 }

@@ -20,6 +20,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
@@ -35,8 +36,11 @@ import android.widget.Toast;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto;
 import com.android.keyguard.KeyguardStatusView;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSPanel.Callback;
 import com.android.systemui.qs.QuickQSPanel;
@@ -45,6 +49,7 @@ import com.android.systemui.qs.TouchAnimator.Builder;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.NextAlarmController.NextAlarmChangeCallback;
+import com.android.systemui.statusbar.policy.SplitClockView;
 import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserInfoController.OnUserInfoChangedListener;
 import com.android.systemui.tuner.TunerService;
@@ -388,5 +393,42 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     @Override
     public void onUserInfoChanged(String name, Drawable picture) {
         mMultiUserAvatar.setImageDrawable(picture);
+    }
+
+    @Override
+    public void setTextColor() {
+        final int color = QSColorHelper.getTextColor(mContext);
+        ((SplitClockView) mDateTimeAlarmGroup.findViewById(R.id.clock)).setTextColor(color);
+        ((TextView) mDateTimeAlarmGroup.findViewById(R.id.date)).setTextColor(color);
+        ((TextView) mDateTimeAlarmGroup.findViewById(R.id.alarm_status)).setTextColor(color);
+        // Seems the text becomes invisible, when calling "setTextColor" directly on "mEmergencyOnly",
+        // or not using a ColorStateList.
+        ((TextView) findViewById(R.id.header_emergency_calls_only)).setTextColor(
+                QSColorHelper.getTextDisabledTintList(mContext));
+    }
+
+    @Override
+    public void setIconColor() {
+        final ColorStateList color = QSColorHelper.getIconTintList(mContext);
+        ((ImageView) mDateTimeAlarmGroup.findViewById(R.id.alarm_status_collapsed)).setImageTintList(color);
+        ((TextView) mDateTimeAlarmGroup.findViewById(R.id.date)).setCompoundDrawableTintList(color);
+        ((TextView) mDateTimeAlarmGroup.findViewById(R.id.alarm_status)).setCompoundDrawableTintList(color);
+        mExpandIndicator.setImageTintList(color);
+        mSettingsButton.setImageTintList(color);
+        ((ImageView) mSettingsContainer.findViewById(R.id.tuner_icon)).setImageTintList(
+                QSColorHelper.getIconTunerTintList(mContext));
+    }
+
+    @Override
+    public void setRippleColor() {
+        mExpandIndicator.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mExpandIndicator.getBackground()));
+        mDateTimeAlarmGroup.findViewById(R.id.alarm_status).setBackground(
+                QSRippleHelper.getColoredRippleDrawable(mContext,
+                mDateTimeAlarmGroup.findViewById(R.id.alarm_status).getBackground()));
+        mMultiUserSwitch.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mMultiUserSwitch.getBackground()));
+        mSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mSettingsButton.getBackground()));
     }
 }

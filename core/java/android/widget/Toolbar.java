@@ -26,6 +26,7 @@ import android.annotation.StyleRes;
 import android.annotation.TestApi;
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
@@ -999,6 +1000,18 @@ public class Toolbar extends ViewGroup {
         return mMenuView.getMenu();
     }
 
+    /** @hide */
+    public void setMenuItemIconTintList(ColorStateList color) {
+        ensureMenuView();
+        mMenuView.setMenuItemIconTintList(color);
+    }
+
+    /** @hide */
+    public void setMenuItemRippleColor(ColorStateList color) {
+        ensureMenuView();
+        mMenuView.setMenuItemRippleColor(color);
+    }
+
     /**
      * Set the icon to use for the overflow button.
      *
@@ -1018,6 +1031,16 @@ public class Toolbar extends ViewGroup {
     public Drawable getOverflowIcon() {
         ensureMenu();
         return mMenuView.getOverflowIcon();
+    }
+
+    /**
+     * Return the current overflow button.
+     * @hide
+     */
+    @Nullable
+    public View getOverflowButton() {
+        ensureMenu();
+        return mMenuView.getOverflowButton();
     }
 
     private void ensureMenu() {
