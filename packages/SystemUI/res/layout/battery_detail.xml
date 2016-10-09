@@ -48,6 +48,7 @@
         android:layout_height="@dimen/battery_detail_graph_space_bottom" />
 
     <View
+        android:id="@+id/battery_usage_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"

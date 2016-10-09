@@ -220,6 +220,26 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
         }
     };
 
+    public void updateDndModePanelBgColor() {
+        mDetailAdapter.updateZenModePanelBgColor();
+    }
+
+    public void updateDeatailAccentColor() {
+        mDetailAdapter.updateZenModePanelAccentColor();
+    }
+
+    public void updateDeatailTextColor() {
+        mDetailAdapter.updateZenModePanelTextColor();
+    }
+
+    public void updateDeatailIconColor() {
+        mDetailAdapter.updateZenModePanelIconColor();
+    }
+
+    public void updateDeatailRippleColor() {
+        mDetailAdapter.updateZenModePanelRippleColor();
+    }
+
     private final ZenModeController.Callback mZenCallback = new ZenModeController.Callback() {
         public void onZenChanged(int zen) {
             refreshState(zen);
@@ -236,6 +256,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
     };
 
     private final class DndDetailAdapter implements DetailAdapter, OnAttachStateChangeListener {
+        private ZenModePanel mZenModePanel = null;
 
         @Override
         public CharSequence getTitle() {
@@ -268,15 +289,20 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
 
         @Override
         public View createDetailView(Context context, View convertView, ViewGroup parent) {
-            final ZenModePanel zmp = convertView != null ? (ZenModePanel) convertView
+            mZenModePanel = convertView != null ? (ZenModePanel) convertView
                     : (ZenModePanel) LayoutInflater.from(context).inflate(
                             R.layout.zen_mode_panel, parent, false);
             if (convertView == null) {
-                zmp.init(mController);
-                zmp.addOnAttachStateChangeListener(this);
-                zmp.setCallback(mZenModePanelCallback);
+                mZenModePanel.init(mController);
+                mZenModePanel.addOnAttachStateChangeListener(this);
+                mZenModePanel.setCallback(mZenModePanelCallback);
+                updateZenModePanelBgColor();
+                updateZenModePanelAccentColor();
+                updateZenModePanelTextColor();
+                updateZenModePanelIconColor();
+                updateZenModePanelRippleColor();
             }
-            return zmp;
+            return mZenModePanel;
         }
 
         @Override
@@ -287,6 +313,36 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
         @Override
         public void onViewDetachedFromWindow(View v) {
             mShowingDetail = false;
+        }
+
+        private void updateZenModePanelBgColor() {
+            if (mZenModePanel != null) {
+                mZenModePanel.setZenModePanelBgColor();
+            }
+        }
+
+        private void updateZenModePanelAccentColor() {
+            if (mZenModePanel != null) {
+                mZenModePanel.setZenModePanelAccentColor();
+            }
+        }
+
+        private void updateZenModePanelTextColor() {
+            if (mZenModePanel != null) {
+                mZenModePanel.setZenModePanelTextColor();
+            }
+        }
+
+        private void updateZenModePanelIconColor() {
+            if (mZenModePanel != null) {
+                mZenModePanel.setZenModePanelIconColor();
+            }
+        }
+
+        private void updateZenModePanelRippleColor() {
+            if (mZenModePanel != null) {
+                mZenModePanel.setZenModePanelRippleColor();
+            }
         }
     }
 

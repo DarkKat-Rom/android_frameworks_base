@@ -302,4 +302,19 @@ public class BrightnessController implements ToggleSlider.Listener {
         }
     }
 
+    public void updateBrightnessThumbBgColor() {
+        mControl.setBrightnessThumbBgColor();
+    }
+
+    public void updateAccentColor() {
+        mControl.setAccentColor();
+    }
+
+    public void updateIconColor() {
+        mControl.setIconColor();
+    }
+
+    public void updateRippleColor() {
+        mControl.setRippleColor();
+    }
 }

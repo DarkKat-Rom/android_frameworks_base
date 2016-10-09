@@ -316,6 +316,11 @@ public class BatteryMeterDrawable extends Drawable implements
         return color;
     }
 
+    @Override
+    public void setTint(int tintColor) {
+        setIconColor(tintColor);
+    }
+
     public void setIconColor(int fillColor) {
         mFrameColor = (mFrameColor & 0xff000000) | (fillColor & 0x00ffffff);
         mIconTint = fillColor;

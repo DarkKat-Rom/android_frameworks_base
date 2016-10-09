@@ -216,6 +216,10 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         return null;
     }
 
+    public View getOverflowButton() {
+        return mOverflowButton;
+    }
+
     @Override
     public MenuView getMenuView(ViewGroup root) {
         MenuView oldMenuView = mMenuView;

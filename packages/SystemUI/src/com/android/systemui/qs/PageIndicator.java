@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.R;
 
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ public class PageIndicator extends ViewGroup {
         while (numPages > getChildCount()) {
             ImageView v = new ImageView(mContext);
             v.setImageResource(R.drawable.minor_a_b);
+            v.setImageTintList(QSColorHelper.getIconTintList(mContext));
             addView(v, new LayoutParams(mPageIndicatorWidth, mPageIndicatorHeight));
         }
         // Refresh state.
@@ -209,6 +212,14 @@ public class PageIndicator extends ViewGroup {
         for (int i = 0; i < N; i++) {
             int left = (mPageIndicatorWidth - mPageDotWidth) * i;
             getChildAt(i).layout(left, 0, mPageIndicatorWidth + left, mPageIndicatorHeight);
+        }
+    }
+
+    public void setIconColor() {
+        final int N = getChildCount();
+        for (int i = 0; i < N; i++) {
+            ImageView v = (ImageView) getChildAt(i);
+            v.setImageTintList(QSColorHelper.getIconTintList(mContext));
         }
     }
 

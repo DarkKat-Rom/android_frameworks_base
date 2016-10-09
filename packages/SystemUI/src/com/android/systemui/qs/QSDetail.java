@@ -35,6 +35,8 @@ import android.widget.TextView;
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.qs.QSTile.DetailAdapter;
 import com.android.systemui.statusbar.phone.BaseStatusBarHeader;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -63,7 +65,7 @@ public class QSDetail extends LinearLayout {
     private boolean mScanState;
     private boolean mClosingDetail;
     private boolean mFullyExpanded;
-    private View mQsDetailHeaderBack;
+    private ImageView mQsDetailHeaderBack;
     private BaseStatusBarHeader mHeader;
     private boolean mTriggeredExpand;
     private int mOpenX;
@@ -92,7 +94,7 @@ public class QSDetail extends LinearLayout {
         mDetailDoneButton = (TextView) findViewById(android.R.id.button1);
 
         mQsDetailHeader = findViewById(R.id.qs_detail_header);
-        mQsDetailHeaderBack = mQsDetailHeader.findViewById(com.android.internal.R.id.up);
+        mQsDetailHeaderBack = (ImageView) mQsDetailHeader.findViewById(com.android.internal.R.id.up);
         mQsDetailHeaderTitle = (TextView) mQsDetailHeader.findViewById(android.R.id.title);
         mQsDetailHeaderSwitch = (Switch) mQsDetailHeader.findViewById(android.R.id.toggle);
         mQsDetailHeaderProgress = (ImageView) findViewById(R.id.qs_detail_header_progress);
@@ -258,6 +260,38 @@ public class QSDetail extends LinearLayout {
             mQsDetailHeaderProgress.animate().alpha(0f);
             anim.stop();
         }
+    }
+
+    public void setAccentColor() {
+        mQsDetailHeaderSwitch.setThumbTintList(QSColorHelper.getSwitchThumbTintList(mContext));
+        mQsDetailHeaderSwitch.setTrackTintList(QSColorHelper.getSwitchTrackTintList(mContext));
+        mQsDetailHeaderSwitch.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                mQsDetailHeaderSwitch.getBackground()));
+    }
+
+    public void setTextColor() {
+        mQsDetailHeaderTitle.setTextColor(QSColorHelper.getTextColor(mContext));
+        mDetailSettingsButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+        mDetailDoneButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+    }
+
+    public void setIconColor() {
+        mQsDetailHeaderBack.setImageTintList(QSColorHelper.getIconNormalTintList(mContext));
+        mQsDetailHeaderSwitch.setThumbTintList(QSColorHelper.getSwitchThumbTintList(mContext));
+        mQsDetailHeaderSwitch.setTrackTintList(QSColorHelper.getSwitchTrackTintList(mContext));
+    }
+
+    public void setRippleColor() {
+        mQsDetailHeader.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mQsDetailHeader.getBackground()));
+        mQsDetailHeaderBack.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mQsDetailHeaderBack.getBackground()));
+        mQsDetailHeaderSwitch.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                mQsDetailHeaderSwitch.getBackground()));
+        mDetailSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mDetailSettingsButton.getBackground()));
+        mDetailDoneButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mDetailDoneButton.getBackground()));
     }
 
     private final QSPanel.Callback mQsPanelCallback = new QSPanel.Callback() {

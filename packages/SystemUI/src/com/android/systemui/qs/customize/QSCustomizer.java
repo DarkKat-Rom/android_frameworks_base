@@ -18,23 +18,30 @@ package com.android.systemui.qs.customize;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.Toolbar.OnMenuItemClickListener;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto;
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSContainer;
 import com.android.systemui.qs.QSDetailClipper;
@@ -42,6 +49,7 @@ import com.android.systemui.qs.QSTile;
 import com.android.systemui.statusbar.phone.NotificationsQuickSettingsContainer;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import com.android.systemui.statusbar.phone.QSTileHost;
+import com.android.systemui.statusbar.phone.SystemUIDialog;
 import com.android.systemui.statusbar.policy.KeyguardMonitor.Callback;
 
 import java.util.ArrayList;
@@ -77,10 +85,7 @@ public class QSCustomizer extends LinearLayout implements OnMenuItemClickListene
         LayoutInflater.from(getContext()).inflate(R.layout.qs_customize_panel_content, this);
 
         mToolbar = (Toolbar) findViewById(com.android.internal.R.id.action_bar);
-        TypedValue value = new TypedValue();
-        mContext.getTheme().resolveAttribute(android.R.attr.homeAsUpIndicator, value, true);
-        mToolbar.setNavigationIcon(
-                getResources().getDrawable(value.resourceId, mContext.getTheme()));
+        mToolbar.setNavigationIcon(R.drawable.ic_ab_back_white);
         mToolbar.setNavigationOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,8 +93,10 @@ public class QSCustomizer extends LinearLayout implements OnMenuItemClickListene
             }
         });
         mToolbar.setOnMenuItemClickListener(this);
-        mToolbar.getMenu().add(Menu.NONE, MENU_RESET, 0,
-                mContext.getString(com.android.internal.R.string.reset));
+        mToolbar.getMenu()
+                .add(Menu.NONE, MENU_RESET, 0, mContext.getString(com.android.internal.R.string.reset))
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                .setIcon(R.drawable.ic_action_reset);
         mToolbar.setTitle(R.string.qs_edit);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
@@ -175,14 +182,30 @@ public class QSCustomizer extends LinearLayout implements OnMenuItemClickListene
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_RESET:
-                MetricsLogger.action(getContext(), MetricsProto.MetricsEvent.ACTION_QS_EDIT_RESET);
-                reset();
+                showResetDialog();
                 break;
         }
         return false;
     }
 
+    private void showResetDialog() {
+        AlertDialog dialog = new Builder(mContext)
+                .setTitle(com.android.internal.R.string.reset)
+                .setMessage(R.string.qs_dlg_reset_message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        reset();
+                    }
+                })
+                .create();
+        SystemUIDialog.setShowForAllUsers(dialog, true);
+        SystemUIDialog.applyFlags(dialog);
+        dialog.show();
+    }
     private void reset() {
+        MetricsLogger.action(getContext(), MetricsProto.MetricsEvent.ACTION_QS_EDIT_RESET);
         ArrayList<String> tiles = new ArrayList<>();
         String defTiles = mContext.getString(R.string.quick_settings_tiles_default);
         for (String tile : defTiles.split(",")) {
@@ -202,6 +225,37 @@ public class QSCustomizer extends LinearLayout implements OnMenuItemClickListene
 
     private void save() {
         mTileAdapter.saveSpecs(mHost);
+    }
+
+    public void updateDecorationBgColor(ColorStateList color) {
+        mTileAdapter.updateDecorationBgColor(color);
+    }
+
+    public void setActionBarTextColor() {
+        mToolbar.setTitleTextColor(QSColorHelper.getTextColor(mContext));
+    }
+
+    public void setActionBarIconColor() {
+        if (mToolbar.getNavigationIcon() != null) {
+            mToolbar.getNavigationIcon().mutate().setTint(
+                    QSColorHelper.getIconNormalColor(mContext));
+        }
+        mToolbar.getOverflowIcon().mutate().setTint(
+                QSColorHelper.getIconNormalColor(mContext));
+        mToolbar.setMenuItemIconTintList(QSColorHelper.getIconNormalTintList(mContext));
+
+    }
+
+    public void setActionBarRippleColor() {
+        if (mToolbar.getNavigationView() != null) {
+            mToolbar.getNavigationView().setBackground(QSRippleHelper.getColoredRippleDrawable(
+                    mContext, mToolbar.getNavigationView().getBackground()));
+        }
+        if (mToolbar.getOverflowButton() != null) {
+            mToolbar.getOverflowButton().setBackground(QSRippleHelper.getColoredRippleDrawable(
+                    mContext, mToolbar.getOverflowButton().getBackground()));
+        }
+        mToolbar.setMenuItemRippleColor(QSColorHelper.getRippleTintList(mContext));
     }
 
     private final Callback mKeyguardCallback = new Callback() {

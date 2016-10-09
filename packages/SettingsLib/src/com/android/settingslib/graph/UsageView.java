@@ -99,12 +99,36 @@ public class UsageView extends FrameLayout {
         mUsageGraph.setAccentColor(color);
     }
 
+    public void setProjectionColor(int color) {
+        mUsageGraph.setProjectionColor(color);
+    }
+
+    public void setLabelsColor(int color) {
+        for (TextView v : mLabels) {
+            v.setTextColor(color);
+        }
+    }
+
+    public void setBottomLabelsColor(int color) {
+        for (TextView v : mBottomLabels) {
+            v.setTextColor(color);
+        }
+    }
+
     public void setDividerLoc(int dividerLoc) {
         mUsageGraph.setDividerLoc(dividerLoc);
     }
 
+    public void setDividersColor(int color) {
+        mUsageGraph.setDividersColor(color);
+    }
+
     public void setDividerColors(int middleColor, int topColor) {
         mUsageGraph.setDividerColors(middleColor, topColor);
+    }
+
+    public void setDividerColors(int bottomColor, int middleColor, int topColor) {
+        mUsageGraph.setDividerColors(bottomColor, middleColor, topColor);
     }
 
     public void setSideLabelWeights(float before, float after) {

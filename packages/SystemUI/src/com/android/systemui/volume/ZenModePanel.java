@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -55,6 +56,8 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.statusbar.policy.ZenModeController;
 
 import java.io.FileDescriptor;
@@ -99,7 +102,7 @@ public class ZenModePanel extends LinearLayout {
     protected SegmentedButtons mZenButtons;
     private View mZenIntroduction;
     private TextView mZenIntroductionMessage;
-    private View mZenIntroductionConfirm;
+    private ImageView mZenIntroductionConfirm;
     private TextView mZenIntroductionCustomize;
     protected LinearLayout mZenConditions;
     private TextView mZenAlarmWarning;
@@ -171,7 +174,7 @@ public class ZenModePanel extends LinearLayout {
         mZenIntroduction = findViewById(R.id.zen_introduction);
         mZenIntroductionMessage = (TextView) findViewById(R.id.zen_introduction_message);
         mSpTexts.add(mZenIntroductionMessage);
-        mZenIntroductionConfirm = findViewById(R.id.zen_introduction_confirm);
+        mZenIntroductionConfirm = (ImageView) findViewById(R.id.zen_introduction_confirm);
         mZenIntroductionConfirm.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -810,6 +813,100 @@ public class ZenModePanel extends LinearLayout {
     private void fireExpanded() {
         if (mCallback != null) {
             mCallback.onExpanded(mExpanded);
+        }
+    }
+
+    public void setZenModePanelBgColor() {
+        mZenButtons.setBackgroundTintList(QSColorHelper.getZenButtonsBgTintList(mContext));
+        mZenIntroduction.setBackgroundTintList(QSColorHelper.getZenButtonsBgTintList(mContext));
+    }
+
+    public void setZenModePanelAccentColor() {
+        mZenButtons.setTextColor(QSColorHelper.getZenModeButtonTextColors(mContext));
+        mZenIntroductionMessage.setTextColor(QSColorHelper.getAccentColor(mContext));
+        for (int irg = 0; irg < mZenRadioGroup.getChildCount(); irg++) {
+            CompoundButton cb = (CompoundButton) mZenRadioGroup.getChildAt(irg);
+            if (cb != null) {
+                cb.setButtonTintList(QSColorHelper.getZenModeConditionsIconColors(mContext));
+                cb.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                        cb.getBackground()));
+            }
+        }
+        for (int irgc = 0; irgc < mZenRadioGroupContent.getChildCount(); irgc++) {
+            View row = mZenRadioGroupContent.getChildAt(irgc);
+            if (row != null) {
+                TextView tv = (TextView) row.findViewById(android.R.id.text2);
+                if (tv != null) {
+                    tv.setTextColor(QSColorHelper.getAccentColor(mContext));
+                }
+            }
+        }
+    }
+
+    public void setZenModePanelTextColor() {
+        mZenButtons.setTextColor(QSColorHelper.getZenModeButtonTextColors(mContext));
+        mZenIntroductionCustomize.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+        for (int i = 0; i < mZenRadioGroupContent.getChildCount(); i++) {
+            View row = mZenRadioGroupContent.getChildAt(i);
+            if (row != null) {
+                TextView tv = (TextView) row.findViewById(android.R.id.text1);
+                if (tv != null) {
+                    tv.setTextColor(QSColorHelper.getTextColor(mContext));
+                }
+            }
+        }
+    }
+
+    public void setZenModePanelIconColor() {
+        mZenIntroductionConfirm.setImageTintList(QSColorHelper.getIconNormalTintList(mContext));
+        for (int irg = 0; irg < mZenRadioGroup.getChildCount(); irg++) {
+            CompoundButton cb = (CompoundButton) mZenRadioGroup.getChildAt(irg);
+            if (cb != null) {
+                cb.setButtonTintList(QSColorHelper.getZenModeConditionsIconColors(mContext));
+            }
+        }
+        for (int irgc = 0; irgc < mZenRadioGroupContent.getChildCount(); irgc++) {
+            View row = mZenRadioGroupContent.getChildAt(irgc);
+            if (row != null) {
+                ImageView iv1 = (ImageView) row.findViewById(android.R.id.button1);
+                ImageView iv2 = (ImageView) row.findViewById(android.R.id.button2);
+                if (iv1 != null) {
+                    iv1.setImageTintList(QSColorHelper.getIconNormalTintList(mContext));
+                }
+                if (iv2 != null) {
+                    iv2.setImageTintList(QSColorHelper.getIconNormalTintList(mContext));
+                }
+            }
+        }
+    }
+
+    public void setZenModePanelRippleColor() {
+        mZenButtons.setRippleColor();
+        mZenIntroductionConfirm.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mZenIntroductionConfirm.getBackground()));
+        mZenIntroductionCustomize.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                mZenIntroductionCustomize.getBackground()));
+        for (int irg = 0; irg < mZenRadioGroup.getChildCount(); irg++) {
+            View v = mZenRadioGroup.getChildAt(irg);
+            if (v != null) {
+                v.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                        v.getBackground()));
+            }
+        }
+        for (int irgc = 0; irgc < mZenRadioGroupContent.getChildCount(); irgc++) {
+            View row = mZenRadioGroupContent.getChildAt(irgc);
+            if (row != null) {
+                View v1 = row.findViewById(android.R.id.button1);
+                View v2 = row.findViewById(android.R.id.button2);
+                if (v1 != null) {
+                    v1.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                            v1.getBackground()));
+                }
+                if (v2 != null) {
+                    v2.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                            v2.getBackground()));
+                }
+            }
         }
     }
 

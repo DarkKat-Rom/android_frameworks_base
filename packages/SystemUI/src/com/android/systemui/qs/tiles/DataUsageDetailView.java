@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.settingslib.net.DataUsageController;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.qs.DataUsageGraph;
@@ -64,7 +65,7 @@ public class DataUsageDetailView extends LinearLayout {
         final Resources res = mContext.getResources();
         final int titleId;
         final long bytes;
-        int usageColor = R.color.system_accent_color;
+        int usageColor = QSColorHelper.getAccentColor(mContext);
         final String top;
         String bottom = null;
         if (info.usageLevel < info.warningLevel || info.limitLevel <= 0) {
@@ -89,26 +90,33 @@ public class DataUsageDetailView extends LinearLayout {
                     formatBytes(info.usageLevel));
             bottom = res.getString(R.string.quick_settings_cellular_detail_data_limit,
                     formatBytes(info.limitLevel));
-            usageColor = R.color.system_warning_color;
+            usageColor = mContext.getColor(R.color.system_warning_color);
         }
 
         final TextView title = (TextView) findViewById(android.R.id.title);
         title.setText(titleId);
+        title.setTextColor(QSColorHelper.getTextColor(mContext));
         final TextView usage = (TextView) findViewById(R.id.usage_text);
         usage.setText(formatBytes(bytes));
-        usage.setTextColor(mContext.getColor(usageColor));
+        usage.setTextColor(usageColor);
         final DataUsageGraph graph = (DataUsageGraph) findViewById(R.id.usage_graph);
         graph.setLevels(info.limitLevel, info.warningLevel, info.usageLevel);
+        graph.setAccentColor();
+        graph.setIconColor();
         final TextView carrier = (TextView) findViewById(R.id.usage_carrier_text);
         carrier.setText(info.carrier);
+        carrier.setTextColor(QSColorHelper.getTextColor(mContext));
         final TextView period = (TextView) findViewById(R.id.usage_period_text);
         period.setText(info.period);
+        period.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
         final TextView infoTop = (TextView) findViewById(R.id.usage_info_top_text);
         infoTop.setVisibility(top != null ? View.VISIBLE : View.GONE);
         infoTop.setText(top);
+        infoTop.setTextColor(QSColorHelper.getTextColor(mContext));
         final TextView infoBottom = (TextView) findViewById(R.id.usage_info_bottom_text);
         infoBottom.setVisibility(bottom != null ? View.VISIBLE : View.GONE);
         infoBottom.setText(bottom);
+        infoBottom.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
     }
 
     private String formatBytes(long bytes) {

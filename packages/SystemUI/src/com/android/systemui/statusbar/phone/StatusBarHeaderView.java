@@ -516,6 +516,18 @@ public class StatusBarHeaderView extends BaseStatusBarHeader implements View.OnC
     }
 
     @Override
+    public void setTextColor() {
+    }
+
+    @Override
+    public void setIconColor() {
+    }
+
+    @Override
+    public void setRippleColor() {
+    }
+
+    @Override
     public void onClick(View v) {
         if (v == mSettingsButton) {
             if (mSettingsButton.isTunerClick()) {

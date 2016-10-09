@@ -104,6 +104,7 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.internal.util.darkkat.WeatherServiceControllerImpl;
 import com.android.internal.util.darkkat.WeatherHelper;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
@@ -126,6 +127,7 @@ import com.android.systemui.classifier.FalsingManager;
 import com.android.systemui.darkkat.NetworkTrafficControllerImpl;
 import com.android.systemui.darkkat.statusbar.NetworkTraffic;
 import com.android.systemui.darkkat.statusbar.StatusBarWeather;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.doze.DozeHost;
 import com.android.systemui.doze.DozeLog;
 import com.android.systemui.keyguard.KeyguardViewMediator;
@@ -348,6 +350,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     TextView mNotificationPanelDebugText;
 
     // settings
+    private QSContainer mQSContainer;
     private QSPanel mQSPanel;
 
     // top bar
@@ -478,6 +481,30 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_PRIMARY_BACKGROUND_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_SECONDARY_BACKGROUND_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_ACCENT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR),
+                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW),
                     false, this, UserHandle.USER_ALL);
@@ -563,6 +590,30 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR))) {
                 updateStatusBarBatteryTextColor(true);
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE))) {
+                updateUiNightMode();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS))) {
+                updateStatusBarExpandedUseThemeColors();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_PRIMARY_BACKGROUND_COLOR))) {
+                updateStatusBarExpandedPrimaryBgColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_SECONDARY_BACKGROUND_COLOR))) {
+                updateStatusBarExpandedSecondaryBgColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_ACCENT_COLOR))) {
+                updateStatusBarExpandedAccentColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_TEXT_COLOR))) {
+                updateStatusBarExpandedTextColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_ICON_COLOR))) {
+                updateStatusBarExpandedIconColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR))) {
+                updateStatusBarExpandedRippleColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW))
                 || uri.equals(Settings.System.getUriFor(
@@ -1094,15 +1145,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             container.addInflateListener(new InflateListener() {
                 @Override
                 public void onInflated(View v) {
-                    QSContainer qsContainer = (QSContainer) v.findViewById(
+                    mQSContainer = (QSContainer) v.findViewById(
                             R.id.quick_settings_container);
-                    qsContainer.setHost(qsh);
-                    mQSPanel = qsContainer.getQsPanel();
+                    mQSContainer.setHost(qsh);
+                    mQSPanel = mQSContainer.getQsPanel();
                     mQSPanel.setBrightnessMirror(mBrightnessMirrorController);
                     mKeyguardStatusBar.setQSPanel(mQSPanel);
-                    mHeader = qsContainer.getHeader();
+                    mHeader = mQSContainer.getHeader();
                     initSignalCluster(mHeader);
                     mHeader.setActivityStarter(PhoneStatusBar.this);
+                    updateQSAndHeaderColors();
                 }
             });
         }
@@ -2428,6 +2480,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateStatusBarTextColor(false);
         updateStatusBarIconColor(false);
         updateStatusBarBatteryTextColor(false);
+        updateStatusBarExpandedColors();
         updateWeatherVisibility();
         updateWeatherType();
         updateShowNetworkTraffic();
@@ -2453,10 +2506,94 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
-
     private void updateStatusBarBatteryTextColor(boolean animate) {
         if (mIconController != null) {
             mIconController.updateBatteryTextColor(animate);
+        }
+    }
+
+    private void updateUiNightMode() {
+        if (ThemeHelper.statusBarExpandedUseThemeColors(mContext)) {
+            updateStatusBarExpandedColors();
+        }
+    }
+
+    private void updateStatusBarExpandedUseThemeColors() {
+        updateStatusBarExpandedColors();
+    }
+
+    private void updateStatusBarExpandedColors() {
+        updateQSAndHeaderColors();
+    }
+
+    private void updateStatusBarExpandedPrimaryBgColor() {
+        updateQSAndHeaderPrimaryBgColor();
+    }
+
+    private void updateStatusBarExpandedSecondaryBgColor() {
+        updateQSAndHeaderSecondaryBgColor();
+    }
+
+    private void updateStatusBarExpandedAccentColor() {
+        updateQSAndHeaderAccentColor();
+    }
+
+    private void updateStatusBarExpandedTextColor() {
+        updateQSAndHeaderTextColor();
+    }
+
+    private void updateStatusBarExpandedIconColor() {
+        updateQSAndHeaderIconColor();
+    }
+
+    private void updateStatusBarExpandedRippleColor() {
+        updateQSAndHeaderRippleColor();
+    }
+
+    private void updateQSAndHeaderColors() {
+        updateQSAndHeaderPrimaryBgColor();
+        updateQSAndHeaderSecondaryBgColor();
+        updateQSAndHeaderAccentColor();
+        updateQSAndHeaderTextColor();
+        updateQSAndHeaderIconColor();
+        updateQSAndHeaderRippleColor();
+    }
+
+    private void updateQSAndHeaderPrimaryBgColor() {
+        if (mQSContainer != null) {
+            mQSContainer.setPrimaryBgColor(
+                    QSColorHelper.getPrimaryBgTintList(mContext));
+        }
+    }
+
+    private void updateQSAndHeaderSecondaryBgColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateSecondaryBgColor(
+                    QSColorHelper.getSecondaryBgTintList(mContext));
+        }
+    }
+
+    private void updateQSAndHeaderAccentColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateAccentColor();
+        }
+    }
+
+    private void updateQSAndHeaderTextColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateTextColor();
+        }
+    }
+
+    private void updateQSAndHeaderIconColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateIconColor();
+        }
+    }
+
+    private void updateQSAndHeaderRippleColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateRippleColor();
         }
     }
 

@@ -46,6 +46,16 @@ public class ColorHelper {
         }
     }
 
+    public static boolean isColorGrayscale(int color) {
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        return Math.abs(r - g) < 20
+                && Math.abs(r - b) < 20
+                && Math.abs(g - b) < 20;
+    }
+
     public static int getLightenOrDarkenColor(int originalColor) {
         boolean isOriginalColorDark = isColorDark(originalColor);
         float factor = isOriginalColorDark ? 0.1f : 0.8f;

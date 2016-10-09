@@ -21,10 +21,6 @@
     <color name="system_secondary_color">#ff1f2429</color><!-- darkkat blue blue grey -->
     <color name="system_accent_color">#ff009688</color><!-- deep teal 500 -->
 
-    <color name="qs_detail_transition">#66ffffff</color><!-- 40% white -->
-    <color name="qs_edit_overflow_bg">@color/system_secondary_color</color>
-    <color name="qs_tile_adapter_bg">@color/system_secondary_color</color>
-
     <color name="notification_guts_bg_color">@color/system_secondary_color</color>
     <color name="notification_guts_slider_color">@color/system_accent_color</color>
     <color name="notification_guts_disabled_slider_color">#ff757575</color><!-- grey 600 -->

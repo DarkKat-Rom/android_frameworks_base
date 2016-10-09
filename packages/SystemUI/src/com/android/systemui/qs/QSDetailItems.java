@@ -32,6 +32,10 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
+
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 
@@ -102,7 +106,9 @@ public class QSDetailItems extends FrameLayout {
 
     public void setEmptyState(int icon, int text) {
         mEmptyIcon.setImageResource(icon);
+        mEmptyIcon.setImageTintList(QSColorHelper.getIconTintList(mContext));
         mEmptyText.setText(text);
+        mEmptyText.setTextColor(QSColorHelper.getTextDisabledColor(mContext));
     }
 
     @Override
@@ -178,21 +184,27 @@ public class QSDetailItems extends FrameLayout {
                         false);
             }
             view.setVisibility(mItemsVisible ? VISIBLE : INVISIBLE);
+            view.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    view.getBackground()));
             final ImageView iv = (ImageView) view.findViewById(android.R.id.icon);
             iv.setImageResource(item.icon);
+            iv.setImageTintList(QSColorHelper.getIconTintList(mContext));
             iv.getOverlay().clear();
             if (item.overlay != null) {
                 item.overlay.setBounds(0, 0, item.overlay.getIntrinsicWidth(),
                         item.overlay.getIntrinsicHeight());
+                item.overlay.setTint(QSColorHelper.getIconColor(mContext));
                 iv.getOverlay().add(item.overlay);
             }
             final TextView title = (TextView) view.findViewById(android.R.id.title);
             title.setText(item.line1);
+            title.setTextColor(QSColorHelper.getTextColor(mContext));
             final TextView summary = (TextView) view.findViewById(android.R.id.summary);
             final boolean twoLines = !TextUtils.isEmpty(item.line2);
             title.setMaxLines(twoLines ? 1 : 2);
             summary.setVisibility(twoLines ? VISIBLE : GONE);
             summary.setText(twoLines ? item.line2 : null);
+            summary.setTextColor(QSColorHelper.getAccentColor(mContext));
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -202,7 +214,10 @@ public class QSDetailItems extends FrameLayout {
                 }
             });
             final ImageView disconnect = (ImageView) view.findViewById(android.R.id.icon2);
+            disconnect.setImageTintList(QSColorHelper.getIconTintList(mContext));
             disconnect.setVisibility(item.canDisconnect ? VISIBLE : GONE);
+            disconnect.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    disconnect.getBackground()));
             disconnect.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

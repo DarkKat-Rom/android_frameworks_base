@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.android.internal.util.ArrayUtils;
 import com.android.settingslib.drawable.UserIconDrawable;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.UserAvatarView;
@@ -93,9 +94,26 @@ public class UserDetailItemView extends LinearLayout {
         mAvatar.setAvatarWithBadge(picture, userId);
     }
 
+    public void bind(String name, Bitmap picture, int userId, boolean colorize) {
+        mName.setText(name);
+        mAvatar.setAvatarWithBadge(picture, userId);
+        if (colorize) {
+            mName.setTextColor(QSColorHelper.getUserNameTintList(mContext));
+            mAvatar.setFrameColor(QSColorHelper.getUserAvatarFrameTintList(mContext));
+        }
+    }
+
     public void bind(String name, Drawable picture, int userId) {
         mName.setText(name);
         mAvatar.setDrawableWithBadge(picture, userId);
+    }
+
+    public void bind(String name, Drawable picture, int userId, boolean colorizeIcon) {
+        int color = colorizeIcon ? QSColorHelper.getIconColor(mContext) : 0;
+        mName.setText(name);
+        mAvatar.setDrawableWithBadge(picture, userId, color);
+        mName.setTextColor(QSColorHelper.getUserNameTintList(mContext));
+        mAvatar.setFrameColor(QSColorHelper.getUserAvatarFrameTintList(mContext));
     }
 
     public void setAvatarEnabled(boolean enabled) {

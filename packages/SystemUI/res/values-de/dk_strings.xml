@@ -25,4 +25,7 @@
     <string name="network_traffic_unit_bytes_per_second">B/s</string>
     <string name="network_traffic_unit_kilo_bytes_per_second">kB/s</string>
     <string name="network_traffic_unit_mega_bytes_per_second">MB/s</string>
+
+    <!-- Quick settings -->
+    <string name="qs_dlg_reset_message">Kacheln der Schnelleinstellungen zurücksetzen ?</string>
 </resources>

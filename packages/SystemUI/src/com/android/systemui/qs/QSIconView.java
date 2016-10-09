@@ -24,7 +24,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 
 import java.util.Objects;
 
@@ -85,6 +87,12 @@ public class QSIconView extends ViewGroup {
                 d.setAutoMirrored(true);
             }
             iv.setImageDrawable(d);
+            if (d != null) {
+                d.mutate();
+                d.setTint(state.disabledByPolicy ?
+                        QSColorHelper.getIconDisabledColor(mContext)
+                        : QSColorHelper.getIconColor(mContext));
+            }
             iv.setTag(R.id.qs_icon_tag, state.icon);
             iv.setPadding(0, padding, 0, padding);
             if (d instanceof Animatable && iv.isShown()) {
@@ -95,10 +103,22 @@ public class QSIconView extends ViewGroup {
                 }
             }
         }
-        if (state.disabledByPolicy) {
-            iv.setColorFilter(getContext().getColor(R.color.qs_tile_disabled_color));
-        } else {
-            iv.clearColorFilter();
+    }
+
+    public void setIconColor() {
+        if (mIcon instanceof ImageView) {
+            if (((ImageView) mIcon).getDrawable() != null) {
+                ((ImageView) mIcon).getDrawable().setTint(QSColorHelper.getIconColor(mContext));
+            }
+        } else if (mIcon instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) mIcon).getChildCount(); i++) {
+                if (((ViewGroup) mIcon).getChildAt(i) instanceof ImageView) {
+                    ImageView iv = (ImageView) ((ViewGroup) mIcon).getChildAt(i);
+                    if (iv.getDrawable() != null) {
+                        iv.getDrawable().setTint(QSColorHelper.getIconColor(mContext));
+                    }
+                }
+            }
         }
     }
 

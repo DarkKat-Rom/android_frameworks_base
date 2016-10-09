@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile.SignalState;
 
@@ -52,6 +53,7 @@ public final class SignalTileView extends QSIconView {
     private ImageView addTrafficView(int icon) {
         final ImageView traffic = new ImageView(mContext);
         traffic.setImageResource(icon);
+        traffic.setImageTintList(QSColorHelper.getIconTintList(mContext));
         traffic.setAlpha(0f);
         addView(traffic);
         return traffic;
@@ -112,6 +114,7 @@ public final class SignalTileView extends QSIconView {
         if (s.overlayIconId > 0) {
             mOverlay.setVisibility(VISIBLE);
             mOverlay.setImageResource(s.overlayIconId);
+            mOverlay.setImageTintList(QSColorHelper.getIconTintList(mContext));
         } else {
             mOverlay.setVisibility(GONE);
         }
@@ -140,5 +143,12 @@ public final class SignalTileView extends QSIconView {
         } else {
             view.setAlpha(newAlpha);
         }
+    }
+
+    @Override
+    public void setIconColor() {
+        super.setIconColor();
+        mIn.setImageTintList(QSColorHelper.getIconTintList(mContext));
+        mOut.setImageTintList(QSColorHelper.getIconTintList(mContext));
     }
 }

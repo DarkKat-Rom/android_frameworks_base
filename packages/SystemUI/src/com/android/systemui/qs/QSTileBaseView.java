@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 
 public class QSTileBaseView extends LinearLayout {
 
@@ -52,6 +53,8 @@ public class QSTileBaseView extends LinearLayout {
 
         mTileBackground = newTileBackground();
         if (mTileBackground instanceof RippleDrawable) {
+            ((RippleDrawable) mTileBackground).setColor(
+                    QSColorHelper.getRippleTintList(mContext));
             setRipple((RippleDrawable) mTileBackground);
         }
         setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -147,6 +150,13 @@ public class QSTileBaseView extends LinearLayout {
         return mIcon;
     }
 
+    public void setTextColor() {
+    }
+
+    public void setIconColor() {
+        mIcon.setIconColor();
+    }
+
     @Override
     public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
@@ -173,6 +183,13 @@ public class QSTileBaseView extends LinearLayout {
                 info.setChecked(mTileState);
                 info.setCheckable(true);
             }
+        }
+    }
+
+    public void setRippleColor() {
+        if (mTileBackground instanceof RippleDrawable) {
+            ((RippleDrawable) mTileBackground).setColor(
+                    QSColorHelper.getRippleTintList(mContext));
         }
     }
 

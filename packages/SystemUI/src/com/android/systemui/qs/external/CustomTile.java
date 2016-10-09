@@ -39,6 +39,7 @@ import android.view.WindowManagerGlobal;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.qs.external.TileLifecycleManager.TileChangeListener;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -278,13 +279,15 @@ public class CustomTile extends QSTile<QSTile.State> implements TileChangeListen
             tileState = Tile.STATE_UNAVAILABLE;
             drawable = mDefaultIcon.loadDrawable(mContext);
         }
-        int color = mContext.getColor(getColor(tileState));
-        drawable.setTint(color);
+        int iconColor = getIconColor(tileState);
+        int textColor = getTextColor(tileState);
+        drawable.mutate();
+        drawable.setTint(iconColor);
         state.icon = new DrawableIcon(drawable);
         state.label = mTile.getLabel();
         if (tileState == Tile.STATE_UNAVAILABLE) {
             state.label = new SpannableStringBuilder().append(state.label,
-                    new ForegroundColorSpan(color),
+                    new ForegroundColorSpan(textColor),
                     SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE);
         }
         if (mTile.getContentDescription() != null) {
@@ -311,14 +314,26 @@ public class CustomTile extends QSTile<QSTile.State> implements TileChangeListen
         });
     }
 
-    private static int getColor(int state) {
+    private int getIconColor(int state) {
         switch (state) {
             case Tile.STATE_UNAVAILABLE:
-                return R.color.qs_tile_tint_unavailable;
+                return QSColorHelper.getIconUnavailableColor(mContext);
             case Tile.STATE_INACTIVE:
-                return R.color.qs_tile_tint_inactive;
+                return QSColorHelper.getIconInactiveColor(mContext);
             case Tile.STATE_ACTIVE:
-                return R.color.qs_tile_tint_active;
+                return QSColorHelper.getIconColor(mContext);
+        }
+        return 0;
+    }
+
+    private int getTextColor(int state) {
+        switch (state) {
+            case Tile.STATE_UNAVAILABLE:
+                return QSColorHelper.getTextUnavailableColor(mContext);
+            case Tile.STATE_INACTIVE:
+                return QSColorHelper.getTextInactiveColor(mContext);
+            case Tile.STATE_ACTIVE:
+                return QSColorHelper.getTextColorSecondary(mContext);
         }
         return 0;
     }

@@ -27,6 +27,7 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.settingslib.RestrictedLockUtils;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.qs.PseudoGridView;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
 /**
@@ -71,14 +72,16 @@ public class UserDetailView extends PseudoGridView {
             UserSwitcherController.UserRecord item = getItem(position);
             UserDetailItemView v = UserDetailItemView.convertOrInflate(
                     mContext, convertView, parent);
+            v.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    v.getBackground()));
             if (v != convertView) {
                 v.setOnClickListener(this);
             }
             String name = getName(mContext, item);
             if (item.picture == null) {
-                v.bind(name, getDrawable(mContext, item), item.resolveId());
+                v.bind(name, getDrawable(mContext, item).mutate(), item.resolveId(), item.isAddUser);
             } else {
-                v.bind(name, item.picture, item.info.id);
+                v.bind(name, item.picture, item.info.id, true);
             }
             v.setActivated(item.isCurrent);
             v.setDisabledByAdmin(item.isDisabledByAdmin);

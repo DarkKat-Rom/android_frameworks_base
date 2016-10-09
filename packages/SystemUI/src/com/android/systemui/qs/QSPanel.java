@@ -28,13 +28,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.QSColorHelper;
+import com.android.systemui.darkkat.util.QSRippleHelper;
 import com.android.systemui.qs.QSTile.DetailAdapter;
 import com.android.systemui.qs.QSTile.Host.Callback;
 import com.android.systemui.qs.customize.QSCustomizer;
 import com.android.systemui.qs.external.CustomTile;
+import com.android.systemui.qs.tiles.DndTile;
+import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.settings.BrightnessController;
 import com.android.systemui.settings.ToggleSlider;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -68,6 +73,7 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
     private boolean mGridContentVisible = true;
 
     protected QSTileLayout mTileLayout;
+    private TextView mEditButton;
 
     private QSCustomizer mCustomizePanel;
     private Record mDetailRecord;
@@ -106,7 +112,9 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
                 R.layout.qs_paged_tile_layout, this, false);
         mTileLayout.setListening(mListening);
         addView((View) mTileLayout);
-        findViewById(android.R.id.edit).setOnClickListener(view ->
+        mEditButton = (TextView) findViewById(android.R.id.edit);
+        mEditButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+        mEditButton.setOnClickListener(view ->
                 mHost.startRunnableDismissingKeyguard(() -> showEdit(view)));
     }
 
@@ -256,6 +264,71 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
             r.tile.refreshState();
         }
         mFooter.refreshState();
+    }
+
+    public void updateBrightnessThumbBgColor() {
+        mBrightnessController.updateBrightnessThumbBgColor();
+    }
+
+    public void updateDndModePanelBgColor() {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof DndTile) {
+                ((DndTile) r.tile).updateDndModePanelBgColor();
+            }
+        }
+    }
+
+    public void updateAccentColor() {
+        mBrightnessController.updateAccentColor();
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof DndTile) {
+                ((DndTile) r.tile).updateDeatailAccentColor();
+            }
+        }
+    }
+
+    public void updateTextColor() {
+        for (TileRecord r : mRecords) {
+            r.tileView.setTextColor();
+            if (r.tile instanceof DndTile) {
+                ((DndTile) r.tile).updateDeatailTextColor();
+            }
+        }
+        if (mEditButton != null) {
+            mEditButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+        }
+        mFooter.setTextColor();
+    }
+
+    public void updateIconColor() {
+        mBrightnessController.updateIconColor();
+        for (TileRecord r : mRecords) {
+            r.tileView.setIconColor();
+            if (r.tile instanceof WifiTile) {
+                ((WifiTile) r.tile).updateDeatilItems();
+            } else if (r.tile instanceof DndTile) {
+                ((DndTile) r.tile).updateDeatailIconColor();
+            }
+        }
+
+        if (mTileLayout instanceof PagedTileLayout) {
+            ((PagedTileLayout) mTileLayout).setIconColor();
+        }
+        mFooter.setIconColor();
+    }
+
+    public void updateRippleColor() {
+        mBrightnessController.updateRippleColor();
+        for (TileRecord r : mRecords) {
+            r.tileView.setRippleColor();
+            if (r.tile instanceof DndTile) {
+                ((DndTile) r.tile).updateDeatailRippleColor();
+            }
+        }
+        if (mEditButton != null) {
+            mEditButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    mEditButton.getBackground()));
+        }
     }
 
     public void showDetailAdapter(boolean show, DetailAdapter adapter, int[] locationInWindow) {
