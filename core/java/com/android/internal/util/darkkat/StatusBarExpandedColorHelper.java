@@ -23,6 +23,7 @@ public class StatusBarExpandedColorHelper {
 
     public static int getPrimaryBackgroundColor(Context context) {
         int color;
+
         if (ThemeHelper.statusBarExpandedUseThemeColors(context)) {
             color = ThemeHelper.getSystemUIPrimaryColor(context);
         } else {
@@ -30,11 +31,13 @@ public class StatusBarExpandedColorHelper {
                     Settings.System.STATUS_BAR_EXPANDED_PRIMARY_BACKGROUND_COLOR,
                     ThemeHelper.getSystemUIPrimaryColor(context));
         }
+
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
     public static int getSecondaryBackgroundColor(Context context) {
         int color;
+
         if (ThemeHelper.statusBarExpandedUseThemeColors(context)) {
             color = ThemeHelper.getSystemUISecondaryColor(context);
         } else {
@@ -42,11 +45,13 @@ public class StatusBarExpandedColorHelper {
                     Settings.System.STATUS_BAR_EXPANDED_SECONDARY_BACKGROUND_COLOR,
                     ThemeHelper.getSystemUISecondaryColor(context));
         }
+
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
     public static int getAccentColor(Context context) {
         int color;
+
         if (ThemeHelper.statusBarExpandedUseThemeColors(context)) {
             color = ThemeHelper.getSystemUIAccentColor(context);
         } else {
@@ -54,11 +59,13 @@ public class StatusBarExpandedColorHelper {
                     Settings.System.STATUS_BAR_EXPANDED_ACCENT_COLOR,
                     ThemeHelper.getSystemUIAccentColor(context));
         }
+
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
     public static int getTextColor(Context context) {
         int color;
+
         if (ThemeHelper.statusBarExpandedUseThemeColors(context)) {
             color = ColorConstants.WHITE;
         } else {
@@ -66,11 +73,13 @@ public class StatusBarExpandedColorHelper {
                     Settings.System.STATUS_BAR_EXPANDED_TEXT_COLOR,
                     ColorConstants.WHITE);
         }
+
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
     public static int getIconColor(Context context) {
         int color;
+
         if (ThemeHelper.statusBarExpandedUseThemeColors(context)) {
             color = ColorConstants.WHITE;
         } else {
@@ -78,6 +87,7 @@ public class StatusBarExpandedColorHelper {
                     Settings.System.STATUS_BAR_EXPANDED_ICON_COLOR,
                     ColorConstants.WHITE);
         }
+
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
@@ -113,13 +123,11 @@ public class StatusBarExpandedColorHelper {
     }
 
     protected static int getRippleAlpha(int color) {
-        int alpha;
         if (ColorHelper.isColorGrayscale(color)) {
-            alpha = ColorHelper.isColorDark(color) ?
-                   ColorConstants.RIPPLE_ALPHA_DARK : ColorConstants.RIPPLE_ALPHA_LIGHT;
+            return ColorHelper.isColorDark(color) ?
+                   ColorConstants.SBE_RIPPLE_ALPHA_DARK : ColorConstants.SBE_RIPPLE_ALPHA_LIGHT;
         } else {
-            alpha = ColorConstants.RIPPLE_ALPHA_COLORED;
+            return ColorConstants.SBE_RIPPLE_ALPHA_COLORED;
         }
-        return alpha;
     }
 }

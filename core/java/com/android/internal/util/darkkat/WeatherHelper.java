@@ -31,6 +31,8 @@ public class WeatherHelper {
     public static final int PACKAGE_DISABLED = 1;
     public static final int PACKAGE_MISSING  = 2;
 
+    public static final String DAY_INDEX = "day_index";
+
     public static int getWeatherServiceAvailability(Context context) {
         boolean isInstalled = false;
         int availability = PACKAGE_MISSING;
@@ -73,5 +75,15 @@ public class WeatherHelper {
                 .setClassName(WeatherServiceControllerImpl.PACKAGE_NAME,
                 WeatherServiceControllerImpl.PACKAGE_NAME + ".SettingsActivity");
         return settings;
+    }
+
+    public static boolean detailedWeatherShowLocation(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.DETAILED_WEATHER_SHOW_LOCATION, 1) == 1;
+    }
+
+    public static int getDetailedWeatherConditionIconType(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.DETAILED_WEATHER_CONDITION_ICON, ICON_MONOCHROME);
     }
 }

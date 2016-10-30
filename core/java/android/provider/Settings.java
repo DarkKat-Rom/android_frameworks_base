@@ -3561,6 +3561,95 @@ public final class Settings {
         // DarkKat additions start
 
         /**
+         * Wether to use detailed weather view color values from global theme
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_USE_THEME_COLORS =
+                "detailed_weather_use_theme_colors";
+
+        /**
+         * Wether to use expanded status bar color values from global theme 
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_USE_THEME_COLORS =
+                "status_bar_expanded_use_theme_colors";
+
+        /**
+         * Detailed weather view status bar background color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_STATUS_BAR_BG_COLOR =
+                "detailed_weather_status_bar_bg_color";
+
+        /**
+         * Detailed weather view accent color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_ACCENT_COLOR = "detailed_weather_accent_color";
+
+        /**
+         * Detailed weather view action bar background color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_ACTION_BAR_BG_COLOR =
+                "detailed_weather_action_bar_bg_color";
+
+        /**
+         * Detailed weather view content background color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CONTENT_BG_COLOR =
+                "detailed_weather_content_bg_color";
+
+        /**
+         * Detailed weather view card background color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CARD_BG_COLOR = "detailed_weather_card_bg_color";
+
+        /**
+         * Detailed weather view action bar text color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_ACTION_BAR_TEXT_COLOR =
+                "detailed_weather_action_bar_text_color";
+
+        /**
+         * Detailed weather view card text color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CARD_TEXT_COLOR =
+                "detailed_weather_card_text_color";
+
+        /**
+         * Detailed weather view action bar icon color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_ACTION_BAR_ICON_COLOR =
+                "detailed_weather_action_bar_icon_color";
+
+        /**
+         * Detailed weather view card icon color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CARD_ICON_COLOR =
+                "detailed_weather_card_icon_color";
+
+        /**
+         * Detailed weather view action bar ripple color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_ACTION_BAR_RIPPLE_COLOR =
+                "detailed_weather_action_bar_ripple_color";
+
+        /**
+         * Detailed weather view card ripple color
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CARD_RIPPLE_COLOR =
+                "detailed_weather_card_ripple_color";
+
+        /**
          * Color of the text on the status bar
          * @hide
          */
@@ -3596,13 +3685,6 @@ public final class Settings {
          */
         public static final String STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE =
                 "status_bar_battery_text_color_dark_mode";
-
-        /**
-         * Wether to use expanded status bar color values from global theme 
-         * @hide
-         */
-        public static final String STATUS_BAR_EXPANDED_USE_THEME_COLORS =
-                "status_bar_expanded_use_theme_colors";
 
         /**
          * Color of the primary background on the expanded status bar
@@ -3650,98 +3732,6 @@ public final class Settings {
          */
         public static final String STATUS_BAR_EXPANDED_RIPPLE_COLOR =
                 "status_bar_expanded_ripple_color";
-
-        /**
-         * Detailed weather view theme
-         * 0 = Material
-         * 1 = Darkkat
-         * 2 = Material light
-         * default: 0
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_THEME = "detailed_weather_theme";
-
-        /**
-         * Wether to customize the detailed weather view colors
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CUSTOMIZE_COLORS =
-                "detailed_weather_customize_colors";
-
-        /**
-         * Detailed weather view status bar background color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_STATUS_BAR_BG_COLOR =
-                "detailed_weather_status_bar_bg_color";
-
-        /**
-         * Detailed weather view accent color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_ACCENT_COLOR = "detailed_weather_accent_color";
-
-        /**
-         * Detailed weather view action bar background color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_ACTION_BAR_BG_COLOR =
-                "detailed_weather_action_bar_bg_color";
-
-        /**
-         * Detailed weather view content background color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CONTENT_BG_COLOR =
-                "detailed_weather_content_bg_color";
-
-        /**
-         * Detailed weather view cards background color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CARDS_BG_COLOR = "detailed_weather_cards_bg_color";
-
-        /**
-         * Detailed weather view action bar text color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_ACTION_BAR_TEXT_COLOR =
-                "detailed_weather_action_bar_text_color";
-
-        /**
-         * Detailed weather view cards text color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CARDS_TEXT_COLOR =
-                "detailed_weather_cards_text_color";
-
-        /**
-         * Detailed weather view action bar icon color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_ACTION_BAR_ICON_COLOR =
-                "detailed_weather_action_bar_icon_color";
-
-        /**
-         * Detailed weather view cards icon color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CARDS_ICON_COLOR =
-                "detailed_weather_cards_icon_color";
-
-        /**
-         * Detailed weather view action bar ripple color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_ACTION_BAR_RIPPLE_COLOR =
-                "detailed_weather_action_bar_ripple_color";
-
-        /**
-         * Detailed weather view cards ripple color
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CARDS_RIPPLE_COLOR =
-                "detailed_weather_cards_ripple_color";
 
         /**
          * Wether to show the location in the detailed weather view

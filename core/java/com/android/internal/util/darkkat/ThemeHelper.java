@@ -27,9 +27,12 @@ public class ThemeHelper {
     public static final int THEME_BLACKOUT       = 3;
 
     public static int getTheme(Context context) {
-        final int theme = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_MODE, 2);
-        return theme;
+        return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.UI_NIGHT_MODE, 2);
+    }
+
+    public static boolean detailedWeatherUseThemeColors(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.DETAILED_WEATHER_USE_THEME_COLORS, 1) == 1;
     }
 
     public static boolean statusBarExpandedUseThemeColors(Context context) {
@@ -37,44 +40,119 @@ public class ThemeHelper {
                 Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS, 1) == 1;
     }
 
-    public static int getSystemUIPrimaryColor(Context context) {
-        int color;
+    // General
+
+    public static int getColorBackground(Context context) {
         if (getTheme(context) == THEME_DARKKAT) {
-            color = ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
+            return ColorConstants.DARKKAT_BLUE_GREY;
         } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            color = ColorConstants.SYSTEMUI_PRIMARY_DAY;
+            return ColorConstants.MATERIAL_GREY_50;
         } else {
-            color = ColorConstants.SYSTEMUI_PRIMARY_BLACKOUT;
+            return ColorConstants.BLACK;
         }
-        return color;
+    }
+
+    public static int getColorBackgroundFloating(Context context) {
+        if (getTheme(context) == THEME_DARKKAT) {
+            return ColorConstants.DARKKAT_BLUE_BLUE_GREY;
+        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            return ColorConstants.WHITE;
+        } else {
+            return ColorConstants.BLACK;
+        }
+    }
+
+    public static int getAccentColor(Context context) {
+        if (getTheme(context) != THEME_BLACKOUT) {
+            return ColorConstants.MATERIAL_DEEP_TEAL_500;
+        } else {
+            return ColorConstants.MATERIAL_BLUE_700;
+        }
+    }
+
+    public static int getPrimaryTextColor(Context context) {
+        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
+            return ColorConstants.WHITE;
+        } else {
+            return (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
+                    | (ColorConstants.BLACK & 0x00ffffff);
+        }
+    }
+
+    public static int getSecondaryTextColor(Context context) {
+        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
+            return (ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT << 24)
+                    | (ColorConstants.WHITE & 0x00ffffff);
+        } else {
+            return (ColorConstants.TEXT_SECONDARY_ALPHA_DAY << 24)
+                    | (ColorConstants.BLACK & 0x00ffffff);
+        }
+    }
+
+    public static int getIconColor(Context context) {
+        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
+            return (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24)
+                    | (ColorConstants.WHITE & 0x00ffffff);
+        } else {
+            return (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24)
+                    | (ColorConstants.BLACK & 0x00ffffff);
+        }
+    }
+
+    public static int getRippleColor(Context context) {
+        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
+            return (ColorConstants.RIPPLE_ALPHA_NIGHT << 24)
+                    | (ColorConstants.WHITE & 0x00ffffff);
+        } else {
+            return (ColorConstants.RIPPLE_ALPHA_DAY << 24)
+                    | (ColorConstants.BLACK & 0x00ffffff);
+        }
+    }
+
+    public static int getDividerColor(Context context) {
+        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
+            return (ColorConstants.DIVIDER_ALPHA_NIGHT << 24)
+                    | (ColorConstants.WHITE & 0x00ffffff);
+        } else {
+            return (ColorConstants.DIVIDER_ALPHA_DAY << 24)
+                    | (ColorConstants.BLACK & 0x00ffffff);
+        }
+    }
+
+    // SystemUI
+
+    public static int getSystemUIPrimaryColor(Context context) {
+        if (getTheme(context) == THEME_DARKKAT) {
+            return ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
+        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            return ColorConstants.SYSTEMUI_PRIMARY_DAY;
+        } else {
+            return ColorConstants.SYSTEMUI_PRIMARY_BLACKOUT;
+        }
     }
 
     public static int getSystemUISecondaryColor(Context context) {
-        int color;
         if (getTheme(context) == THEME_DARKKAT) {
-            color = ColorConstants.SYSTEMUI_SECONDARY_DARKKAT;
+            return ColorConstants.SYSTEMUI_SECONDARY_DARKKAT;
         } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            color = ColorConstants.SYSTEMUI_SECONDARY_DAY;
+            return ColorConstants.SYSTEMUI_SECONDARY_DAY;
         } else {
-            color = ColorConstants.SYSTEMUI_SECONDARY_BLACKOUT;
+            return ColorConstants.SYSTEMUI_SECONDARY_BLACKOUT;
         }
-        return color;
     }
 
     public static int getSystemUIAccentColor(Context context) {
-        int color;
         if (getTheme(context) == THEME_DARKKAT) {
-            color = ColorConstants.SYSTEMUI_ACCENT_DARKKAT;
+            return ColorConstants.SYSTEMUI_ACCENT_DARKKAT;
         } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            color = ColorConstants.SYSTEMUI_ACCENT_DAY;
+            return ColorConstants.SYSTEMUI_ACCENT_DAY;
         } else {
-            color = ColorConstants.SYSTEMUI_ACCENT_BLACKOUT;
+            return ColorConstants.SYSTEMUI_ACCENT_BLACKOUT;
         }
-        return color;
     }
 
     public static int getSystemUIRippleColor(Context context) {
-        return (ColorConstants.RIPPLE_ALPHA_LIGHT << 24) | (ColorConstants.WHITE & 0x00ffffff);
+        return (ColorConstants.SBE_RIPPLE_ALPHA_LIGHT << 24) | (ColorConstants.WHITE & 0x00ffffff);
     }
 
     public static int getSystemUIRippleAccentColor(Context context) {
