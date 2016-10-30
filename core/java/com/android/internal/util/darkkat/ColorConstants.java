@@ -32,6 +32,8 @@ public class ColorConstants {
     public static final int MATERIAL_BLUE_GREY_800 = 0xff37474F;
     public static final int MATERIAL_DEEP_TEAL_500 = 0xff009688;
     public static final int MATERIAL_BLUE_700      = 0xff1976d2;
+    public static final int MATERIAL_BLUE_500      = 0xff2196f3;
+    public static final int MATERIAL_GREY_50       = 0xfffafafa;
 
     // Theme DarkKat
     public static final int DARKKAT_BLUE_GREY      = 0xff1b1f23;
@@ -63,6 +65,27 @@ public class ColorConstants {
 
     // Alpha values
 
+    // General
+    public static final int FULLY_OPAQUE_ALPHA       = 255;
+    public static final int HIGHTLIGHT_ALPHA_COLORED = 66;
+    public static final int RIPPLE_ALPHA_COLORED     = HIGHTLIGHT_ALPHA_COLORED;
+
+    // General (Night theme)
+    public static final int TEXT_PRIMARY_ALPHA_NIGHT   = FULLY_OPAQUE_ALPHA;
+    public static final int TEXT_SECONDARY_ALPHA_NIGHT = 179;
+    public static final int ICON_NORMAL_ALPHA_NIGHT    = TEXT_SECONDARY_ALPHA_NIGHT;
+    public static final int HIGHTLIGHT_ALPHA_NIGHT     = 51;
+    public static final int RIPPLE_ALPHA_NIGHT         = HIGHTLIGHT_ALPHA_NIGHT;
+    public static final int DIVIDER_ALPHA_NIGHT        = HIGHTLIGHT_ALPHA_NIGHT;
+
+    // General (Day theme)
+    public static final int TEXT_PRIMARY_ALPHA_DAY   = 222;
+    public static final int TEXT_SECONDARY_ALPHA_DAY = 138;
+    public static final int ICON_NORMAL_ALPHA_DAY    = TEXT_SECONDARY_ALPHA_DAY;
+    public static final int HIGHTLIGHT_ALPHA_DAY     = 31;
+    public static final int RIPPLE_ALPHA_DAY         = HIGHTLIGHT_ALPHA_DAY;
+    public static final int DIVIDER_ALPHA_DAY        = HIGHTLIGHT_ALPHA_DAY;
+
     // SystemUI
 
     // Status bar
@@ -70,14 +93,16 @@ public class ColorConstants {
     public static final int DARK_MODE_ALPHA_SINGLE_TONE  = 153;
 
     // Status bar expanded (All themes)
-    public static final int FULLY_OPAQUE_ALPHA        = 255;
-    public static final int TEXT_SECONDARY_ALPHA      = 179;
-    public static final int ICON_NORMAL_ALPHA         = 179;
-    public static final int ICON_TUNER_ALPHA          = 77;
+
+    public static final int SBE_TEXT_SECONDARY_ALPHA  = TEXT_SECONDARY_ALPHA_NIGHT;
+    public static final int SBE_ICON_NORMAL_ALPHA     = ICON_NORMAL_ALPHA_NIGHT;
+    public static final int SBE_RIPPLE_ALPHA_LIGHT   = RIPPLE_ALPHA_NIGHT;
+    public static final int SBE_RIPPLE_ALPHA_DARK    = RIPPLE_ALPHA_DAY;
+    public static final int SBE_RIPPLE_ALPHA_COLORED = RIPPLE_ALPHA_COLORED;
+    public static final int SBE_ICON_TUNER_ALPHA      = 77;
+
+    // Status bar expanded (Quick settings all themes)
     public static final int QS_TILE_DISABLED_ALPHA    = 97;
     public static final int QS_TILE_INACTIVE_ALPHA    = 74;
     public static final int QS_TILE_UNAVAILABLE_ALPHA = 64;
-    public static final int RIPPLE_ALPHA_COLORED      = 66;
-    public static final int RIPPLE_ALPHA_LIGHT        = 51;
-    public static final int RIPPLE_ALPHA_DARK         = 31;
 }

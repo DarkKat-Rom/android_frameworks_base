@@ -62,7 +62,7 @@ public class QSColorHelper extends StatusBarExpandedColorHelper {
     }
 
     public static int getTextColorSecondary(Context context) {
-        return (ColorConstants.TEXT_SECONDARY_ALPHA << 24) | (getTextColor(context) & 0x00ffffff);
+        return (ColorConstants.SBE_TEXT_SECONDARY_ALPHA << 24) | (getTextColor(context) & 0x00ffffff);
     }
 
     public static int getTextDisabledColor(Context context) {
@@ -121,7 +121,7 @@ public class QSColorHelper extends StatusBarExpandedColorHelper {
     }
 
     public static int getIconNormalColor(Context context) {
-        return (ColorConstants.ICON_NORMAL_ALPHA << 24) | (getIconColor(context) & 0x00ffffff);
+        return (ColorConstants.SBE_ICON_NORMAL_ALPHA << 24) | (getIconColor(context) & 0x00ffffff);
     }
 
     public static int getIconDisabledColor(Context context) {
@@ -145,7 +145,7 @@ public class QSColorHelper extends StatusBarExpandedColorHelper {
     }
 
     public static ColorStateList getIconTunerTintList(Context context) {
-        int color = (ColorConstants.ICON_TUNER_ALPHA << 24) | (getIconColor(context) & 0x00ffffff);
+        int color = (ColorConstants.SBE_ICON_TUNER_ALPHA << 24) | (getIconColor(context) & 0x00ffffff);
         return ColorStateList.valueOf(color);
     }
 
