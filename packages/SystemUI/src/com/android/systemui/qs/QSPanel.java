@@ -72,7 +72,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
     private boolean mGridContentVisible = true;
 
     protected QSTileLayout mTileLayout;
-//    private TextView mEditButton;
 
     private QSCustomizer mCustomizePanel;
     private Record mDetailRecord;
@@ -111,11 +110,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
                 R.layout.qs_paged_tile_layout, this, false);
         mTileLayout.setListening(mListening);
         addView((View) mTileLayout);
-
-//        mEditButton = (TextView) findViewById(android.R.id.edit);
-//        mEditButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
-//        mEditButton.setOnClickListener(view ->
-//                mHost.startRunnableDismissingKeyguard(() -> showEdit(view)));
     }
 
     public boolean isShowingCustomize() {
@@ -301,9 +295,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
                 ((DndTile) r.tile).updateDeatailTextColor();
             }
         }
-//        if (mEditButton != null) {
-//            mEditButton.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
-//        }
         mFooter.setTextColor();
     }
 
@@ -332,10 +323,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback {
                 ((DndTile) r.tile).updateDeatailRippleColor();
             }
         }
-//        if (mEditButton != null) {
-//            mEditButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
-//                    mEditButton.getBackground()));
-//        }
     }
 
     public void showDetailAdapter(boolean show, DetailAdapter adapter, int[] locationInWindow) {

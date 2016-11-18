@@ -17,20 +17,25 @@
 <resources>
 
     <!-- DarkKat theme -->
-    <color name="background_material_dark">#ff1b1f23</color><!-- darkkat blue grey -->
-    <color name="background_floating_material_dark">#ff1f2429</color><!-- darkkat blue blue grey -->
-    <color name="accent_material_dark">#ff009688</color><!-- material teal 500 -->
+    <color name="darkkat_blue_grey">#ff1b1f23</color>
+    <color name="darkkat_blue_blue_grey">#ff1f2429</color>
 
-    <color name="primary_material_dark">#ff21272b</color><!-- material blue grey 950 -->
+    <color name="accent_darkkat">@color/material_deep_teal_500</color>
 
-    <color name="timepicker_default_ampm_selected_background_color_material">#ff009688</color><!-- material teal 500 -->
-    <color name="timepicker_default_selector_color_material">#ff009688</color><!-- material teal 500 -->
+    <color name="background_material_dark">@color/darkkat_blue_grey</color>
+    <color name="background_floating_material_dark">@color/darkkat_blue_blue_grey</color>
+    <color name="secondary_material_settings">@color/darkkat_blue_blue_grey</color>
+    <color name="accent_material_dark">@color/accent_darkkat</color>
+    <color name="primary_material_dark">@color/material_blue_grey_950</color>
 
-    <color name="datepicker_default_circle_background_color_material_dark">#ff009688</color><!-- material teal 500 -->
+    <color name="timepicker_default_ampm_selected_background_color_material">@color/accent_darkkat</color>
+    <color name="timepicker_default_selector_color_material">@color/accent_darkkat</color>
 
-    <color name="system_notification_accent_color">#ff009688</color><!-- material teal 500 -->
-    <color name="notification_material_background_color">#ff1b1f23</color><!-- darkkat blue grey -->
+    <color name="datepicker_default_circle_background_color_material_dark">@color/accent_darkkat</color>
+
+    <color name="system_notification_accent_color">@color/accent_darkkat</color>
+    <color name="notification_material_background_color">@color/darkkat_blue_grey</color>
     <color name="notification_default_color">#b3ffffff</color>
     <color name="notification_icon_default_color">#b3ffffff</color>
-    <color name="notification_action_list">#ff1f2429</color><!-- darkkat blue blue grey -->
+    <color name="notification_action_list">@color/darkkat_blue_blue_grey</color>
 </resources>

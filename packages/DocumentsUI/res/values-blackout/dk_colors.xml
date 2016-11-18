@@ -16,10 +16,11 @@
 
 <resources>
 
-    <!-- Blackout theme -->
-    <color name="system_notification_accent_color">#ff1976D2</color>
-    <color name="notification_material_background_color">#ff000000</color>
-    <color name="notification_default_color">#b3ffffff</color>
-    <color name="notification_icon_default_color">@color/notification_default_color</color>
-    <color name="notification_action_list">#ff000000</color>
+    <!-- Blackout theme
+         (additional colors)-->
+    <color name="background_primary_blackout">#ff000000</color>
+    <color name="background_secondary_blackout">#ff101010</color>
+
+    <color name="background_primary">@color/background_primary_blackout</color>
+    <color name="background_secondary">@color/background_secondary_blackout</color>
 </resources>

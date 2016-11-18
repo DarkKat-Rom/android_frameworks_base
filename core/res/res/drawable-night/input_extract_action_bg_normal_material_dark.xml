@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2013 The Android Open Source Project
+<!--
+     Copyright (C) 2016 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,13 +14,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Blackout theme -->
-    <style name="TrimmedHorizontalProgressBar" parent="android:Widget.Material.ProgressBar.Horizontal">
-        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_material_trimmed</item>
-        <item name="android:minHeight">3dp</item>
-        <item name="android:maxHeight">3dp</item>
-    </style>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/material_deep_teal_500"/>
+</shape>

@@ -17,22 +17,18 @@
 <resources>
 
     <!-- Blackout theme -->
-    <color name="material_grey_50">@*android:color/material_grey_900</color>
-    <color name="material_grey_500">#ff9e9e9e</color>
-    <color name="material_teal_700">#ff1976D2</color>
-    <color name="window_background">#ff000000</color>
-    <color name="drawer_background">#ff000000</color>
-    <color name="directory_background">#ff000000</color>
-    <color name="primary_dark">#ff000000</color>
-    <color name="primary">#ff000000</color>
-    <color name="accent">#ff1976D2</color>
-    <color name="accent_dark">#ff1976D2</color>
-    <color name="action_mode">@color/material_grey_500</color>
-    <color name="status_bar_color">#ff000000</color>
-    <color name="band_select_background">#ff000000</color>
-    <color name="band_select_border">#44000000</color>
-    <color name="item_doc_background_disabled">#ff000000</color>
-    <color name="root_activated_color">@color/material_teal_700</color>
-    <color name="item_doc_background">#ff000000</color>
-    <color name="item_doc_background_selected">#ff1565c0</color>
+    <color name="window_background">@color/background_primary</color>
+    <color name="drawer_background">@color/background_primary</color>
+    <color name="directory_background">@color/background_primary</color>
+
+    <color name="accent_dark">#ff1976d2</color><!-- Material blue 700 -->
+
+    <color name="band_select_background">@color/background_primary_blackout</color>
+    <color name="band_select_border">#44ffffff</color>
+
+    <color name="root_activated_color">#ff1976d2</color><!-- Material blue 700 -->
+
+    <color name="item_doc_background_disabled">@color/background_primary</color>
+    <color name="item_doc_background">@color/background_secondary_blackout</color>
+    <color name="item_doc_background_selected">#ff0d47a1</color><!-- Material blue 900 -->
 </resources>

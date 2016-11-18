@@ -93,7 +93,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     protected TouchAnimator mSettingsAlpha;
     private float mExpansionAmount;
     private QSTileHost mHost;
-    private View mEdit;
+    private ImageView mEdit;
     private boolean mShowFullAlarm;
     private float mDateTimeTranslation;
 
@@ -107,7 +107,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
         mEmergencyOnly = (TextView) findViewById(R.id.header_emergency_calls_only);
 
-        mEdit = findViewById(android.R.id.edit);
+        mEdit = (ImageView) findViewById(android.R.id.edit);
         findViewById(android.R.id.edit).setOnClickListener(view ->
                 mHost.startRunnableDismissingKeyguard(() -> mQsPanel.showEdit(view)));
 
@@ -414,6 +414,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         ((TextView) mDateTimeAlarmGroup.findViewById(R.id.date)).setCompoundDrawableTintList(color);
         ((TextView) mDateTimeAlarmGroup.findViewById(R.id.alarm_status)).setCompoundDrawableTintList(color);
         mExpandIndicator.setImageTintList(color);
+        mEdit.setImageTintList(color);
         mSettingsButton.setImageTintList(color);
         ((ImageView) mSettingsContainer.findViewById(R.id.tuner_icon)).setImageTintList(
                 QSColorHelper.getIconTunerTintList(mContext));

@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="8dp"
-        android:background="@color/material_grey_50"/>
+        android:background="@color/background_primary"/>
 
     <FrameLayout
         android:id="@+id/container_directory"
@@ -36,7 +36,7 @@
         android:id="@+id/container_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/material_grey_50"
+        android:background="@color/background_primary"
         android:elevation="8dp" />
 
 </LinearLayout>
