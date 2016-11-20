@@ -32,14 +32,14 @@ public class DetailedWeatherColorHelper {
     public static int getStatusBarBgColor(Context context) {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_STATUS_BAR_BG_COLOR,
-                DetailedWeatherThemeHelper.getStatusBarBgColor());
+                DetailedWeatherThemeHelper.getStatusBarBgColor(context));
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
     public static int getActionBarBgColor(Context context) {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_ACTION_BAR_BG_COLOR,
-                DetailedWeatherThemeHelper.getActionBarBgColor());
+                DetailedWeatherThemeHelper.getActionBarBgColor(context));
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
@@ -53,7 +53,7 @@ public class DetailedWeatherColorHelper {
     public static int getCardBgColor(Context context) {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_CARD_BG_COLOR,
-                DetailedWeatherThemeHelper.getColorBackgroundFloating(context));
+                DetailedWeatherThemeHelper.getCardBgColor(context));
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 

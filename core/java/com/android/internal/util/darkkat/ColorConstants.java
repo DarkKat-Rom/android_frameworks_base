@@ -39,6 +39,9 @@ public class ColorConstants {
     public static final int DARKKAT_BLUE_GREY      = 0xff1b1f23;
     public static final int DARKKAT_BLUE_BLUE_GREY = 0xff1f2429;
 
+    // Theme Blackout
+    public static final int BLACKOUT_PRIMARY_COLOR = 0xff101010;
+
     // SystemUI
 
     // Status bar

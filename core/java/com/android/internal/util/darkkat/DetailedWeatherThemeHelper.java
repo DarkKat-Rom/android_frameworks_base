@@ -20,12 +20,20 @@ import android.content.Context;
 
 public class DetailedWeatherThemeHelper extends ThemeHelper {
 
-    public static int getStatusBarBgColor() {
-        return ColorConstants.MATERIAL_BLUE_700;
+    public static int getStatusBarBgColor(Context context) {
+        if (getTheme(context) == THEME_BLACKOUT) {
+            return ColorConstants.BLACK;
+        } else {
+            return ColorConstants.MATERIAL_BLUE_700;
+        }
     }
 
-    public static int getActionBarBgColor() {
-        return ColorConstants.MATERIAL_BLUE_500;
+    public static int getActionBarBgColor(Context context) {
+        if (getTheme(context) == THEME_BLACKOUT) {
+            return ColorConstants.BLACKOUT_PRIMARY_COLOR;
+        } else {
+            return ColorConstants.MATERIAL_BLUE_500;
+        }
     }
 
     public static int getContentBgColor(Context context) {
@@ -33,7 +41,11 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
     }
 
     public static int getCardBgColor(Context context) {
-        return getColorBackgroundFloating(context);
+        if (getTheme(context) == THEME_BLACKOUT) {
+            return ColorConstants.BLACKOUT_PRIMARY_COLOR;
+        } else {
+            return getColorBackgroundFloating(context);
+        }
     }
 
     public static int getActionBarTextColor() {
