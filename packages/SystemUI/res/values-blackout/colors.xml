@@ -23,19 +23,16 @@
     <color name="system_accent_color">#ff1976D2</color><!-- blue 700 -->
 
     <color name="notification_guts_bg_color">@color/system_secondary_color</color>
-    <color name="notification_guts_slider_color">@color/system_accent_color</color>
     <color name="notification_guts_disabled_slider_color">#ff757575</color><!-- grey 600 -->
     <color name="notification_guts_secondary_slider_color">#7a7c7c</color>
-    <color name="notification_guts_seekbar_tick_mark_tint">#ffffffff</color>
     <color name="notification_guts_icon_tint">#b3ffffff</color><!-- 70% white -->
     <color name="notification_guts_disabled_icon_tint">#4dffffff</color><!-- 30% white -->
 
     <color name="notification_legacy_background_color">@color/system_primary_color</color>
     <color name="notification_material_background_color">@color/system_primary_color</color>
     <color name="notification_material_background_dimmed_color">#cc000000</color><!-- 80% black -->
-    <color name="notification_material_background_low_priority_color">@color/system_primary_color</color>
-    <color name="notification_material_background_media_default_color">@color/system_primary_color</color>
-    <color name="notification_shade_background_color">@color/system_primary_color</color>
+    <color name="notification_material_background_low_priority_color">@color/system_secondary_color</color>
+    <color name="notification_shade_background_color">@color/system_secondary_color</color>
     <color name="notification_ripple_untinted_color">#33ffffff</color><!-- 20% white -->
     <color name="notification_ripple_color_low_priority">#33ffffff</color><!-- 20% white -->
     <color name="notification_ripple_tinted_color">#42ffffff</color><!-- 25% white -->

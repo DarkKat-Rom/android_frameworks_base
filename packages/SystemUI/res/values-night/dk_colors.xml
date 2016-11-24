@@ -16,8 +16,8 @@
 
 <resources>
 
-    <!-- Day theme
+    <!-- DarkKat theme
         (additional colors) -->
-    <color name="notification_guts_seekbar_tick_mark_tint">#ff000000</color>
-    <color name="qs_tile_adapter_bg">#ff384248</color>
+    <color name="notification_guts_seekbar_tick_mark_tint">#ffffffff</color>
+    <color name="qs_tile_adapter_bg">@color/system_secondary_color</color>
 </resources>
