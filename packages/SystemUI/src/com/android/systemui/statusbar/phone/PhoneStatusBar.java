@@ -483,6 +483,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE),
+                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TEXT_COLOR),
                     false, this, UserHandle.USER_ALL);
@@ -491,9 +494,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.UI_NIGHT_MODE),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS),
@@ -516,6 +516,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR),
                     false, this, UserHandle.USER_ALL);
+/* Disabled for now
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_USE_THEME_COLORS),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_PRIMARY_BACKGROUND_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_SECONDARY_BACKGROUND_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_DISMISS_ALL_COLOR),
+                    false, this, UserHandle.USER_ALL);
+ */
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW),
                     false, this, UserHandle.USER_ALL);
@@ -592,7 +606,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            if (uri.equals(Settings.System.getUriFor(
+            if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE))) {
+                updateUiNightMode();
+            } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TEXT_COLOR))) {
                 updateStatusBarTextColor(true);
             } else if (uri.equals(Settings.System.getUriFor(
@@ -601,9 +618,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR))) {
                 updateStatusBarBatteryTextColor(true);
-            } else if (uri.equals(Settings.Secure.getUriFor(
-                    Settings.Secure.UI_NIGHT_MODE))) {
-                updateUiNightMode();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS))) {
                 updateStatusBarExpandedUseThemeColors();
@@ -625,6 +639,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR))) {
                 updateStatusBarExpandedRippleColor();
+/* Disabled for now
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_USE_THEME_COLORS))) {
+                updateNotificationUseThemeColors();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_PRIMARY_BACKGROUND_COLOR))) {
+                updateNotificationBgColors();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_SECONDARY_BACKGROUND_COLOR))) {
+                updateNotificationSecondaryBgColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_DISMISS_ALL_COLOR))) {
+                updateNotificationDismissAllColor();
+ */
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW))
                 || uri.equals(Settings.System.getUriFor(
@@ -1279,6 +1307,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateClearAll();
         inflateEmptyShadeView();
         updateEmptyShadeView();
+// Disabled for now
+//        mEmptyShadeView.setTextColor();
+//        mDismissView.setTextColor();
         inflateOverflowContainer();
         mStatusBarKeyguardViewManager.onDensityOrFontScaleChanged();
         mUserInfoController.onDensityOrFontScaleChanged();
@@ -2610,6 +2641,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateStatusBarIconColor(false);
         updateStatusBarBatteryTextColor(false);
         updateStatusBarExpandedColors();
+// Disabled for now
+//        updateNotificationColors();
         updateWeatherVisibility();
         updateWeatherType();
         updateShowNetworkTraffic();
@@ -2642,9 +2675,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void updateUiNightMode() {
+        // TO-DO:
+        // Update the QS and header colors here as well,
+        // so the QS and header colors will get updated when no custom colors are defined
         if (ThemeHelper.statusBarExpandedUseThemeColors(mContext)) {
             updateStatusBarExpandedColors();
         }
+// Disabled for now
+//        updateNotificationColors();
     }
 
     private void updateStatusBarExpandedUseThemeColors() {
@@ -2724,6 +2762,32 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mQSContainer != null) {
             mQSContainer.updateRippleColor();
         }
+    }
+
+    private void updateNotificationUseThemeColors() {
+        updateNotificationColors();
+    }
+
+    private void updateNotificationColors() {
+        updateNotificationPrimaryBgColor();
+        updateNotificationSecondaryBgColor();
+        updateNotificationDismissAllColor();
+        
+    }
+
+    private void updateNotificationBgColors() {
+        updateNotificationPrimaryBgColor();
+    }
+
+    @Override
+    protected void updateNotificationSecondaryBgColor() {
+        super.updateNotificationSecondaryBgColor();
+        mStackScroller.setBgColor();
+    }
+
+    private void updateNotificationDismissAllColor() {
+        mEmptyShadeView.setTextColor();
+        mDismissView.setTextColor();
     }
 
     private void updateWeatherVisibility() {

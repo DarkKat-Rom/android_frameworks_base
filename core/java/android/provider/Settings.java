@@ -3568,13 +3568,6 @@ public final class Settings {
                 "detailed_weather_use_theme_colors";
 
         /**
-         * Wether to use expanded status bar color values from global theme 
-         * @hide
-         */
-        public static final String STATUS_BAR_EXPANDED_USE_THEME_COLORS =
-                "status_bar_expanded_use_theme_colors";
-
-        /**
          * Detailed weather view status bar background color
          * @hide
          */
@@ -3687,6 +3680,13 @@ public final class Settings {
                 "status_bar_battery_text_color_dark_mode";
 
         /**
+         * Wether to use expanded status bar color values from global theme 
+         * @hide
+         */
+        public static final String STATUS_BAR_EXPANDED_USE_THEME_COLORS =
+                "status_bar_expanded_use_theme_colors";
+
+        /**
          * Color of the primary background on the expanded status bar
          * @hide
          */
@@ -3732,6 +3732,57 @@ public final class Settings {
          */
         public static final String STATUS_BAR_EXPANDED_RIPPLE_COLOR =
                 "status_bar_expanded_ripple_color";
+
+        /**
+         * Wether to use notification color values from global theme 
+         * @hide
+         */
+        public static final String NOTIFICATION_USE_THEME_COLORS =
+                "notification_use_theme_colors";
+
+        /**
+         * Color of the notification primary background
+         * @hide
+         */
+        public static final String NOTIFICATION_PRIMARY_BACKGROUND_COLOR =
+                "notification_primary_background_color";
+
+        /**
+         * Color of the notification secondary background
+         * @hide
+         */
+        public static final String NOTIFICATION_SECONDARY_BACKGROUND_COLOR =
+                "notification_secondary_background_color";
+
+        /**
+         * Color of the notification accent
+         * @hide
+         */
+        public static final String NOTIFICATION_ACCENT_COLOR = "notification_accent_color";
+
+        /**
+         * Color of the notification text
+         * @hide
+         */
+        public static final String NOTIFICATION_TEXT_COLOR = "notification_text_color";
+
+        /**
+         * Color of the notification icons
+         * @hide
+         */
+        public static final String NOTIFICATION_ICON_COLOR = "notification_icon_color";
+
+        /**
+         * Color of the notification ripple effect
+         * @hide
+         */
+        public static final String NOTIFICATION_RIPPLE_COLOR = "notification_ripple_color";
+
+        /**
+         * Color of the dismiss all and no notification text
+         * @hide
+         */
+        public static final String NOTIFICATION_DISMISS_ALL_COLOR = "notification_dismiss_all_color";
 
         /**
          *  Whether to show the music visualizer on the lock screen

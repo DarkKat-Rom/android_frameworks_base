@@ -17,10 +17,6 @@
 <resources>
 
     <!-- DarkKat theme -->
-    <color name="system_primary_color">#ff1b1f23</color><!-- darkkat blue grey -->
-    <color name="system_secondary_color">#ff1f2429</color><!-- darkkat blue blue grey -->
-    <color name="system_accent_color">#ff009688</color><!-- deep teal 500 -->
-
     <color name="notification_guts_bg_color">@color/system_secondary_color</color>
     <color name="notification_guts_disabled_slider_color">#ff757575</color><!-- grey 600 -->
     <color name="notification_guts_secondary_slider_color">#7a7c7c</color>

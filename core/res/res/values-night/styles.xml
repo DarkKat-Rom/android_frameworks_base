@@ -18,6 +18,31 @@
 
     <!-- DarkKat theme -->
 
+    <style name="TextAppearance.StatusBar.EventContent">
+        <item name="textColor">#b3ffffff</item>
+        <item name="textSize">@dimen/notification_text_size</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Title">
+        <item name="textColor">#ffffff</item>
+        <item name="fontFamily">sans-serif-light</item>
+        <item name="textSize">@dimen/notification_title_text_size</item>
+        <item name="textStyle">bold</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Line2">
+        <item name="textSize">@dimen/notification_subtext_size</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Info">
+        <item name="textSize">@dimen/notification_subtext_size</item>
+        <item name="textColor">#b3ffffff</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Time">
+        <item name="textSize">@dimen/notification_subtext_size</item>
+        <item name="textColor">#b3ffffff</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Emphasis">
+        <item name="textColor">#ffffff</item>
+    </style>
+
     <!-- Notification text colors
          (based on CyanideL) -->
     <style name="TextAppearance.Material.Notification">
@@ -28,17 +53,16 @@
     <style name="TextAppearance.Material.Notification.Reply" />
 
     <style name="TextAppearance.Material.Notification.Title">
-        <item name="textColor">@color/primary_text_material_dark</item>
+        <item name="textColor">@color/primary_text_default_material_dark</item>
         <item name="textSize">@dimen/notification_title_text_size</item>
     </style>
 
     <style name="TextAppearance.Material.Notification.Line2">
-        <item name="textColor">@color/secondary_text_material_dark</item>
         <item name="textSize">@dimen/notification_subtext_size</item>
     </style>
 
     <style name="TextAppearance.Material.Notification.Info">
-        <item name="textColor">@color/secondary_text_material_dark</item>
+        <item name="textColor">@color/secondary_text_default_material_dark</item>
         <item name="textSize">@dimen/notification_subtext_size</item>
     </style>
 

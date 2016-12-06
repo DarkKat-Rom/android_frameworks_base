@@ -41,5 +41,6 @@
     <color name="notification_material_background_color">@color/black</color>
     <color name="notification_default_color">#b3ffffff</color>
     <color name="notification_icon_default_color">#b3ffffff</color>
-    <color name="notification_action_list">@color/black</color>
+    <color name="notification_action_list">@color/primary_color_blackout</color>
+    <color name="notification_action_list_dark">#ff131313</color>
 </resources>
