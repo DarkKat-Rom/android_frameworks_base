@@ -119,6 +119,11 @@ public class DataUsageDetailView extends LinearLayout {
         infoBottom.setVisibility(bottom != null ? View.VISIBLE : View.GONE);
         infoBottom.setText(bottom);
         infoBottom.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
+        boolean showLevel = info.warningLevel > 0 || info.limitLevel > 0;
+        graph.setVisibility(showLevel ? View.VISIBLE : View.GONE);
+        if (!showLevel) {
+            infoTop.setVisibility(View.GONE);
+        }
     }
 
     private String formatBytes(long bytes) {

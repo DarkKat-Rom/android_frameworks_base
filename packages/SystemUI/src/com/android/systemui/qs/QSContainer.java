@@ -368,4 +368,9 @@ public class QSContainer extends FrameLayout {
         mQuickQSPanel.updateRippleColor();
         mQSCustomizer.setActionBarRippleColor();
     }
+
+    public void hideImmediately() {
+        animate().cancel();
+        setY(-mHeader.getHeight());
+    }
 }
