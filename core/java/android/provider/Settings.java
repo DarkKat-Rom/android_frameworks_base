@@ -6429,7 +6429,10 @@ public final class Settings {
         public static final String UI_NIGHT_MODE = "ui_night_mode";
 
         /**
-         * Auto theme mode which switches based on lightsensor
+         * The theme used for the night mode when the user selected ui night mode auto
+         * 2 - Theme DarkKat
+         * 3 - Theme Blackout
+         * default: 2
          * @hide
          */
         public static final String UI_NIGHT_AUTO_MODE = "ui_night_auto_mode";
