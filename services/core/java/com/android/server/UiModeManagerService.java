@@ -56,7 +56,7 @@ import com.android.server.twilight.TwilightState;
 
 final class UiModeManagerService extends SystemService {
     private static final String TAG = UiModeManager.class.getSimpleName();
-    private static final boolean LOG = true;
+    private static final boolean LOG = false;
 
     // Enable launching of applications when entering the dock.
     private static final boolean ENABLE_LAUNCH_DESK_DOCK_APP = true;
