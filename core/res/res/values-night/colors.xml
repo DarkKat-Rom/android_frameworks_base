@@ -32,11 +32,4 @@
     <color name="timepicker_default_selector_color_material">@color/accent_darkkat</color>
 
     <color name="datepicker_default_circle_background_color_material_dark">@color/accent_darkkat</color>
-
-    <color name="system_notification_accent_color">@color/accent_darkkat</color>
-    <color name="notification_material_background_color">@color/darkkat_blue_grey</color>
-    <color name="notification_default_color">#b3ffffff</color>
-    <color name="notification_icon_default_color">#b3ffffff</color>
-    <color name="notification_action_list">@color/darkkat_blue_blue_grey</color>
-    <color name="notification_action_list_dark">#ff21262c</color>
 </resources>

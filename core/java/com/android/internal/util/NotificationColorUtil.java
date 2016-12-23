@@ -338,8 +338,6 @@ public class NotificationColorUtil {
             }
         }
         return color;
-// Disabled for now
-//        return resolvedColor;
     }
 
     /**

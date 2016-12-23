@@ -20,6 +20,5 @@
         (additional colors) -->
     <color name="system_primary_color">#ff263238</color><!-- material blue grey 900 -->
 
-    <color name="notification_guts_seekbar_tick_mark_tint">#ff000000</color>
     <color name="qs_tile_adapter_bg">#ff384248</color>
 </resources>

@@ -42,7 +42,6 @@ import android.content.pm.UserInfo;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.AsyncTask;
@@ -83,7 +82,6 @@ import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,7 +90,6 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
-import com.android.internal.util.darkkat.NotificationColorHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -1027,77 +1024,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         if (entry.icon != null) {
             entry.icon.setTag(R.id.icon_is_pre_L, entry.targetSdk < Build.VERSION_CODES.LOLLIPOP);
         }
-
-// Disabled for now
-//        updateNotificationPrimaryBgColor(entry);
-//        updateNotificationSecondaryBgColor(entry);
-    }
-
-    protected void updateNotificationPrimaryBgColor() {
-        ArrayList<Entry> activeNotifications = mNotificationData.getActiveNotifications();
-        final int notificationCount = activeNotifications.size();
-        for (int i = 0; i < notificationCount; i++) {
-            NotificationData.Entry entry = activeNotifications.get(i);
-            updateNotificationPrimaryBgColor(entry);
-        }
-    }
-
-    protected void updateNotificationSecondaryBgColor() {
-        ArrayList<Entry> activeNotifications = mNotificationData.getActiveNotifications();
-        final int notificationCount = activeNotifications.size();
-        for (int i = 0; i < notificationCount; i++) {
-            NotificationData.Entry entry = activeNotifications.get(i);
-            updateNotificationSecondaryBgColor(entry);
-        }
-    }
-
-    private void updateNotificationPrimaryBgColor(NotificationData.Entry entry) {
-        final ActivatableNotificationView anv = (ActivatableNotificationView) entry.row;
-        if (anv != null) {
-            anv.setNormalColor();
-        }
-    }
-
-    private void updateNotificationSecondaryBgColor(NotificationData.Entry entry) {
-        final View expandedView = entry.getExpandedContentView();
-        final View headsUpView = entry.getHeadsUpContentView();
-        LinearLayout actionList = null;
-
-        if (expandedView != null) {
-            actionList = (LinearLayout) expandedView.findViewById(com.android.internal.R.id.actions);
-            if (actionList != null) {
-                if (actionList.getBackground() instanceof ColorDrawable) {
-                    ((ColorDrawable) actionList.getBackground()).setColor(
-                            NotificationColorHelper.getSecondaryBackgroundColor(mContext));
-                }
-                for (int i = 0; i < actionList.getChildCount(); i++) {
-                    if (actionList.getChildAt(i).getId() == com.android.internal.R.id.button_holder) {
-                        if (actionList.getChildAt(i).getBackground() instanceof ColorDrawable) {
-                            ((ColorDrawable) actionList.getChildAt(i).getBackground()).setColor(
-                            NotificationColorHelper.getEmphazisedActionBackgroundColor(mContext));
-                        }
-                    }
-                }
-            }
-        }
-        if (headsUpView != null) {
-            actionList = (LinearLayout) headsUpView.findViewById(com.android.internal.R.id.actions);
-            if (actionList != null) {
-                if (actionList.getBackground() instanceof ColorDrawable) {
-                    ((ColorDrawable) actionList.getBackground()).setColor(
-                            NotificationColorHelper.getSecondaryBackgroundColor(mContext));
-                }
-                for (int i = 0; i < actionList.getChildCount(); i++) {
-                    if (actionList.getChildAt(i).getId() == com.android.internal.R.id.button_holder) {
-                        if (actionList.getChildAt(i).getBackground() instanceof ColorDrawable) {
-                            ((ColorDrawable) actionList.getChildAt(i).getBackground()).setColor(
-                            NotificationColorHelper.getEmphazisedActionBackgroundColor(mContext));
-                        }
-                    }
-                }
-            }
-        }
-                
     }
 
     public boolean isMediaNotification(NotificationData.Entry entry) {
