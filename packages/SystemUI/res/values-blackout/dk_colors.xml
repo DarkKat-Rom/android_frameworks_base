@@ -22,6 +22,5 @@
     <color name="system_secondary_color">#ff000000</color>
     <color name="system_accent_color">#ff1976D2</color><!-- blue 700 -->
 
-    <color name="notification_guts_seekbar_tick_mark_tint">#ffffffff</color>
     <color name="qs_tile_adapter_bg">@color/system_secondary_color</color>
 </resources>

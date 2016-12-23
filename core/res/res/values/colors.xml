@@ -150,7 +150,7 @@
 
     <color name="accessibility_focus_highlight">#bf39b500</color>
 
-    <color name="system_notification_accent_color">#009688</color>
+    <color name="system_notification_accent_color">#ff607D8B</color>
     <color name="battery_saver_mode_color">#fff4511e</color><!-- deep orange 600 -->
 
     <!-- Default user icon colors -->

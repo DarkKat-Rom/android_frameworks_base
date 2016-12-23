@@ -20,9 +20,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
-import android.widget.TextView;
-
-import com.android.internal.util.darkkat.NotificationColorHelper;
 
 import com.android.systemui.Interpolators;
 
@@ -134,13 +131,6 @@ public abstract class StackScrollerDecorView extends ExpandableView {
 
     public void cancelAnimation() {
         mContent.animate().cancel();
-    }
-
-    public void setTextColor() {
-        if (mContent instanceof TextView) {
-            ((TextView) mContent).setTextColor(
-                    NotificationColorHelper.getDismissAllTextColor(getContext()));
-        }
     }
 
     protected abstract View findContentView();

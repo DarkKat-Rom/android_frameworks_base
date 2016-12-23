@@ -159,7 +159,7 @@
                     android:thumbTint="?android:attr/colorAccent"
                     android:progressTint="?android:attr/colorAccent"
                     style="@android:style/Widget.Material.SeekBar.Discrete"
-                    android:tickMarkTint="@color/notification_guts_seekbar_tick_mark_tint" />
+                    android:tickMarkTint="@android:color/black" />
 
         </FrameLayout>
     </LinearLayout>

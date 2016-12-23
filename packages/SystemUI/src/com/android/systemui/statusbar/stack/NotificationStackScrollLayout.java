@@ -57,7 +57,6 @@ import android.widget.ScrollView;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
-import com.android.internal.util.darkkat.NotificationColorHelper;
 import com.android.systemui.ExpandHelper;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -448,11 +447,6 @@ public class NotificationStackScrollLayout extends ViewGroup
         invalidate();
     }
 
-    public void setBgColor() {
-        mBgColor = NotificationColorHelper.getSecondaryBackgroundColor(getContext());
-        mBackgroundPaint.setColor(mBgColor);
-        invalidate();
-    }
     private void initView(Context context) {
         mScroller = new OverScroller(getContext());
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);

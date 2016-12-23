@@ -66,29 +66,6 @@ public class ColorConstants {
     public static final int SYSTEMUI_SECONDARY_BLACKOUT = BLACK;
     public static final int SYSTEMUI_ACCENT_BLACKOUT    = MATERIAL_BLUE_700;
 
-    // Notifications
-
-    // Notifications (Day theme)
-    public static final int NOTIFICATION_BG_PRIMARY_DAY    = WHITE;
-    public static final int NOTIFICATION_BG_LOW_DAY        = 0xfff5f5f5;
-    public static final int NOTIFICATION_BG_SECONDARY_DAY  = 0xffeeeeee;
-    public static final int NOTIFICATION_BG_EMPHASIZED_DAY = 0xffe0e0e0;
-    public static final int NOTIFICATION_ACCENT_DAY        = MATERIAL_DEEP_TEAL_500;
-
-    // Notifications (DarkKat theme)
-    public static final int NOTIFICATION_BG_PRIMARY_DARKKAT    = DARKKAT_BLUE_GREY;
-    public static final int NOTIFICATION_BG_LOW_DARKKAT        = DARKKAT_BLUE_BLUE_GREY;
-    public static final int NOTIFICATION_BG_SECONDARY_DARKKAT  = DARKKAT_BLUE_BLUE_GREY;
-    public static final int NOTIFICATION_BG_EMPHASIZED_DARKKAT = 0xff21262c;
-    public static final int NOTIFICATION_ACCENT_DARKKAT        = MATERIAL_DEEP_TEAL_500;
-
-    // Notifications (Blackout theme)
-    public static final int NOTIFICATION_BG_PRIMARY_BLACKOUT    = BLACK;
-    public static final int NOTIFICATION_BG_LOW_BLACKOUT        = BLACK;
-    public static final int NOTIFICATION_BG_SECONDARY_BLACKOUT  = BLACKOUT_PRIMARY_COLOR;
-    public static final int NOTIFICATION_BG_EMPHASIZED_BLACKOUT = 0xff131313;
-    public static final int NOTIFICATION_ACCENT_BLACKOUT        = MATERIAL_BLUE_700;
-
     // Alpha values
 
     // General
@@ -131,9 +108,4 @@ public class ColorConstants {
     public static final int QS_TILE_DISABLED_ALPHA    = 97;
     public static final int QS_TILE_INACTIVE_ALPHA    = 74;
     public static final int QS_TILE_UNAVAILABLE_ALPHA = 64;
-
-    // Notifications
-
-    // Notifications (All themes)
-    public static final int NOTIFICATION_BG_DIMMED_ALPHA = 204;
 }

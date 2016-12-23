@@ -32,8 +32,6 @@ import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
 
-import com.android.internal.util.darkkat.NotificationColorHelper;
-
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.classifier.FalsingManager;
@@ -131,8 +129,8 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
     private float mAppearAnimationTranslation;
     private boolean mShowingLegacyBackground;
     private final int mLegacyColor;
-    private int mNormalColor;
-    private int mLowPriorityColor;
+    private final int mNormalColor;
+    private final int mLowPriorityColor;
     private boolean mIsBelowSpeedBump;
     private FalsingManager mFalsingManager;
     private boolean mTrackTouch;
@@ -181,9 +179,6 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mNormalColor = context.getColor(R.color.notification_material_background_color);
         mLowPriorityColor = context.getColor(
                 R.color.notification_material_background_low_priority_color);
-// Disabled for now
-//        mNormalColor = NotificationColorHelper.getPrimaryBackgroundColor(context);
-//        mLowPriorityColor = NotificationColorHelper.getLowBackgroundColor(context);
         mTintedRippleColor = context.getColor(
                 R.color.notification_ripple_tinted_color);
         mLowPriorityRippleColor = context.getColor(
@@ -201,8 +196,6 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mBackgroundDimmed = (NotificationBackgroundView) findViewById(R.id.backgroundDimmed);
         mBackgroundNormal.setCustomBackground(R.drawable.notification_material_bg);
         mBackgroundDimmed.setCustomBackground(R.drawable.notification_material_bg_dim);
-// Disabled for now
-//        setNormalColor();
         updateBackground();
         updateBackgroundTint();
         updateOutlineAlpha();
@@ -873,14 +866,6 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         } else {
             return mNormalRippleColor;
         }
-    }
-
-    public void setNormalColor() {
-        mNormalColor = NotificationColorHelper.getPrimaryBackgroundColor(mContext);
-        mLowPriorityColor = NotificationColorHelper.getLowBackgroundColor(mContext);
-        mBackgroundNormal.setNormalOrDimmedBackground(mNormalColor);
-        mBackgroundDimmed.setNormalOrDimmedBackground(
-                NotificationColorHelper.getDimmedBackgroundColor(mContext));
     }
 
     /**

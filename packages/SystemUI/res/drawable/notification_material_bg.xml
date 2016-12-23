@@ -17,7 +17,7 @@
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
         android:color="@color/notification_ripple_untinted_color">
-    <item android:id="@+id/backgroundFill">
+    <item>
         <shape>
             <solid android:color="@color/notification_material_background_color" />
         </shape>

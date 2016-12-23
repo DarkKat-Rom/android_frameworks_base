@@ -40,11 +40,6 @@ public class ThemeHelper {
                 Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS, 1) == 1;
     }
 
-    public static boolean notificationUseThemeColors(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.NOTIFICATION_USE_THEME_COLORS, 1) == 1;
-    }
-
     // General
 
     public static int getColorBackground(Context context) {
@@ -163,61 +158,5 @@ public class ThemeHelper {
     public static int getSystemUIRippleAccentColor(Context context) {
         return (ColorConstants.RIPPLE_ALPHA_COLORED << 24)
                 | (getSystemUIAccentColor(context) & 0x00ffffff);
-    }
-
-    // Notifications
-
-    public static int getNotificationPrimaryBgColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.NOTIFICATION_BG_PRIMARY_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.NOTIFICATION_BG_PRIMARY_DAY;
-        } else {
-            return ColorConstants.NOTIFICATION_BG_PRIMARY_BLACKOUT;
-        }
-    }
-
-    public static int getNotificationLowBgColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.NOTIFICATION_BG_LOW_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.NOTIFICATION_BG_LOW_DAY;
-        } else {
-            return ColorConstants.NOTIFICATION_BG_LOW_BLACKOUT;
-        }
-    }
-
-    public static int getNotificationSecondaryBgColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.NOTIFICATION_BG_SECONDARY_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.NOTIFICATION_BG_SECONDARY_DAY;
-        } else {
-            return ColorConstants.NOTIFICATION_BG_SECONDARY_BLACKOUT;
-        }
-    }
-
-    public static int getNotificationAccentColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.NOTIFICATION_ACCENT_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.NOTIFICATION_ACCENT_DAY;
-        } else {
-            return ColorConstants.NOTIFICATION_ACCENT_BLACKOUT;
-        }
-    }
-
-    public static int getNotificationTextColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT << 24)
-                | (ColorConstants.WHITE & 0x00ffffff);
-        } else {
-            return (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
-                | (ColorConstants.BLACK & 0x00ffffff);
-        }
-    }
-
-    public static int getNotificationDismissAllTextColor() {
-        return ColorConstants.WHITE;
     }
 }
