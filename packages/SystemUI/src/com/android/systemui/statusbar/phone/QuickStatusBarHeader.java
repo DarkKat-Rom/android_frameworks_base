@@ -29,6 +29,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -429,5 +430,10 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
                 mMultiUserSwitch.getBackground()));
         mSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
                 mSettingsButton.getBackground()));
+    }
+
+    @Override
+    public void onClosingFinished() {
+        ((HorizontalScrollView) findViewById(R.id.quick_qs_panel_scroll)).scrollTo(0, 0);
     }
 }

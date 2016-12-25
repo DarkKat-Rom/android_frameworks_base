@@ -3951,6 +3951,13 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_TICKER = "status_bar_show_ticker";
 
         /**
+         * Whether to enable scroll on the QuickQSPanel
+         *
+         * @hide
+         */
+        public static final String QS_BAR_ENABLE_SCROLL = "qs_bar_enable_scroll";
+
+        /**
          * Number of rows used for the Quick Settings (portrait)
          *
          * @hide

@@ -26,8 +26,10 @@ import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
@@ -53,6 +55,8 @@ public class QSContainer extends FrameLayout {
     protected QSPanel mQSPanel;
     private QSDetail mQSDetail;
     protected BaseStatusBarHeader mHeader;
+    private ViewGroup mQuickQsPanelScrollerContainer;
+    private HorizontalScrollView mQuickQsPanelScroller;
     private QuickQSPanel mQuickQSPanel;
     protected float mQsExpansion;
     private boolean mQsExpanded;
@@ -77,8 +81,11 @@ public class QSContainer extends FrameLayout {
         mQSDetail = (QSDetail) findViewById(R.id.qs_detail);
         mHeader = (BaseStatusBarHeader) findViewById(R.id.header);
         mQuickQSPanel = (QuickQSPanel) mHeader.findViewById(R.id.quick_qs_panel);
+        mQuickQsPanelScrollerContainer =
+                (ViewGroup) mHeader.findViewById(R.id.quick_qs_panel_scroll_container);
+        mQuickQsPanelScroller = (HorizontalScrollView) mHeader.findViewById(R.id.quick_qs_panel_scroll);
         mQSDetail.setQsPanel(mQSPanel, mHeader);
-        mQSAnimator = new QSAnimator(this, mQuickQSPanel, mQSPanel);
+        mQSAnimator = new QSAnimator(this, mQuickQSPanel, mQSPanel, mQuickQsPanelScroller);
         mQSCustomizer = (QSCustomizer) findViewById(R.id.qs_customize);
         mQSCustomizer.setQsContainer(this);
     }
@@ -372,5 +379,12 @@ public class QSContainer extends FrameLayout {
     public void hideImmediately() {
         animate().cancel();
         setY(-mHeader.getHeight());
+    }
+
+    public void updateQSBarEnableScroll(boolean enabled) {
+        mQSAnimator.setFancyAnimaton(!enabled);
+        mQuickQSPanel.updateQSBarEnableScroll(enabled);
+        mQuickQsPanelScrollerContainer.setClipChildren(enabled);
+        mQuickQsPanelScrollerContainer.setClipToPadding(enabled);
     }
 }

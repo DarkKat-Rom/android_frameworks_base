@@ -43,4 +43,11 @@
 
     <!-- Ticker text end padding -->
     <dimen name="ticker_text_end_padding">10dp</dimen>
+
+    <!-- OmniRom addition -->
+
+    <!-- Quick settings (bar) -->
+
+    <!-- Start and end margin of the QS bar scroller -->
+    <dimen name="qs_scroller_margin_start_end">12dp</dimen>
 </resources>
