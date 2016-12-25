@@ -586,6 +586,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_SHOW_TICKER),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_BAR_ENABLE_SCROLL),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_ROWS_PORTRAIT),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -687,6 +690,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_SHOW_TICKER))) {
                 updateShowTicker();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_BAR_ENABLE_SCROLL))) {
+                updateQSBarEnableScroll();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_ROWS_PORTRAIT))
                 || uri.equals(Settings.System.getUriFor(
@@ -2649,6 +2655,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateClockStyle();
         updateClockSettings();
         updateShowTicker();
+        updateQSBarEnableScroll();
     }
 
     private void updateStatusBarTextColor(boolean animate) {
@@ -2872,6 +2879,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 Settings.System.STATUS_BAR_SHOW_TICKER, 0) == 1;
         if (mIconController != null) {
             mIconController.updateShowTicker(mShowTicker);
+        }
+    }
+
+    private void updateQSBarEnableScroll() {
+        if (mQSContainer != null) {
+            boolean scrollEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.QS_BAR_ENABLE_SCROLL, 0) == 1;
+            mQSContainer.updateQSBarEnableScroll(scrollEnabled);
         }
     }
 
@@ -5096,6 +5111,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     public void onClosingFinished() {
         runPostCollapseRunnables();
+        mHeader.onClosingFinished();
     }
 
     public void onUnlockHintStarted() {

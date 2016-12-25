@@ -49,4 +49,5 @@ public abstract class BaseStatusBarHeader extends RelativeLayout implements
     public abstract void setTextColor();
     public abstract void setIconColor();
     public abstract void setRippleColor();
+    public abstract void onClosingFinished();
 }
