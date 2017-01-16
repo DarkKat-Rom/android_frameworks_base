@@ -32,6 +32,15 @@
     <!-- Network traffic text end margin -->
     <dimen name="network_traffic_text_end_margin">3dp</dimen>
 
+    <!-- Battery arcs size -->
+    <dimen name="status_bar_battery_arcs_size">16dp</dimen>
+
+    <!-- Battery arcs stroke width -->
+    <dimen name="status_bar_battery_arcs_stroke_width">1.5dp</dimen>
+
+    <!-- Battery charging bolt text padding -->
+    <dimen name="battery_charging_bolt_text_padding">4dp</dimen>
+
     <!-- Ticker start padding -->
     <dimen name="ticker_start_padding">6dp</dimen>
 
