@@ -16,12 +16,9 @@
 <resources>
 
     <!-- Battery bar -->
-    <declare-styleable name="BatteryBar">
-        <attr name="frameColor" />
-    </declare-styleable>
-
-    <!-- Network traffic -->
-    <declare-styleable name="NetworkTraffic">
-        <attr name="isOnKeyguard" format="boolean" />
-    </declare-styleable>
+    <style name="BatteryBarStyle" parent="@android:style/Widget.Material.ProgressBar.Horizontal">
+        <item name="android:indeterminate">false</item>
+        <item name="android:minHeight">1dp</item>
+        <item name="android:maxHeight">1dp</item>
+    </style>
 </resources>
