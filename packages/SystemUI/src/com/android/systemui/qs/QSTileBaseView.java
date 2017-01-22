@@ -26,9 +26,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
+import com.android.systemui.BatteryMeterBaseDrawable;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
 
@@ -156,6 +158,38 @@ public class QSTileBaseView extends LinearLayout {
 
     public void setIconColor() {
         mIcon.setIconColor();
+    }
+
+    public void setBatteryTextColor() {
+        if (mIcon.getIconView() instanceof ImageView
+                && ((ImageView) mIcon.getIconView()).getDrawable() instanceof BatteryMeterBaseDrawable) {
+            ((BatteryMeterBaseDrawable) ((ImageView) mIcon.getIconView()).getDrawable()).setTextColor(
+                    QSColorHelper.getBatteryTextColor(mContext));
+        }
+    }
+
+    public void setBatteryTextVisibility(boolean show) {
+       if (mIcon.getIconView() instanceof ImageView
+                && ((ImageView) mIcon.getIconView()).getDrawable() instanceof BatteryMeterBaseDrawable) {
+            ((BatteryMeterBaseDrawable) ((ImageView) mIcon.getIconView()).getDrawable())
+                    .setTextVisibility(show);
+        }
+    }
+
+    public void setBatteryCircleDots(int interval, int length) {
+       if (mIcon.getIconView() instanceof ImageView
+                && ((ImageView) mIcon.getIconView()).getDrawable() instanceof BatteryMeterBaseDrawable) {
+            ((BatteryMeterBaseDrawable) ((ImageView) mIcon.getIconView()).getDrawable())
+                    .setCircleDots(interval, length);
+        }
+    }
+
+    public void setCutOutText(boolean cutOutText) {
+       if (mIcon.getIconView() instanceof ImageView
+                && ((ImageView) mIcon.getIconView()).getDrawable() instanceof BatteryMeterBaseDrawable) {
+            ((BatteryMeterBaseDrawable) ((ImageView) mIcon.getIconView()).getDrawable())
+                    .setCutOutText(cutOutText);
+        }
     }
 
     @Override

@@ -4012,6 +4012,48 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_TICKER = "status_bar_show_ticker";
 
         /**
+         * Type of the quick settings battery meter
+         * 0 - Battery icon portrait
+         * 1 - Battery icon landscape left
+         * 2 - Battery icon landscape right
+         * 3 - Battery icon circle
+         * 4 - Battery icon arcs
+         * default: 0
+         * @hide
+         */
+        public static final String QS_TILE_BATTERY_METER_TYPE = "qs_tile_battery_meter_type";
+
+
+        /**
+         *  Whether to show the percentage text embedded in the quick settings battery meter icon
+         * @hide
+         */
+        public static final String QS_TILE_BATTERY_METER_SHOW_TEXT = "qs_tile_battery_meter_show_text";
+
+        /**
+         * Dot interval of the quick settings circle battery meter icon
+         * 0 - No dots
+         * 1 - 10
+         * default: 0
+         * @hide
+         */
+        public static final String QS_TILE_BATTERY_METER_CIRCLE_DOT_INTERVAL = "qs_tile_battery_meter_circle_dot_interval";
+
+        /**
+         * Dot length of the quick settings circle battery meter icon
+         * 0 - 10
+         * default: 0
+         * @hide
+         */
+        public static final String QS_TILE_BATTERY_METER_CIRCLE_DOT_LENGTH = "qs_tile_battery_meter_circle_dot_length";
+
+        /**
+         *  Whether to cut the embedded percentage text out of the quick settings battery meter icon
+         * @hide
+         */
+        public static final String QS_TILE_BATTERY_METER_CUT_OUT_TEXT = "qs_tile_battery_meter_cut_out_text";
+
+        /**
          * Whether to enable scroll on the QuickQSPanel
          *
          * @hide

@@ -37,6 +37,7 @@ import com.android.systemui.qs.QSTile.DetailAdapter;
 import com.android.systemui.qs.QSTile.Host.Callback;
 import com.android.systemui.qs.customize.QSCustomizer;
 import com.android.systemui.qs.external.CustomTile;
+import com.android.systemui.qs.tiles.BatteryTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.settings.BrightnessController;
@@ -309,6 +310,50 @@ public class QSPanel extends LinearLayout implements Callback {
             r.tileView.setRippleColor();
             if (r.tile instanceof DndTile) {
                 ((DndTile) r.tile).updateDeatailRippleColor();
+            }
+        }
+    }
+
+    public void updateBatteryTextColor() {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof BatteryTile) {
+                r.tileView.setBatteryTextColor();
+            }
+        }
+    }
+
+    public void updateBatteryMeterType(int type) {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof BatteryTile) {
+                ((BatteryTile) r.tile).updateIconType(type);
+                r.tile.refreshState();
+            }
+        }
+    }
+
+    public void updateBatteryMeterTextVisibility(boolean show) {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof BatteryTile) {
+                ((BatteryTile) r.tile).updateBatteryTextVisibility(show);
+                r.tileView.setBatteryTextVisibility(show);
+            }
+        }
+    }
+
+    public void updateBatteryMeterCircleDots(int interval, int length) {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof BatteryTile) {
+                ((BatteryTile) r.tile).updateCircleDots(interval, length);
+                r.tileView.setBatteryCircleDots(interval, length);
+            }
+        }
+    }
+
+    public void updateBatteryMeterCutOutText(boolean cutOutText) {
+        for (TileRecord r : mRecords) {
+            if (r.tile instanceof BatteryTile) {
+                ((BatteryTile) r.tile).updateCutOutText(cutOutText);
+                r.tileView.setCutOutText(cutOutText);
             }
         }
     }

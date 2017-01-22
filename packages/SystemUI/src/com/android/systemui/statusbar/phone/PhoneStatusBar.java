@@ -529,6 +529,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -627,6 +630,21 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_COLUMNS_LANDSCAPE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_TYPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_SHOW_TEXT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_INTERVAL),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_LENGTH),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -664,6 +682,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR))) {
                 updateStatusBarExpandedRippleColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR))) {
+                updateStatusBarExpandedBatteryTextColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW))
                 || uri.equals(Settings.System.getUriFor(
@@ -753,6 +774,21 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_COLUMNS_LANDSCAPE))) {
                 updateQSRowsColumnsLandscape();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_TYPE))) {
+                updateQSAndHeaderBatteryMeterType();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_SHOW_TEXT))) {
+                updateQSAndHeaderBatteryMeterTextVisibility();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_INTERVAL))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_LENGTH))) {
+                updateQSAndHeaderBatteryMeterCircleDots();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT))) {
+                updateQSAndHeaderBatteryMeterCutOutText();
+
             }
         }
     }
@@ -1248,6 +1284,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     initSignalCluster(mHeader);
                     mHeader.setActivityStarter(PhoneStatusBar.this);
                     updateQSAndHeaderColors();
+                    updateQSAndHeaderBatteryTile();
                 }
             });
         }
@@ -2779,6 +2816,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateQSAndHeaderRippleColor();
     }
 
+    private void updateStatusBarExpandedBatteryTextColor() {
+        updateQSAndHeaderBatteryTextColor();
+    }
+
     private void updateQSAndHeaderColors() {
         updateQSAndHeaderPrimaryBgColor();
         updateQSAndHeaderSecondaryBgColor();
@@ -2786,6 +2827,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateQSAndHeaderTextColor();
         updateQSAndHeaderIconColor();
         updateQSAndHeaderRippleColor();
+        updateQSAndHeaderBatteryTextColor();
     }
 
     private void updateQSAndHeaderPrimaryBgColor() {
@@ -2823,6 +2865,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void updateQSAndHeaderRippleColor() {
         if (mQSContainer != null) {
             mQSContainer.updateRippleColor();
+        }
+    }
+
+    private void updateQSAndHeaderBatteryTextColor() {
+        if (mQSContainer != null) {
+            mQSContainer.updateBatteryTextColor();
         }
     }
 
@@ -3035,6 +3083,47 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         Resources res = mContext.getResources();
         if (res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             updateResources();
+        }
+    }
+
+    private void updateQSAndHeaderBatteryTile() {
+        updateQSAndHeaderBatteryMeterType();
+        updateQSAndHeaderBatteryMeterTextVisibility();
+        updateQSAndHeaderBatteryMeterCircleDots();
+        updateQSAndHeaderBatteryMeterCutOutText();
+    }
+
+    private void updateQSAndHeaderBatteryMeterType() {
+        final int type = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_TILE_BATTERY_METER_TYPE, 0);
+        if (mQSContainer != null) {
+            mQSContainer.updateBatteryMeterType(type);
+        }
+    }
+
+    private void updateQSAndHeaderBatteryMeterTextVisibility() {
+        final boolean show = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_TILE_BATTERY_METER_SHOW_TEXT, 0) == 1;
+        if (mQSContainer != null) {
+            mQSContainer.updateBatteryMeterTextVisibility(show);
+        }
+    }
+
+    private void updateQSAndHeaderBatteryMeterCircleDots() {
+        final int interval = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_INTERVAL, 0);
+        final int length = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_TILE_BATTERY_METER_CIRCLE_DOT_LENGTH, 0);
+        if (mQSContainer != null) {
+            mQSContainer.updateBatteryMeterCircleDots(interval, length);
+        }
+    }
+
+    private void updateQSAndHeaderBatteryMeterCutOutText() {
+        final boolean cutOut = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT, 1) == 1;
+        if (mQSContainer != null) {
+            mQSContainer.updateBatteryMeterCutOutText(cutOut);
         }
     }
 

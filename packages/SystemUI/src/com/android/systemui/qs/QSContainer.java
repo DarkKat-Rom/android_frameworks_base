@@ -376,6 +376,29 @@ public class QSContainer extends FrameLayout {
         mQSCustomizer.setActionBarRippleColor();
     }
 
+    public void updateBatteryTextColor() {
+        mQuickQSPanel.updateBatteryTextColor();
+    }
+
+    public void updateBatteryMeterType(int type) {
+        mQSPanel.updateBatteryMeterType(type);
+        mQuickQSPanel.updateBatteryMeterType(type);
+    }
+
+    public void updateBatteryMeterTextVisibility(boolean show) {
+        mQSPanel.updateBatteryMeterTextVisibility(show);
+        mQuickQSPanel.updateBatteryMeterTextVisibility(show);
+    }
+
+    public void updateBatteryMeterCircleDots(int interval, int length) {
+        mQSPanel.updateBatteryMeterCircleDots(interval, length);
+        mQuickQSPanel.updateBatteryMeterCircleDots(interval, length);
+    }
+
+    public void updateBatteryMeterCutOutText(boolean cutOutText) {
+        mQuickQSPanel.updateBatteryMeterCutOutText(cutOutText);
+    }
+
     public void hideImmediately() {
         animate().cancel();
         setY(-mHeader.getHeight());
