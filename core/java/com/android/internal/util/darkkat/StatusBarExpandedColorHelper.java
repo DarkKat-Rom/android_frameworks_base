@@ -130,4 +130,11 @@ public class StatusBarExpandedColorHelper {
             return ColorConstants.SBE_RIPPLE_ALPHA_COLORED;
         }
     }
+
+    public static int getBatteryTextColor(Context context) {
+        int color = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR,
+                ColorConstants.WHITE);
+        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
+    }
 }

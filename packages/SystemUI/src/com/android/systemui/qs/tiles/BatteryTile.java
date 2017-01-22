@@ -38,7 +38,10 @@ import android.widget.TextView;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.settingslib.BatteryInfo;
 import com.android.settingslib.graph.UsageView;
+import com.android.systemui.BatteryMeterBaseDrawable;
 import com.android.systemui.BatteryMeterDrawable;
+import com.android.systemui.BatteryMeterCircleDrawable;
+import com.android.systemui.BatteryMeterArcsDrawable;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.darkkat.util.QSRippleHelper;
@@ -47,7 +50,18 @@ import com.android.systemui.statusbar.policy.BatteryController;
 
 import java.text.NumberFormat;
 
-public class BatteryTile extends QSTile<QSTile.State> implements BatteryController.BatteryStateChangeCallback {
+public class BatteryTile extends QSTile<QSTile.State> implements
+        BatteryController.BatteryStateChangeCallback {
+
+    public static final int VERTICAL         = 0;
+    public static final int HORIZONTAL_LEFT  = 1;
+    public static final int HORIZONTAL_RIGHT = 2;
+    public static final int CIRCLE           = 3;
+    public static final int ARCS             = 4;
+
+    private static final float ROTATION_LEFT_DEGREES  = -90f;
+    private static final float ROTATION_RIGHT_DEGREES = 90f;
+    public static final float ROTATION_NONE           = 0f;
 
     private final BatteryController mBatteryController;
     private final BatteryDetail mBatteryDetail = new BatteryDetail();
@@ -57,6 +71,12 @@ public class BatteryTile extends QSTile<QSTile.State> implements BatteryControll
     private boolean mCharging;
     private boolean mDetailShown;
     private boolean mPluggedIn;
+
+    private int mType = VERTICAL;
+    private boolean mShowPercent = false;
+    private int mDotInterval = 0;
+    private int mDotLength = 0;
+    private boolean mCutOutText = true;
 
     public BatteryTile(Host host) {
         super(host);
@@ -76,6 +96,23 @@ public class BatteryTile extends QSTile<QSTile.State> implements BatteryControll
     @Override
     public int getMetricsCategory() {
         return MetricsEvent.QS_BATTERY_TILE;
+    }
+
+    public void updateIconType(int type) {
+        mType = type;
+    }
+
+    public void updateBatteryTextVisibility(boolean show) {
+        mShowPercent = show;
+    }
+
+    public void updateCircleDots(int interval, int length) {
+        mDotInterval = interval;
+        mDotLength = length;
+    }
+
+    public void updateCutOutText(boolean cutOutText) {
+        mCutOutText = cutOutText;
     }
 
     @Override
@@ -118,9 +155,32 @@ public class BatteryTile extends QSTile<QSTile.State> implements BatteryControll
         state.icon = new Icon() {
             @Override
             public Drawable getDrawable(Context context) {
-                BatteryMeterDrawable drawable =
-                        new BatteryMeterDrawable(context, new Handler(Looper.getMainLooper()), 0f, 0f);
+                BatteryMeterBaseDrawable drawable;
+                switch (mType) {
+                    case HORIZONTAL_LEFT:
+                        drawable = new BatteryMeterDrawable(context, new Handler(Looper.getMainLooper()),
+                                ROTATION_LEFT_DEGREES, ROTATION_RIGHT_DEGREES);
+                        break;
+                    case HORIZONTAL_RIGHT:
+                        drawable = new BatteryMeterDrawable(context, new Handler(Looper.getMainLooper()),
+                                ROTATION_RIGHT_DEGREES, ROTATION_LEFT_DEGREES);
+                        break;
+                    case CIRCLE:
+                        drawable = new BatteryMeterCircleDrawable(context, new Handler(Looper.getMainLooper()));
+                        break;
+                    case ARCS:
+                        drawable = new BatteryMeterArcsDrawable(context, new Handler(Looper.getMainLooper()));
+                        break;
+                    default:
+                        drawable = new BatteryMeterDrawable(context, new Handler(Looper.getMainLooper()),
+                                ROTATION_NONE, ROTATION_NONE);
+                        break;
+                }
                 drawable.setIconColor(QSColorHelper.getIconColor(mContext));
+                drawable.setTextColor(QSColorHelper.getBatteryTextColor(mContext));
+                drawable.setTextVisibility(mShowPercent);
+                drawable.setCircleDots(mDotInterval, mDotLength);
+                drawable.setCutOutText(mCutOutText);
                 drawable.onBatteryLevelChanged(mLevel, mPluggedIn, mCharging);
                 drawable.onPowerSaveChanged(mPowerSave);
                 return drawable;
