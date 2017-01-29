@@ -42,11 +42,14 @@ import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.qs.QSContainer;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSPanel.Callback;
 import com.android.systemui.qs.QuickQSPanel;
 import com.android.systemui.qs.TouchAnimator;
 import com.android.systemui.qs.TouchAnimator.Builder;
+import com.android.systemui.settings.BrightnessController;
+import com.android.systemui.settings.ToggleSlider;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.NextAlarmController.NextAlarmChangeCallback;
@@ -70,6 +73,8 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     private TextView mAlarmStatus;
     private View mAlarmStatusCollapsed;
 
+    private View mBrightnessView;
+    private QuickQSPanel mHeaderQsPanel;
     private QSPanel mQsPanel;
 
     private boolean mExpanded;
@@ -84,11 +89,9 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     private boolean mListening;
     private AlarmManager.AlarmClockInfo mNextAlarm;
 
-    private QuickQSPanel mHeaderQsPanel;
     private boolean mShowEmergencyCallsOnly;
     protected MultiUserSwitch mMultiUserSwitch;
     private ImageView mMultiUserAvatar;
-
 
     private TouchAnimator mAnimator;
     protected TouchAnimator mSettingsAlpha;
@@ -98,8 +101,23 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     private boolean mShowFullAlarm;
     private float mDateTimeTranslation;
 
+    private BrightnessController mBrightnessController;
+    private int mBrightnesSliderVisibility = QSContainer.BRIGHTNESS_SLIDER_HIDDEN;
+
+    private final int mHeight;
+    private final int mHeightWithBrightnessView;
+    private final int mExpandedHeight;
+    private final int mExpandedHeightWithBrightnessView;
+
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mHeight = context.getResources().getDimensionPixelSize(R.dimen.status_bar_header_height);
+        mHeightWithBrightnessView = context.getResources().getDimensionPixelSize(
+                R.dimen.status_bar_header_with_brightness_view_height);
+        mExpandedHeight = context.getResources().getDimensionPixelSize(R.dimen.status_bar_header_expanded_height);
+        mExpandedHeightWithBrightnessView = context.getResources().getDimensionPixelSize(
+                R.dimen.status_bar_header_with_brightness_view_expanded_height);
     }
 
     @Override
@@ -122,6 +140,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
         mExpandIndicator = (ExpandableIndicator) findViewById(R.id.expand_indicator);
 
+        mBrightnessView = findViewById(R.id.qs_brightness_view);
         mHeaderQsPanel = (QuickQSPanel) findViewById(R.id.quick_qs_panel);
 
         mSettingsButton = (SettingsButton) findViewById(R.id.settings_button);
@@ -141,6 +160,30 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         ((RippleDrawable) mExpandIndicator.getBackground()).setForceSoftware(true);
 
         updateResources();
+
+        mBrightnessController = new BrightnessController(getContext(),
+                (ImageView) findViewById(R.id.brightness_icon),
+                (ToggleSlider) findViewById(R.id.brightness_slider));
+
+        if (mHost != null) {
+            mBrightnessController.setBackgroundLooper(mHost.getLooper());
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        int brightnessViewTop = getContext().getResources().getDimensionPixelSize(
+                R.dimen.qs_brightness_view_margin_top);
+        int headerQsPanelScrollContainerTop =
+                getContext().getResources().getDimensionPixelSize(showBrightnesSliderOnBar()
+                        ? R.dimen.qs_bar_with_brightness_view_margin_top : R.dimen.qs_bar_margin_top);
+        mBrightnessView.layout(left, brightnessViewTop, right,
+                brightnessViewTop + mBrightnessView.getMeasuredHeight());
+        View headerQsPanelScrollContainer = findViewById(R.id.quick_qs_panel_scroll_container);
+        headerQsPanelScrollContainer.layout(left, headerQsPanelScrollContainerTop, right,
+                headerQsPanelScrollContainerTop + headerQsPanelScrollContainer.getMeasuredHeight());
+        updateBottom();
     }
 
     @Override
@@ -209,6 +252,13 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         updateEverything();
     }
 
+    private void updateBottom() {
+        int bottom = showBrightnesSliderOnBar()
+                ? (mExpansionAmount == 1 ? mExpandedHeightWithBrightnessView : mHeightWithBrightnessView) 
+                        : (mExpansionAmount == 1 ? mExpandedHeight : mHeight);
+        setBottom(bottom);
+    }
+
     @Override
     public void onNextAlarmChanged(AlarmManager.AlarmClockInfo nextAlarm) {
         mNextAlarm = nextAlarm;
@@ -236,6 +286,9 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         updateAlarmVisibilities();
 
         mExpandIndicator.setExpanded(headerExpansionFraction > EXPAND_INDICATOR_THRESHOLD);
+        if (mExpansionAmount == 1 || mExpansionAmount == 0) {
+            requestLayout();
+        }
     }
 
     @Override
@@ -291,6 +344,13 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
             mNextAlarmController.addStateChangedCallback(this);
         } else {
             mNextAlarmController.removeStateChangedCallback(this);
+        }
+        if (mBrightnessView.getVisibility() == View.VISIBLE) {
+            if (mListening) {
+                mBrightnessController.registerCallbacks();
+            } else {
+                mBrightnessController.unregisterCallbacks();
+            }
         }
     }
 
@@ -359,6 +419,11 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     }
 
     @Override
+    public View getBrightnessView() {
+        return mBrightnessView;
+    }
+
+    @Override
     public void setNextAlarmController(NextAlarmController nextAlarmController) {
         mNextAlarmController = nextAlarmController;
     }
@@ -395,6 +460,16 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     }
 
     @Override
+    public void updateBrightnessThumbBgColor() {
+        mBrightnessController.updateBrightnessThumbBgColor();
+    }
+
+    @Override
+    public void updateAccentColor() {
+        mBrightnessController.updateAccentColor();
+    }
+
+    @Override
     public void setTextColor() {
         final int color = QSColorHelper.getTextColor(mContext);
         ((SplitClockView) mDateTimeAlarmGroup.findViewById(R.id.clock)).setTextColor(color);
@@ -417,6 +492,7 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         mSettingsButton.setImageTintList(color);
         ((ImageView) mSettingsContainer.findViewById(R.id.tuner_icon)).setImageTintList(
                 QSColorHelper.getIconTunerTintList(mContext));
+        mBrightnessController.updateIconColor();
     }
 
     @Override
@@ -430,6 +506,30 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
                 mMultiUserSwitch.getBackground()));
         mSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
                 mSettingsButton.getBackground()));
+        mBrightnessController.updateRippleColor();
+    }
+
+    @Override
+    public void updateBrightnesSliderVisibility(int visibility) {
+        mBrightnesSliderVisibility = visibility;
+        if (mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
+                || showBrightnesSliderOnBar()) {
+            mBrightnessView.setVisibility(View.VISIBLE);
+        } else if (showBrightnesSliderOnPanel()) {
+            mBrightnessView.setVisibility(View.INVISIBLE);
+        } else {
+            mBrightnessView.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean showBrightnesSliderOnBar() {
+        return mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
+                || mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW_ON_QS_BAR;
+    }
+
+    private boolean showBrightnesSliderOnPanel() {
+        return mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
+                || mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL;
     }
 
     @Override

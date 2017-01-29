@@ -40,10 +40,8 @@ import com.android.systemui.qs.external.CustomTile;
 import com.android.systemui.qs.tiles.BatteryTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.WifiTile;
-import com.android.systemui.settings.BrightnessController;
 import com.android.systemui.settings.ToggleSlider;
 import com.android.systemui.statusbar.phone.QSTileHost;
-import com.android.systemui.statusbar.policy.BrightnessMirrorController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
 
@@ -55,7 +53,6 @@ public class QSPanel extends LinearLayout implements Callback {
 
     protected final Context mContext;
     protected final ArrayList<TileRecord> mRecords = new ArrayList<TileRecord>();
-    protected final View mBrightnessView;
     private final H mHandler = new H();
 
     private int mPanelPaddingBottom;
@@ -64,7 +61,6 @@ public class QSPanel extends LinearLayout implements Callback {
     protected boolean mListening;
 
     private Callback mCallback;
-    private BrightnessController mBrightnessController;
     protected QSTileHost mHost;
 
     protected QSFooter mFooter;
@@ -74,8 +70,6 @@ public class QSPanel extends LinearLayout implements Callback {
 
     private QSCustomizer mCustomizePanel;
     private Record mDetailRecord;
-
-    private BrightnessMirrorController mBrightnessMirrorController;
 
     public QSPanel(Context context) {
         this(context, null);
@@ -87,21 +81,12 @@ public class QSPanel extends LinearLayout implements Callback {
 
         setOrientation(VERTICAL);
 
-        mBrightnessView = LayoutInflater.from(context).inflate(
-                R.layout.quick_settings_brightness_dialog, this, false);
-        addView(mBrightnessView);
-
         setupTileLayout();
 
         mFooter = new QSFooter(this, context);
         addView(mFooter.getView());
 
         updateResources();
-
-        mBrightnessController = new BrightnessController(getContext(),
-                (ImageView) findViewById(R.id.brightness_icon),
-                (ToggleSlider) findViewById(R.id.brightness_slider));
-
     }
 
     protected void setupTileLayout() {
@@ -151,18 +136,6 @@ public class QSPanel extends LinearLayout implements Callback {
         return mHost.createTile(subPanel);
     }
 
-    public void setBrightnessMirror(BrightnessMirrorController c) {
-        mBrightnessMirrorController = c;
-        ToggleSlider brightnessSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
-        ToggleSlider mirror = (ToggleSlider) c.getMirror().findViewById(R.id.brightness_slider);
-        brightnessSlider.setMirror(mirror);
-        brightnessSlider.setMirrorController(c);
-    }
-
-    View getBrightnessView() {
-        return mBrightnessView;
-    }
-
     public void setCallback(Callback callback) {
         mCallback = callback;
     }
@@ -176,7 +149,6 @@ public class QSPanel extends LinearLayout implements Callback {
         if (mCustomizePanel != null) {
             mCustomizePanel.setHost(mHost);
         }
-        mBrightnessController.setBackgroundLooper(host.getLooper());
     }
 
     public QSTileHost getHost() {
@@ -187,7 +159,7 @@ public class QSPanel extends LinearLayout implements Callback {
         final Resources res = mContext.getResources();
         mPanelPaddingBottom = res.getDimensionPixelSize(R.dimen.qs_panel_padding_bottom);
         mBrightnessPaddingTop = res.getDimensionPixelSize(R.dimen.qs_brightness_padding_top);
-        setPadding(0, mBrightnessPaddingTop, 0, mPanelPaddingBottom);
+        setPadding(0, 0, 0, mPanelPaddingBottom);
         for (TileRecord r : mRecords) {
             r.tile.clearState();
         }
@@ -203,11 +175,6 @@ public class QSPanel extends LinearLayout implements Callback {
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mFooter.onConfigurationChanged();
-
-        if (mBrightnessMirrorController != null) {
-            // Reload the mirror in case it got reinflated but we didn't.
-            setBrightnessMirror(mBrightnessMirrorController);
-        }
     }
 
     public void onCollapse() {
@@ -240,13 +207,6 @@ public class QSPanel extends LinearLayout implements Callback {
         if (mListening) {
             refreshAllTiles();
         }
-        if (mBrightnessView.getVisibility() == View.VISIBLE) {
-            if (listening) {
-                mBrightnessController.registerCallbacks();
-            } else {
-                mBrightnessController.unregisterCallbacks();
-            }
-        }
     }
 
     public void refreshAllTiles() {
@@ -254,10 +214,6 @@ public class QSPanel extends LinearLayout implements Callback {
             r.tile.refreshState();
         }
         mFooter.refreshState();
-    }
-
-    public void updateBrightnessThumbBgColor() {
-        mBrightnessController.updateBrightnessThumbBgColor();
     }
 
     public void updateDndModePanelBgColor() {
@@ -269,7 +225,6 @@ public class QSPanel extends LinearLayout implements Callback {
     }
 
     public void updateAccentColor() {
-        mBrightnessController.updateAccentColor();
         for (TileRecord r : mRecords) {
             if (r.tile instanceof DndTile) {
                 ((DndTile) r.tile).updateDeatailAccentColor();
@@ -288,7 +243,6 @@ public class QSPanel extends LinearLayout implements Callback {
     }
 
     public void updateIconColor() {
-        mBrightnessController.updateIconColor();
         for (TileRecord r : mRecords) {
             r.tileView.setIconColor();
             if (r.tile instanceof WifiTile) {
@@ -305,7 +259,6 @@ public class QSPanel extends LinearLayout implements Callback {
     }
 
     public void updateRippleColor() {
-        mBrightnessController.updateRippleColor();
         for (TileRecord r : mRecords) {
             r.tileView.setRippleColor();
             if (r.tile instanceof DndTile) {
