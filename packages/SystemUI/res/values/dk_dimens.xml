@@ -52,6 +52,37 @@
 
     <!-- Ticker text end padding -->
     <dimen name="ticker_text_end_padding">10dp</dimen>
+    <!-- Status bar end -->
+
+    <!-- Status bar header -->
+
+    <!-- Height of the status bar header (collapsed QS panel, visible brightness view) -->
+    <dimen name="status_bar_header_with_brightness_view_height">160dp</dimen>
+
+    <!-- Height of the status bar header (expanded QS panel, visible brightness view) -->
+    <dimen name="status_bar_header_with_brightness_view_expanded_height">106dp</dimen>
+
+    <!-- Height of the status bar header (expanded QS panel, hidden brightness view) -->
+    <dimen name="status_bar_header_expanded_height">52dp</dimen>
+
+    <!-- Top margin of the QS brightness view -->
+    <dimen name="qs_brightness_view_margin_top">58dp</dimen>
+
+    <!-- Top margin of the QS bar (visible brightness view)  -->
+    <dimen name="qs_bar_with_brightness_view_margin_top">112dp</dimen>
+
+    <!-- Top margin of the QS bar (hidden brightness view)  -->
+    <dimen name="qs_bar_margin_top">52dp</dimen>
+    <!-- Status bar header end -->
+
+    <!-- Quick settings -->
+
+    <!-- Top margin of the QS panel (visible brightness view)  -->
+    <dimen name="qs_panel_with_brightness_view_margin_top">86dp</dimen>
+
+    <!-- Top margin of the QS panel (hidden brightness view)  -->
+    <dimen name="qs_panel_margin_top">38dp</dimen>
+    <!-- Quick settings end -->
 
     <!-- OmniRom addition -->
 

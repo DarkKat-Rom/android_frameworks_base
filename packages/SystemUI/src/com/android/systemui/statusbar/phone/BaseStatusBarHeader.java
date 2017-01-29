@@ -18,6 +18,7 @@ package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.RelativeLayout;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSPanel.Callback;
@@ -46,8 +47,14 @@ public abstract class BaseStatusBarHeader extends RelativeLayout implements
     public abstract void setNextAlarmController(NextAlarmController nextAlarmController);
     public abstract void setUserInfoController(UserInfoController userInfoController);
     public abstract void setCallback(Callback qsPanelCallback);
+    public View getBrightnessView() {
+        return null;
+    }
+    public abstract void updateBrightnessThumbBgColor();
+    public abstract void updateAccentColor();
     public abstract void setTextColor();
     public abstract void setIconColor();
     public abstract void setRippleColor();
+    public abstract void updateBrightnesSliderVisibility(int visibility);
     public abstract void onClosingFinished();
 }

@@ -631,6 +631,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.QS_COLUMNS_LANDSCAPE),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_BRIGHTNESS_SLIDER_VISIBILITY),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_TILE_BATTERY_METER_TYPE),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -774,6 +777,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_COLUMNS_LANDSCAPE))) {
                 updateQSRowsColumnsLandscape();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_BRIGHTNESS_SLIDER_VISIBILITY))) {
+                updateQSAndHeaderBrightnesSliderVisibility();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_TILE_BATTERY_METER_TYPE))) {
                 updateQSAndHeaderBatteryMeterType();
@@ -1278,12 +1284,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                             R.id.quick_settings_container);
                     mQSContainer.setHost(qsh);
                     mQSPanel = mQSContainer.getQsPanel();
-                    mQSPanel.setBrightnessMirror(mBrightnessMirrorController);
                     mKeyguardStatusBar.setQSPanel(mQSPanel);
                     mHeader = mQSContainer.getHeader();
                     initSignalCluster(mHeader);
                     mHeader.setActivityStarter(PhoneStatusBar.this);
                     updateQSAndHeaderColors();
+                    updateQSAndHeaderBrightnesSliderVisibility();
                     updateQSAndHeaderBatteryTile();
                 }
             });
@@ -3083,6 +3089,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         Resources res = mContext.getResources();
         if (res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             updateResources();
+        }
+    }
+
+    private void updateQSAndHeaderBrightnesSliderVisibility() {
+        final int visibility = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QS_BRIGHTNESS_SLIDER_VISIBILITY, 2);
+        if (mQSContainer != null) {
+            mQSContainer.updateBrightnesSliderVisibility(visibility);
         }
     }
 

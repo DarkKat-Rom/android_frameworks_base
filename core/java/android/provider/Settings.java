@@ -4012,6 +4012,17 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_TICKER = "status_bar_show_ticker";
 
         /**
+         * Quick settings Brightness slider visibility 
+         * 0 - Always
+         * 1 - Show on quick settings bar only
+         * 2 - Show on quick settings panel only
+         * 3 - Hidden 
+         * default: 2
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_SLIDER_VISIBILITY = "qs_brightness_slider_visibility";
+
+        /**
          * Type of the quick settings battery meter
          * 0 - Battery icon portrait
          * 1 - Battery icon landscape left

@@ -55,10 +55,9 @@ public class QuickQSPanel extends QSPanel {
             }
             removeView((View) mTileLayout);
         }
-        mBrightnessView.setVisibility(View.GONE);
         mTileLayout = new HeaderTileLayout(context);
         mTileLayout.setListening(mListening);
-        addView((View) mTileLayout, 1 /* Between brightness and footer */);
+        addView((View) mTileLayout, 0);
     }
 
     @Override
