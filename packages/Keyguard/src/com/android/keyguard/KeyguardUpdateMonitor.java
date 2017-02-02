@@ -24,6 +24,8 @@ import static android.os.BatteryManager.EXTRA_HEALTH;
 import static android.os.BatteryManager.EXTRA_LEVEL;
 import static android.os.BatteryManager.EXTRA_MAX_CHARGING_CURRENT;
 import static android.os.BatteryManager.EXTRA_MAX_CHARGING_VOLTAGE;
+import static android.os.BatteryManager.EXTRA_TEMPERATURE;
+import static android.os.BatteryManager.EXTRA_VOLTAGE;
 import static android.os.BatteryManager.EXTRA_PLUGGED;
 import static android.os.BatteryManager.EXTRA_STATUS;
 
@@ -654,7 +656,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 final int plugged = intent.getIntExtra(EXTRA_PLUGGED, 0);
                 final int level = intent.getIntExtra(EXTRA_LEVEL, 0);
                 final int health = intent.getIntExtra(EXTRA_HEALTH, BATTERY_HEALTH_UNKNOWN);
-
+                final int currentTemperature = intent.getIntExtra(EXTRA_TEMPERATURE, -1);
+                final int currentMiliVolt = intent.getIntExtra(EXTRA_VOLTAGE, -1);
                 final int maxChargingMicroAmp = intent.getIntExtra(EXTRA_MAX_CHARGING_CURRENT, -1);
                 int maxChargingMicroVolt = intent.getIntExtra(EXTRA_MAX_CHARGING_VOLTAGE, -1);
                 final int maxChargingMicroWatt;
@@ -672,7 +675,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 }
                 final Message msg = mHandler.obtainMessage(
                         MSG_BATTERY_UPDATE, new BatteryStatus(status, level, plugged, health,
-                                maxChargingMicroWatt));
+                                currentTemperature, currentMiliVolt, maxChargingMicroAmp,
+                                maxChargingMicroVolt, maxChargingMicroWatt));
                 mHandler.sendMessage(msg);
             } else if (TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(action)) {
                 SimData args = SimData.fromIntent(intent);
@@ -864,14 +868,24 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         public final int level;
         public final int plugged;
         public final int health;
-        public final int maxChargingWattage;
+        public final int currentTemperature;
+        public final int currentMiliVolt;
+        public final int maxChargingMicroAmp;
+        public final int maxChargingMicroVolt;
+        public final int maxChargingMicroWatt;
+
         public BatteryStatus(int status, int level, int plugged, int health,
-                int maxChargingWattage) {
+                int currentTemperature, int currentMiliVolt, int maxChargingMicroAmp,
+                int maxChargingMicroVolt, int maxChargingMicroWatt) {
             this.status = status;
             this.level = level;
             this.plugged = plugged;
             this.health = health;
-            this.maxChargingWattage = maxChargingWattage;
+            this.currentTemperature = currentTemperature;
+            this.currentMiliVolt = currentMiliVolt;
+            this.maxChargingMicroAmp = maxChargingMicroAmp;
+            this.maxChargingMicroVolt = maxChargingMicroVolt;
+            this.maxChargingMicroWatt = maxChargingMicroWatt;
         }
 
         /**
@@ -903,9 +917,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         public final int getChargingSpeed(int slowThreshold, int fastThreshold) {
-            return maxChargingWattage <= 0 ? CHARGING_UNKNOWN :
-                    maxChargingWattage < slowThreshold ? CHARGING_SLOWLY :
-                    maxChargingWattage > fastThreshold ? CHARGING_FAST :
+            return maxChargingMicroWatt <= 0 ? CHARGING_UNKNOWN :
+                    maxChargingMicroWatt < slowThreshold ? CHARGING_SLOWLY :
+                    maxChargingMicroWatt > fastThreshold ? CHARGING_FAST :
                     CHARGING_REGULAR;
         }
     }
@@ -1056,7 +1070,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         // Take a guess at initial SIM state, battery status and PLMN until we get an update
-        mBatteryStatus = new BatteryStatus(BATTERY_STATUS_UNKNOWN, 100, 0, 0, 0);
+        mBatteryStatus = new BatteryStatus(BATTERY_STATUS_UNKNOWN, 100, 0, 0, 0, 0, 0, 0, 0);
 
         // Watch for interesting updates
         final IntentFilter filter = new IntentFilter();
@@ -1381,9 +1395,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
      */
     private void handleBatteryUpdate(BatteryStatus status) {
         if (DEBUG) Log.d(TAG, "handleBatteryUpdate");
-        final boolean batteryUpdateInteresting = isBatteryUpdateInteresting(mBatteryStatus, status);
-        mBatteryStatus = status;
+        final boolean batteryUpdateInteresting = isBatteryUpdateInteresting(mContext, mBatteryStatus, status);
         if (batteryUpdateInteresting) {
+            mBatteryStatus = status;
             for (int i = 0; i < mCallbacks.size(); i++) {
                 KeyguardUpdateMonitorCallback cb = mCallbacks.get(i).get();
                 if (cb != null) {
@@ -1523,12 +1537,23 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
     }
 
-    private static boolean isBatteryUpdateInteresting(BatteryStatus old, BatteryStatus current) {
+    private static boolean isBatteryUpdateInteresting(Context context, BatteryStatus old,
+            BatteryStatus current) {
+        final boolean showBatteryInfo = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_SHOW_BATTERY_INFO, 0) == 1;
+        final boolean showAdvancedBatteryChargingInfo =
+                Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_SHOW_ADVANCED_BATTERY_CHARGING_INFO, 0) == 1;
         final boolean nowPluggedIn = current.isPluggedIn();
         final boolean wasPluggedIn = old.isPluggedIn();
         final boolean stateChangedWhilePluggedIn =
             wasPluggedIn == true && nowPluggedIn == true
             && (old.status != current.status);
+
+        // when showing battery- or advanced charging info change is always interesting
+        if (showBatteryInfo || showAdvancedBatteryChargingInfo) {
+            return true;
+        }
 
         // change in plug state is always interesting
         if (wasPluggedIn != nowPluggedIn || stateChangedWhilePluggedIn) {
@@ -1546,7 +1571,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         // change in charging current while plugged in
-        if (nowPluggedIn && current.maxChargingWattage != old.maxChargingWattage) {
+        if (nowPluggedIn && current.maxChargingMicroWatt != old.maxChargingMicroWatt) {
             return true;
         }
 
