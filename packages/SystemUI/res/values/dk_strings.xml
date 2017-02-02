@@ -15,6 +15,18 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Lock screen -->
+    <string name="keyguard_indication_discharging">Not charging%1$s</string>
+    <string name="keyguard_indication_discharging_part_time">&#160;(%1$s until empty)</string>
+    <string name="keyguard_indication_charging">Charging%1$s%2$s</string>
+    <string name="keyguard_indication_charging_ac">Charging%1$s on AC%2$s</string>
+    <string name="keyguard_indication_charging_usb">Charging%1$s over USB%2$s</string>
+    <string name="keyguard_indication_charging_wireless">Charging%1$s wirelessly%2$s</string>
+    <string name="keyguard_indication_charging_part_fast">&#160;rapidly</string>
+    <string name="keyguard_indication_charging_part_slowly">&#160;slowly</string>
+    <string name="keyguard_indication_charging_part_time">&#160;(%1$s until full)</string>
+
+
     <!-- Network traffic -->
     <string name="network_traffic_no_traffic">0</string>
 

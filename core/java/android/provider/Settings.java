@@ -3752,6 +3752,33 @@ public final class Settings {
         public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
 
         /**
+         *  Whether to show battery info on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_BATTERY_INFO = "lock_screen_show_battery_info";
+
+        /**
+         *  Whether to show the battery temperature on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_BATTERY_TEMP =
+                "lock_screen_show_battery_temp";
+
+        /**
+         *  Whether to show battery charging info on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_BATTERY_CHARGING_INFO =
+                "lock_screen_show_battery_charging_info";
+
+        /**
+         *  Whether to show advanced battery charging info on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_ADVANCED_BATTERY_CHARGING_INFO =
+                "lock_screen_show_advanced_battery_charging_info";
+
+        /**
          * Wether to show the location in the detailed weather view
          * @hide
          */
