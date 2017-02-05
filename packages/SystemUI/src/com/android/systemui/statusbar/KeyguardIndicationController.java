@@ -84,12 +84,12 @@ public class KeyguardIndicationController {
     private int mPlugged;
     private int mCurrentTemperature;
     private int mCurrentMicroAmp;
-    private int mCurrentMiliVolt;
+    private int mCurrentMicroVolt;
     private int mCurrentMicroAmpHours;
     private int mCurrentMicroWatt;
     private int mMaxChargingMicroAmp;
     private int mMaxChargingMicroVolt;
-    private final String mMaxChargingMicroAmpHours;
+    private int mMaxChargingMicroAmpHours;
     private int mMaxChargingMicroWatt;
     private int mChargingSpeed;
     private String mMessageToShowOnScreenOn;
@@ -112,9 +112,6 @@ public class KeyguardIndicationController {
         KeyguardUpdateMonitor.getInstance(context).registerCallback(mUpdateMonitor);
         context.registerReceiverAsUser(mTickReceiver, UserHandle.SYSTEM,
                 new IntentFilter(Intent.ACTION_TIME_TICK), null, null);
-
-        mMaxChargingMicroAmpHours = mContext.getResources().getString(
-                R.string.keyguard_indication_max_battery_capacity);
     }
 
     public void setVisible(boolean visible) {
@@ -282,24 +279,29 @@ public class KeyguardIndicationController {
             if (mCurrentTemperature > 0) {
                 chargingInfo += ", " + mCurrentTemperature / 10 + " °C";
             }
-            if (mCurrentMicroAmp > 0 && mMaxChargingMicroAmp > 0) {
-                chargingInfo +=  "\n" + (mCurrentMicroAmp / 1000) + " mA ("
-                        + (mMaxChargingMicroAmp / 1000) + " mA)";
+            if (mCurrentMicroAmp > 0 || mMaxChargingMicroAmp > 0) {
+                chargingInfo += "\n";
+                chargingInfo += (mCurrentMicroAmp > 0
+                        ? (mCurrentMicroAmp / 1000) + " mA (" : "N/A (");
+                chargingInfo += (mMaxChargingMicroAmp > 0
+                        ? (mMaxChargingMicroAmp / 1000) + " mA)" : "N/A)");
                 onFirstRow = false;
                 count += 1;
             }
-            if (mCurrentMiliVolt > 0 && mMaxChargingMicroVolt > 0) {
+            if (mCurrentMicroVolt > 0 || mMaxChargingMicroVolt > 0) {
                 if (onFirstRow) {
                     chargingInfo += "\n";
                     onFirstRow = false;
                 } else {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
-                chargingInfo += ONE_DIGITS_FORMAT.format(mCurrentMiliVolt / 1000f) + " V ("
-                        + ONE_DIGITS_FORMAT.format(mMaxChargingMicroVolt / 1000000f) + " V)";
+                chargingInfo += (mCurrentMicroVolt > 0
+                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroVolt / 1000f) + " V (" : "N/A (");
+                chargingInfo += (mMaxChargingMicroVolt > 0
+                        ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroVolt / 1000000f) + " V)" : "N/A)");
                 count += 1;
             }
-            if (mCurrentMicroAmpHours > 0) {
+            if (mCurrentMicroAmpHours > 0 || mMaxChargingMicroAmpHours > 0) {
                 if (onFirstRow || count == 2) {
                     chargingInfo += "\n";
                     if (onFirstRow) {
@@ -310,18 +312,22 @@ public class KeyguardIndicationController {
                 } else {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
-                chargingInfo += (mCurrentMicroAmpHours / 1000) + " mAh ("
-                        + mMaxChargingMicroAmpHours + ")";
+                chargingInfo += (mCurrentMicroAmpHours > 0
+                        ? (mCurrentMicroAmpHours / 1000) + " mAh (" : "N/A (");
+                chargingInfo += (mMaxChargingMicroAmpHours > 0
+                        ? (mMaxChargingMicroAmpHours / 1000) + " mAh)" : "N/A)");
                 count += 1;
             }
-            if (mCurrentMicroWatt > 0 && mMaxChargingMicroWatt > 0) {
+            if (mCurrentMicroWatt > 0 || mMaxChargingMicroWatt > 0) {
                 if (onFirstRow || count == 2) {
                     chargingInfo += "\n";
                 } else {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
-                chargingInfo += ONE_DIGITS_FORMAT.format(mCurrentMicroWatt / 1000000f) + " W ("
-                        + ONE_DIGITS_FORMAT.format(mMaxChargingMicroWatt/ 1000000f) + " W)";
+                chargingInfo += (mCurrentMicroWatt > 0
+                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroWatt / 1000000f) + " W (" : "N/A (");
+                chargingInfo += (mMaxChargingMicroWatt > 0
+                        ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroWatt/ 1000000f) + " W)" : "N/A)");
             }
         }
         return chargingInfo;
@@ -374,14 +380,13 @@ public class KeyguardIndicationController {
             mPowerCharged = status.isCharged();
             mPlugged = status.plugged;
             mCurrentTemperature = status.currentTemperature;
-            mCurrentMicroAmp =
-                    batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW);
-            mCurrentMiliVolt = status.currentMiliVolt;
-            mCurrentMicroAmpHours = 
-                    batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
-            mCurrentMicroWatt = (mCurrentMicroAmp) * (mCurrentMiliVolt / 1000);
+            mCurrentMicroAmp = status.currentMicroAmp;
+            mCurrentMicroVolt = status.currentMicroVolt;
+            mCurrentMicroAmpHours = status.currentMicroAmpHours;
+            mCurrentMicroWatt = status.currentMicroWatt;
             mMaxChargingMicroAmp = status.maxChargingMicroAmp;
             mMaxChargingMicroVolt = status.maxChargingMicroVolt;
+            mMaxChargingMicroAmpHours = status.maxChargingMicroAmpHours;
             mMaxChargingMicroWatt = status.maxChargingMicroWatt;
             mChargingSpeed = status.getChargingSpeed(mSlowThreshold, mFastThreshold);
             updateIndication();
