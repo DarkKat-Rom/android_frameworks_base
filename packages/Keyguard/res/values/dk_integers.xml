@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
     <!-- Lock screen -->
 
-    <!-- Maximal capacity of the battery, (this should be overlayed in the device tree) -->
-    <string name="keyguard_indication_max_battery_capacity">2700 mAh</string>
+    <!-- Maximal capacity of the battery, (this have to be overlayed in the device tree) -->
+    <integer name="keyguard_indication_max_battery_capacity">0</integer>
+
+    <!-- Multiplicator of the current and max battery values, (this should be overlayed in the device tree if needed) -->
+    <integer name="keyguard_indication_battery_multiplicator">1</integer>
 </resources>
