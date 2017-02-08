@@ -14,11 +14,15 @@
 
 package com.android.systemui.qs;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Path;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
 import android.view.View.OnLayoutChangeListener;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
@@ -27,6 +31,7 @@ import com.android.systemui.qs.QSPanel.QSTileLayout;
 import com.android.systemui.qs.QSTile.Host.Callback;
 import com.android.systemui.qs.TouchAnimator.Builder;
 import com.android.systemui.qs.TouchAnimator.Listener;
+import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.BaseStatusBarHeader;
 import com.android.systemui.statusbar.phone.QSTileHost;
 
@@ -43,11 +48,15 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
 
     public static final float EXPANDED_TILE_DELAY = .86f;
 
+    public static final int BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL = 2;
+    public static final int BRIGHTNESS_SLIDER_HIDDEN           = 3;
+
+    private final Context mContext;
+    private final Resources mResources;
     private final ArrayList<View> mAllViews = new ArrayList<>();
     private final ArrayList<View> mTopFiveQs = new ArrayList<>();
     private final QSContainer mQsContainer;
     private final BaseStatusBarHeader mHeader;
-    private final View mBrightnessView;
     private final HorizontalScrollView mQuickQsPanelScroller;
     private final QuickQSPanel mQuickQsPanel;
     private final QSPanel mQsPanel;
@@ -60,7 +69,6 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
     private TouchAnimator mTranslationXAnimator;
     private TouchAnimator mTranslationYAnimator;
     private TouchAnimator mNonfirstPageAnimator;
-    private TouchAnimator mBrightnessViewAnimator;
 
     private boolean mOnKeyguard;
 
@@ -69,11 +77,20 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
     private float mLastPosition;
     private QSTileHost mHost;
 
-    public QSAnimator(QSContainer container, BaseStatusBarHeader header,
+    private final int mHeaderHeight;
+    private final int mHeaderHeightWithBrightnessView;
+    private final int mHeaderExpandedHeight;
+    private final int mHeaderExpandedHeightWithBrightnessView;
+
+
+    private int mBrightnesSliderVisibility = BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL;
+
+    public QSAnimator(Context context, QSContainer container, BaseStatusBarHeader header,
             HorizontalScrollView quickPanelScroller, QuickQSPanel quickPanel, QSPanel panel) {
+        mContext = context;
+        mResources = mContext.getResources();
         mQsContainer = container;
         mHeader = header;
-        mBrightnessView = mHeader.getBrightnessView();
         mQuickQsPanelScroller = quickPanelScroller;
         mQuickQsPanel = quickPanel;
         mQsPanel = panel;
@@ -86,6 +103,14 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
         } else {
             Log.w(TAG, "QS Not using page layout");
         }
+
+        mHeaderHeight = mResources.getDimensionPixelSize(R.dimen.status_bar_header_height);
+        mHeaderHeightWithBrightnessView = mResources.getDimensionPixelSize(
+                R.dimen.status_bar_header_with_brightness_view_height);
+        mHeaderExpandedHeight =
+                mResources.getDimensionPixelSize(R.dimen.status_bar_header_expanded_height);
+        mHeaderExpandedHeightWithBrightnessView = mResources.getDimensionPixelSize(
+                R.dimen.status_bar_header_with_brightness_view_expanded_height);
     }
 
     public void onRtlChanged() {
@@ -94,6 +119,7 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
 
     public void setOnKeyguard(boolean onKeyguard) {
         mOnKeyguard = onKeyguard;
+        updateHeaderHeight();
         mQuickQsPanel.setVisibility(mOnKeyguard ? View.INVISIBLE : View.VISIBLE);
         if (mOnKeyguard) {
             clearAnimationState();
@@ -242,16 +268,6 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
                 .setListener(mNonFirstPageListener)
                 .setEndDelay(.5f)
                 .build();
-        if (mBrightnessView != null && isBrightnessViewAnimatonNeeded()) {
-            mBrightnessViewAnimator = new TouchAnimator.Builder()
-                    .addFloat(mBrightnessView, "alpha", getBrightnessViewStartAlpha(),
-                            getBrightnessViewEndAlpha())
-                    .setListener(this)
-                    .setStartDelay(getBrightnessViewStartAlpha() == 0f ? .5f : 0f)
-                    .build();
-        } else {
-            mBrightnessViewAnimator = null;
-        }
     }
 
     private boolean isIconInAnimatedRow(int count) {
@@ -285,9 +301,6 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
             return;
         }
         mLastPosition = position;
-        if (mBrightnessViewAnimator != null) {
-            mBrightnessViewAnimator.setPosition(position);
-        }
         if (mOnFirstPage && mAllowFancy) {
             mQuickQsPanel.setAlpha(1);
             mFirstPageAnimator.setPosition(position);
@@ -301,21 +314,13 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
 
     @Override
     public void onAnimationAtStart() {
-        if (mBrightnessViewAnimator != null) {
-            if (getBrightnessViewStartAlpha() == 0f) {
-                mBrightnessView.setVisibility(View.VISIBLE);
-            }
-        }
+        updateHeaderHeight();
         mQuickQsPanel.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onAnimationAtEnd() {
-        if (mBrightnessViewAnimator != null) {
-            if (getBrightnessViewEndAlpha() == 0f) {
-                mBrightnessView.setVisibility(View.INVISIBLE);
-            }
-        }
+        updateHeaderHeight();
         mQuickQsPanel.setVisibility(View.INVISIBLE);
         final int N = mTopFiveQs.size();
         for (int i = 0; i < N; i++) {
@@ -325,11 +330,7 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
 
     @Override
     public void onAnimationStarted() {
-        if (mBrightnessViewAnimator != null) {
-            if (getBrightnessViewStartAlpha() == 0f) {
-                mBrightnessView.setVisibility(mOnKeyguard ? View.INVISIBLE : View.VISIBLE);
-            }
-        }
+        updateHeaderHeight();
         mQuickQsPanel.setVisibility(mOnKeyguard ? View.INVISIBLE : View.VISIBLE);
         if (mOnFirstPage) {
             final int N = mTopFiveQs.size();
@@ -341,12 +342,6 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
 
     private void clearAnimationState() {
         final int N = mAllViews.size();
-        if (mBrightnessViewAnimator != null) {
-            if (getBrightnessViewStartAlpha() == 1f) {
-                mBrightnessView.setVisibility(View.VISIBLE);
-                mBrightnessView.setAlpha(1);
-            }
-        }
         mQuickQsPanel.setAlpha(0);
         for (int i = 0; i < N; i++) {
             View v = mAllViews.get(i);
@@ -360,18 +355,6 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
         }
     }
 
-    private boolean isBrightnessViewAnimatonNeeded() {
-        return mQsContainer.showBrightnesSliderOnBar() != mQsContainer.showBrightnesSliderOnPanel();
-    }
-
-    private float getBrightnessViewStartAlpha() {
-        return mQsContainer.showBrightnesSliderOnBar() ? 1f : 0f;
-    }
-
-    private float getBrightnessViewEndAlpha() {
-        return mQsContainer.showBrightnesSliderOnBar() ? 0f : 1f;
-    }
-
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
             int oldTop, int oldRight, int oldBottom) {
@@ -383,6 +366,51 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
         // Give the QS panels a moment to generate their new tiles, then create all new animators
         // hooked up to the new views.
         mQsPanel.post(mUpdateAnimators);
+    }
+
+    public void updateBrightnesSliderVisibility(int visibility) {
+        mBrightnesSliderVisibility = visibility;
+        updateHeaderHeight();
+
+        int quickQsScrollContainerMarginTop = mResources.getDimensionPixelSize(alwaysShowBrightnesSlider()
+                ? R.dimen.qs_bar_with_brightness_view_margin_top : R.dimen.qs_bar_margin_top);
+        int qsPanelMarginTop = mResources.getDimensionPixelSize(alwaysShowBrightnesSlider()
+                ? R.dimen.qs_panel_with_brightness_view_margin_top : R.dimen.qs_panel_margin_top);
+        View brightnessView = mHeader.getBrightnessView();
+        View headerQsPanelScrollContainer = mHeader.findViewById(R.id.quick_qs_panel_scroll_container);
+
+        RelativeLayout.LayoutParams quickQsScrollContainerLp =
+                (RelativeLayout.LayoutParams) headerQsPanelScrollContainer.getLayoutParams();
+        FrameLayout.LayoutParams qsPanelLp = (FrameLayout.LayoutParams) mQsPanel.getLayoutParams();
+        quickQsScrollContainerLp.topMargin = quickQsScrollContainerMarginTop;
+        qsPanelLp.topMargin = qsPanelMarginTop;
+        headerQsPanelScrollContainer.setLayoutParams(quickQsScrollContainerLp);
+        mQsPanel.setLayoutParams(qsPanelLp);
+
+        if (alwaysShowBrightnesSlider()) {
+            if (brightnessView.getVisibility() == View.INVISIBLE) {
+                brightnessView.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (brightnessView.getVisibility() == View.VISIBLE) {
+                brightnessView.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void updateHeaderHeight() {
+        int headerHeight = mOnKeyguard || mLastPosition == 1
+                ? (alwaysShowBrightnesSlider()
+                        ? mHeaderExpandedHeightWithBrightnessView : mHeaderExpandedHeight)
+                : (alwaysShowBrightnesSlider()
+                        ? mHeaderHeightWithBrightnessView : mHeaderHeight);
+        FrameLayout.LayoutParams headerLp = (FrameLayout.LayoutParams) mHeader.getLayoutParams();
+        headerLp.height = headerHeight;
+        mHeader.setLayoutParams(headerLp);
+    }
+
+    private boolean alwaysShowBrightnesSlider() {
+        return mBrightnesSliderVisibility != BRIGHTNESS_SLIDER_HIDDEN;
     }
 
     private final TouchAnimator.Listener mNonFirstPageListener =

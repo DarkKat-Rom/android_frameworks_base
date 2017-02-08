@@ -48,11 +48,6 @@ public class QSContainer extends FrameLayout {
     private static final String TAG = "QSContainer";
     private static final boolean DEBUG = false;
 
-    public static final int BRIGHTNESS_SLIDER_SHOW             = 0;
-    public static final int BRIGHTNESS_SLIDER_SHOW_ON_QS_BAR   = 1;
-    public static final int BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL = 2;
-    public static final int BRIGHTNESS_SLIDER_HIDDEN           = 3;
-
     private final Point mSizePoint = new Point();
     private final Rect mQsBounds = new Rect();
 
@@ -75,8 +70,6 @@ public class QSContainer extends FrameLayout {
     private NotificationPanelView mPanelView;
     private boolean mListening;
 
-    private int mBrightnesSliderVisibility = BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL;
-
     public QSContainer(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -92,17 +85,10 @@ public class QSContainer extends FrameLayout {
                 (ViewGroup) mHeader.findViewById(R.id.quick_qs_panel_scroll_container);
         mQuickQsPanelScroller = (HorizontalScrollView) mHeader.findViewById(R.id.quick_qs_panel_scroll);
         mQSDetail.setQsPanel(mQSPanel, mHeader);
-        mQSAnimator = new QSAnimator(this, mHeader, mQuickQsPanelScroller, mQuickQSPanel,
+        mQSAnimator = new QSAnimator(getContext(), this, mHeader, mQuickQsPanelScroller, mQuickQSPanel,
                 mQSPanel);
         mQSCustomizer = (QSCustomizer) findViewById(R.id.qs_customize);
         mQSCustomizer.setQsContainer(this);
-
-        LayoutParams qSPanelLp = (LayoutParams) mQSPanel.getLayoutParams();
-        qSPanelLp.topMargin =
-                getContext().getResources().getDimensionPixelSize(showBrightnesSliderOnPanel()
-                        ? R.dimen.qs_panel_with_brightness_view_margin_top
-                        : R.dimen.qs_panel_margin_top);
-        mQSPanel.setLayoutParams(qSPanelLp);
     }
 
     @Override
@@ -397,16 +383,7 @@ public class QSContainer extends FrameLayout {
     }
 
     public void updateBrightnesSliderVisibility(int visibility) {
-        mBrightnesSliderVisibility = visibility;
-        mHeader.updateBrightnesSliderVisibility(mBrightnesSliderVisibility);
-
-        LayoutParams qSPanelLp = (LayoutParams) mQSPanel.getLayoutParams();
-        qSPanelLp.topMargin =
-                getContext().getResources().getDimensionPixelSize(showBrightnesSliderOnPanel()
-                        ? R.dimen.qs_panel_with_brightness_view_margin_top
-                        : R.dimen.qs_panel_margin_top);
-        mQSPanel.setLayoutParams(qSPanelLp);
-        requestLayout();
+        mQSAnimator.updateBrightnesSliderVisibility(visibility);
     }
 
     public void updateBatteryMeterType(int type) {
@@ -438,15 +415,5 @@ public class QSContainer extends FrameLayout {
         mQuickQSPanel.updateQSBarEnableScroll(enabled);
         mQuickQsPanelScrollerContainer.setClipChildren(enabled);
         mQuickQsPanelScrollerContainer.setClipToPadding(enabled);
-    }
-
-    public boolean showBrightnesSliderOnBar() {
-        return mBrightnesSliderVisibility == BRIGHTNESS_SLIDER_SHOW
-                || mBrightnesSliderVisibility == BRIGHTNESS_SLIDER_SHOW_ON_QS_BAR;
-    }
-
-    public boolean showBrightnesSliderOnPanel() {
-        return mBrightnesSliderVisibility == BRIGHTNESS_SLIDER_SHOW
-                || mBrightnesSliderVisibility == BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL;
     }
 }
