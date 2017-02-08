@@ -296,7 +296,7 @@ public class KeyguardIndicationController {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
                 chargingInfo += (mCurrentMicroVolt > 0
-                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroVolt / 1000f) + " V (" : "N/A (");
+                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroVolt / 1000000f) + " V (" : "N/A (");
                 chargingInfo += (mMaxChargingMicroVolt > 0
                         ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroVolt / 1000000f) + " V)" : "N/A)");
                 count += 1;
