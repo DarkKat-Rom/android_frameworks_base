@@ -57,7 +57,7 @@
     <!-- Status bar header -->
 
     <!-- Height of the status bar header (collapsed QS panel, visible brightness view) -->
-    <dimen name="status_bar_header_with_brightness_view_height">160dp</dimen>
+    <dimen name="status_bar_header_with_brightness_view_height">158dp</dimen>
 
     <!-- Height of the status bar header (expanded QS panel, visible brightness view) -->
     <dimen name="status_bar_header_with_brightness_view_expanded_height">106dp</dimen>

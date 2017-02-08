@@ -102,22 +102,9 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
     private float mDateTimeTranslation;
 
     private BrightnessController mBrightnessController;
-    private int mBrightnesSliderVisibility = QSContainer.BRIGHTNESS_SLIDER_HIDDEN;
-
-    private final int mHeight;
-    private final int mHeightWithBrightnessView;
-    private final int mExpandedHeight;
-    private final int mExpandedHeightWithBrightnessView;
 
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        mHeight = context.getResources().getDimensionPixelSize(R.dimen.status_bar_header_height);
-        mHeightWithBrightnessView = context.getResources().getDimensionPixelSize(
-                R.dimen.status_bar_header_with_brightness_view_height);
-        mExpandedHeight = context.getResources().getDimensionPixelSize(R.dimen.status_bar_header_expanded_height);
-        mExpandedHeightWithBrightnessView = context.getResources().getDimensionPixelSize(
-                R.dimen.status_bar_header_with_brightness_view_expanded_height);
     }
 
     @Override
@@ -175,15 +162,9 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         super.onLayout(changed, left, top, right, bottom);
         int brightnessViewTop = getContext().getResources().getDimensionPixelSize(
                 R.dimen.qs_brightness_view_margin_top);
-        int headerQsPanelScrollContainerTop =
-                getContext().getResources().getDimensionPixelSize(showBrightnesSliderOnBar()
-                        ? R.dimen.qs_bar_with_brightness_view_margin_top : R.dimen.qs_bar_margin_top);
-        mBrightnessView.layout(left, brightnessViewTop, right,
-                brightnessViewTop + mBrightnessView.getMeasuredHeight());
-        View headerQsPanelScrollContainer = findViewById(R.id.quick_qs_panel_scroll_container);
-        headerQsPanelScrollContainer.layout(left, headerQsPanelScrollContainerTop, right,
-                headerQsPanelScrollContainerTop + headerQsPanelScrollContainer.getMeasuredHeight());
-        updateBottom();
+        View brightnessView = findViewById(R.id.qs_brightness_view);
+        brightnessView.layout(left, brightnessViewTop, right,
+                brightnessViewTop + brightnessView.getMeasuredHeight());
     }
 
     @Override
@@ -252,13 +233,6 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         updateEverything();
     }
 
-    private void updateBottom() {
-        int bottom = showBrightnesSliderOnBar()
-                ? (mExpansionAmount == 1 ? mExpandedHeightWithBrightnessView : mHeightWithBrightnessView) 
-                        : (mExpansionAmount == 1 ? mExpandedHeight : mHeight);
-        setBottom(bottom);
-    }
-
     @Override
     public void onNextAlarmChanged(AlarmManager.AlarmClockInfo nextAlarm) {
         mNextAlarm = nextAlarm;
@@ -286,9 +260,6 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         updateAlarmVisibilities();
 
         mExpandIndicator.setExpanded(headerExpansionFraction > EXPAND_INDICATOR_THRESHOLD);
-        if (mExpansionAmount == 1 || mExpansionAmount == 0) {
-            requestLayout();
-        }
     }
 
     @Override
@@ -507,29 +478,6 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
         mSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
                 mSettingsButton.getBackground()));
         mBrightnessController.updateRippleColor();
-    }
-
-    @Override
-    public void updateBrightnesSliderVisibility(int visibility) {
-        mBrightnesSliderVisibility = visibility;
-        if (mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
-                || showBrightnesSliderOnBar()) {
-            mBrightnessView.setVisibility(View.VISIBLE);
-        } else if (showBrightnesSliderOnPanel()) {
-            mBrightnessView.setVisibility(View.INVISIBLE);
-        } else {
-            mBrightnessView.setVisibility(View.GONE);
-        }
-    }
-
-    private boolean showBrightnesSliderOnBar() {
-        return mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
-                || mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW_ON_QS_BAR;
-    }
-
-    private boolean showBrightnesSliderOnPanel() {
-        return mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW
-                || mBrightnesSliderVisibility == QSContainer.BRIGHTNESS_SLIDER_SHOW_ON_QS_PANEL;
     }
 
     @Override

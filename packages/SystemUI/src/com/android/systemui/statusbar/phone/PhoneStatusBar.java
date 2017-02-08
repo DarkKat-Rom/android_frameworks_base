@@ -3095,8 +3095,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void updateQSAndHeaderBrightnesSliderVisibility() {
         final int visibility = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.QS_BRIGHTNESS_SLIDER_VISIBILITY, 2);
-        if (mQSContainer != null) {
-            mQSContainer.updateBrightnesSliderVisibility(visibility);
+        if (visibility < 3 && visibility != 0) {
+            Settings.System.putInt(mContext.getContentResolver(),
+                    Settings.System.QS_BRIGHTNESS_SLIDER_VISIBILITY, 0);
+        } else {
+            if (mQSContainer != null) {
+                mQSContainer.updateBrightnesSliderVisibility(visibility);
+            }
         }
     }
 
