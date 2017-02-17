@@ -36,4 +36,15 @@
     <java-symbol type="string" name="shutdown_reboot_dlg_message_quick_reboot" />
     <java-symbol type="string" name="shutdown_reboot_dlg_message_recovery" />
     <java-symbol type="string" name="shutdown_reboot_dlg_message_bootloader" />
+
+    <!-- SlimRoms additions -->
+
+    <!-- Slim recent app screen -->
+    <java-symbol type="integer" name="config_recentDefaultDur" />
+    <java-symbol type="integer" name="config_recentExitDur" />
+    <java-symbol type="style" name="Animation.RecentScreen" />
+    <java-symbol type="style" name="Animation.RecentScreen.Left" />
+    <java-symbol type="anim" name="recent_screen_enter" />
+    <java-symbol type="anim" name="recent_screen_enter_left" />
+    <java-symbol type="anim" name="recent_screen_fade_out" />
 </resources>

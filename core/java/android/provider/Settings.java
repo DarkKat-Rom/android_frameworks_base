@@ -3746,6 +3746,13 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
+         * Recent card icon color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_ICON_COLOR = "slim_recents_card_icon_color";
+
+        /**
          *  Whether to show the music visualizer on the lock screen
          * @hide
          */
@@ -4134,6 +4141,83 @@ public final class Settings {
         public static final String POWER_MENU_SHOW_ADVANCED_REBOOT = "power_menu_show_advanced_reboot";
 
         // DarkKat additions end
+
+        // SlimRoms additions
+
+        /**
+         * Recent panel background color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_BG_COLOR = "slim_recents_panel_bg_color";
+
+        /**
+         * Recent card background color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_BG_COLOR = "slim_recents_card_bg_color";
+
+        /**
+         * Recent card text color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_TEXT_COLOR = "slim_recents_card_text_color";
+
+        /**
+         * Whether to use slim recents
+         * @hide
+         */
+        public static final String USE_SLIM_RECENTS = "use_slim_recents";
+
+        /**
+         * Whether to only show actually running tasks
+         * @hide
+         */
+        public static final String SLIM_RECENTS_SHOW_RUNNING_TASKS = "slim_recents_show_running_tasks";
+
+        /**
+         * Amount of apps to show in recents
+         * @hide
+         */
+        public static final String SLIM_RECENTS_MAX_APPS = "slim_recents_max_apps";
+
+        /**
+         * Whether recent panel gravity is left or right (default = Gravity.RIGHT).
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_GRAVITY = "slim_recents_panel_gravity";
+
+        /**
+         * Size of recent panel view in percent (default = 100).
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_SCALE_FACTOR = "slim_recents_panel_scale_factor";
+
+        /**
+         * User favorite tasks for recent panel.
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_FAVORITES = "slim_recents_panel_favorites";
+
+        /**
+         * Recent panel expanded mode (auto = 0, always = 1, never = 2).
+         * default = 0.
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_EXPANDED_MODE =
+                "slim_recents_panel_expanded_mode";
+
+        /**
+         * Recent panel: Show topmost task
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_SHOW_TOPMOST = "slim_recents_panel_show_topmost";
+
+        // SlimRoms additions end
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to

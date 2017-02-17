@@ -21,4 +21,33 @@
     <color name="system_primary_color">#ff263238</color><!-- material blue grey 900 -->
 
     <color name="qs_tile_adapter_bg">#ff384248</color>
+
+    <!-- Slim recent app screen -->
+
+    <!-- Default card and header background color -->
+    <color name="recents_default_card_background_color">#ffffffff</color>
+
+    <!-- Empty icon color on dark/light colored backgrounds -->
+    <color name="recents_empty_dark_color">#8a000000</color>
+    <color name="recents_empty_light_color">#b3ffffff</color>
+
+    <!-- Default header text and icon colors -->
+    <color name="recents_default_header_text_color">#de000000</color>
+    <color name="recents_default_header_icon_color">#8a000000</color>
+
+    <!-- Header text and icon colors on dark/light colored backgrounds -->
+    <color name="recents_header_text_color_light">#ffffffff</color>
+    <color name="recents_header_text_color_dark">#de000000</color>
+    <color name="recents_header_icon_color_light">#b3ffffff</color>
+    <color name="recents_header_icon_color_dark">#8a000000</color>
+
+    <!-- SlimRoms additions -->
+
+    <!-- Slim recent app screen -->
+
+    <!-- Slim recent panel background -->
+    <color name="recent_panel_background_color">#80000000</color>
+
+    <!-- Card Color -->
+    <color name="recent_card_background_expanded_color">#00ffffff</color>
 </resources>

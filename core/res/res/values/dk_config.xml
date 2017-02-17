@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!--
+     Copyright (C) 2016-2017 SlimRoms Project
+
+     Copyright (C) 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -16,16 +19,13 @@
 
 <resources>
 
-    <integer name="config_qs_num_rows_landscape_default">1</integer>
-    <integer name="config_qs_num_columns_landscape_default">4</integer>
-
     <!-- SlimRoms additions -->
 
     <!-- Slim recent app screen -->
 
-    <!-- Slim Recents default allowed max apps -->
-    <integer name="slim_recents_max_apps_default">25</integer>
+    <!-- The duration (in milliseconds) of recent app screen animation. -->
+    <integer name="config_recentDefaultDur">300</integer>
 
-    <!-- Default value how much apps show the app screenshot on recents view entry -->
-    <integer name="expanded_items_default">2</integer>
+    <!-- The duration (in milliseconds) of recent app screen exit animation. -->
+    <integer name="config_recentExitDur">450</integer>
 </resources>
