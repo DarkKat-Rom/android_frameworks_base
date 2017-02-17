@@ -101,6 +101,7 @@ import com.android.systemui.SwipeHelper;
 import com.android.systemui.SystemUI;
 import com.android.systemui.assist.AssistManager;
 import com.android.systemui.recents.Recents;
+import com.android.systemui.slimrecent.RecentController;
 import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.NotificationGuts.OnGutsClosedListener;
 import com.android.systemui.statusbar.phone.NavigationBarView;
@@ -245,6 +246,8 @@ public abstract class BaseStatusBar extends SystemUI implements
     private boolean mDeviceProvisioned = false;
 
     protected RecentsComponent mRecents;
+    private RecentController mSlimRecents;
+    protected boolean mShowSlimRecents;
 
     protected int mZenMode;
 
@@ -733,8 +736,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
-
-        mRecents = getComponent(Recents.class);
+        updateRecents();
 
         final Configuration currentConfig = mContext.getResources().getConfiguration();
         mLocale = currentConfig.locale;
@@ -1363,6 +1365,33 @@ public abstract class BaseStatusBar extends SystemUI implements
      */
     protected abstract void toggleSplitScreenMode(int metricsDockAction, int metricsUndockAction);
 
+    protected void rebuildRecentsScreen() {
+        if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.rebuildRecentsScreen();
+        }
+    }
+
+    protected void updateRecents() {
+        mShowSlimRecents = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.USE_SLIM_RECENTS, 0, UserHandle.USER_CURRENT) == 1;
+
+        if (mSlimRecents == null) {
+            mSlimRecents = new RecentController(mContext, mLayoutDirection);
+        }
+        if (mRecents == null) {
+            mRecents = getComponent(Recents.class);
+        }
+        if (mShowSlimRecents) {
+            rebuildRecentsScreen();
+        }
+    }
+
+    protected void updateRecentsScreenColors() {
+        if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.updateColors();
+        }
+    }
+
     /** Proxy for RecentsComponent */
 
     protected void showRecents(boolean triggeredFromAltTab, boolean fromHome) {
@@ -1373,20 +1402,28 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void hideRecents(boolean triggeredFromAltTab, boolean triggeredFromHomeKey) {
-        if (mRecents != null) {
+        if (!mShowSlimRecents && mRecents != null) {
             mRecents.hideRecents(triggeredFromAltTab, triggeredFromHomeKey);
+        } else if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.hideRecents(triggeredFromHomeKey);
         }
     }
 
     protected void toggleRecents() {
-        if (mRecents != null) {
+        if (!mShowSlimRecents && mRecents != null) {
             mRecents.toggleRecents(mDisplay);
+        } else if (mShowSlimRecents && mSlimRecents != null) {
+            sendCloseSystemWindows(SYSTEM_DIALOG_REASON_RECENT_APPS);
+            mSlimRecents.toggleRecents(mDisplay, mLayoutDirection);
         }
+
     }
 
     protected void preloadRecents() {
-        if (mRecents != null) {
+        if (!mShowSlimRecents && mRecents != null) {
             mRecents.preloadRecents();
+        } else if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.preloadRecentTasksList();
         }
     }
 
@@ -1399,8 +1436,10 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void cancelPreloadingRecents() {
-        if (mRecents != null) {
+        if (!mShowSlimRecents && mRecents != null) {
             mRecents.cancelPreloadingRecents();
+        } else if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.cancelPreloadingRecentTasksList();
         }
     }
 

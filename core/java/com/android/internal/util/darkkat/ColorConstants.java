@@ -108,4 +108,7 @@ public class ColorConstants {
     public static final int QS_TILE_DISABLED_ALPHA    = 97;
     public static final int QS_TILE_INACTIVE_ALPHA    = 74;
     public static final int QS_TILE_UNAVAILABLE_ALPHA = 64;
+
+    // Slim recents
+    public static final int SLIM_RECENTS_PANEL_BG_ALPHA = 128;
 }

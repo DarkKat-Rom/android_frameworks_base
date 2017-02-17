@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2017 DarkKat
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recent_card_view_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/recent_card_view_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recent_card_view_header_height"
+        android:padding="@dimen/recent_card_view_header_padding"
+        android:background="@drawable/ripple_drawable_rectangle"
+        android:gravity="center_vertical">
+
+        <RelativeLayout
+            android:id="@+id/recent_card_view_header_app_icon_layout"
+            android:layout_width="@dimen/recent_card_view_header_app_icon_size"
+            android:layout_height="@dimen/recent_card_view_header_app_icon_size">
+
+            <com.android.systemui.slimrecent.RecentImageView
+                android:id="@+id/recent_card_view_header_app_icon"
+                android:layout_width="@dimen/match_parent"
+                android:layout_height="@dimen/match_parent"
+                />
+
+            <com.android.systemui.slimrecent.RecentImageView
+                android:id="@+id/recent_card_view_header_favorite_icon"
+                android:layout_width="@dimen/recent_card_view_header_favorite_icon_size"
+                android:layout_height="@dimen/recent_card_view_header_favorite_icon_size"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_recent_favorite"
+                android:visibility="invisible"
+                />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/recent_card_view_header_app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/recent_card_view_header_title_padding_start"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            />
+
+    </LinearLayout>
+
+    <com.android.systemui.slimrecent.RecentImageView
+        android:id="@+id/recent_card_view_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:padding="2dp"
+        android:background="#ffffffff"
+        />
+
+    <View
+        android:id="@+id/recent_card_view_action_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recent_card_view_action_divider_height"
+        android:background="#ffffffff"
+        />
+
+    <LinearLayout
+        android:id="@+id/recent_card_view_actions"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recent_card_view_actions_height"
+        android:paddingStart="@dimen/recent_card_view_actions_padding_start_end"
+        android:paddingTop="@dimen/recent_card_view_actions_padding_top_bottom"
+        android:paddingEnd="@dimen/recent_card_view_actions_padding_start_end"
+        android:paddingBottom="@dimen/recent_card_view_actions_padding_top_bottom">
+
+        <ImageButton
+            android:id="@+id/recent_card_view_action_info"
+            style="@style/RecentCardViewButton.Borderless.Small"
+            android:layout_width="@dimen/recent_card_view_action_button_size"
+            android:layout_height="@dimen/recent_card_view_action_button_size"
+            android:src="@drawable/ic_info"
+            android:scaleType="centerInside"
+            android:background="@drawable/ripple_drawable_oval"
+            />
+
+        <ImageButton
+            android:id="@+id/recent_card_view_action_multi_window"
+            style="@style/RecentCardViewButton.Borderless.Small"
+            android:layout_width="@dimen/recent_card_view_action_button_size"
+            android:layout_height="@dimen/recent_card_view_action_button_size"
+            android:src="@drawable/ic_multiwindow"
+            android:scaleType="centerInside"
+            android:background="@drawable/ripple_drawable_oval"
+            />
+
+        <ImageButton
+            android:id="@+id/recent_card_view_action_shop"
+            style="@style/RecentCardViewButton.Borderless.Small"
+            android:layout_width="@dimen/recent_card_view_action_button_size"
+            android:layout_height="@dimen/recent_card_view_action_button_size"
+            android:src="@drawable/ic_shop"
+            android:scaleType="centerInside"
+            android:background="@drawable/ripple_drawable_oval"
+            />
+
+        <ImageButton
+            android:id="@+id/recent_card_view_action_expand"
+            style="@style/RecentCardViewButton.Borderless.Small"
+            android:layout_width="@dimen/recent_card_view_action_button_size"
+            android:layout_height="@dimen/recent_card_view_action_button_size"
+            android:src="@drawable/ic_expand_more"
+            android:scaleType="centerInside"
+            android:background="@drawable/ripple_drawable_oval"
+            />
+
+        <ImageButton
+            android:id="@+id/recent_card_view_action_screen_pinning"
+            style="@style/RecentCardViewButton.Borderless.Small"
+            android:layout_width="@dimen/recent_card_view_action_button_size"
+            android:layout_height="@dimen/recent_card_view_action_button_size"
+            android:src="@drawable/recents_lock_to_app_pin"
+            android:scaleType="centerInside"
+            android:background="@drawable/ripple_drawable_oval"
+            />
+
+    </LinearLayout>
+</LinearLayout>

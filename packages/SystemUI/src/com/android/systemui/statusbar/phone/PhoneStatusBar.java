@@ -648,6 +648,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.USE_SLIM_RECENTS),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -794,7 +797,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT))) {
                 updateQSAndHeaderBatteryMeterCutOutText();
-
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.USE_SLIM_RECENTS))) {
+                updateRecents();
             }
         }
     }
@@ -2788,6 +2793,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (ThemeHelper.statusBarExpandedUseThemeColors(mContext)) {
             updateStatusBarExpandedColors();
         }
+        updateRecentsScreenColors();
     }
 
     private void updateStatusBarExpandedUseThemeColors() {
@@ -4485,6 +4491,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateRowStates();
         mScreenPinningRequest.onConfigurationChanged();
         mNetworkController.onConfigurationChanged();
+        rebuildRecentsScreen();
     }
 
     @Override

@@ -40,8 +40,12 @@ public class ThemeHelper {
                 Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS, 1) == 1;
     }
 
-    // General
+    public static boolean slimRecentsUseThemeColors(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.SLIM_RECENTS_USE_THEME_COLORS, 1) == 1;
+    }
 
+    // General
     public static int getColorBackground(Context context) {
         if (getTheme(context) == THEME_DARKKAT) {
             return ColorConstants.DARKKAT_BLUE_GREY;
@@ -120,7 +124,6 @@ public class ThemeHelper {
     }
 
     // SystemUI
-
     public static int getSystemUIPrimaryColor(Context context) {
         if (getTheme(context) == THEME_DARKKAT) {
             return ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
@@ -158,5 +161,31 @@ public class ThemeHelper {
     public static int getSystemUIRippleAccentColor(Context context) {
         return (ColorConstants.RIPPLE_ALPHA_COLORED << 24)
                 | (getSystemUIAccentColor(context) & 0x00ffffff);
+    }
+
+    // Slim recents
+    public static int getSlimRecentsPanelBgColor(Context context) {
+        if (getTheme(context) == THEME_DARKKAT) {
+            return ColorConstants.DARKKAT_BLUE_GREY;
+        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            return ColorConstants.WHITE;
+        } else {
+            return ColorConstants.BLACK;
+        }
+    }
+
+    public static int getSlimRecentsPanelEmptyIconColor(Context context) {
+        int color;
+        int alpha;
+
+        if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            color = ColorConstants.BLACK;
+            alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+        } else {
+            color = ColorConstants.WHITE;
+            alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+        }
+
+        return (alpha << 24) | (color & 0x00ffffff);
     }
 }

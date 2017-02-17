@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2015 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,19 +13,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<resources>
-
-    <integer name="config_qs_num_rows_landscape_default">1</integer>
-    <integer name="config_qs_num_columns_landscape_default">4</integer>
-
-    <!-- SlimRoms additions -->
-
-    <!-- Slim recent app screen -->
-
-    <!-- Slim Recents default allowed max apps -->
-    <integer name="slim_recents_max_apps_default">25</integer>
-
-    <!-- Default value how much apps show the app screenshot on recents view entry -->
-    <integer name="expanded_items_default">2</integer>
-</resources>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval" >
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+</ripple>

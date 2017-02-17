@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2016 - 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -21,4 +21,8 @@
         <item name="android:minHeight">1dp</item>
         <item name="android:maxHeight">1dp</item>
     </style>
+
+    <!-- Slim recent app screen -->
+    <style name="RecentCardViewButton.Borderless.Small"
+            parent="@android:style/Widget.Material.Light.Button.Borderless.Small" />
 </resources>
