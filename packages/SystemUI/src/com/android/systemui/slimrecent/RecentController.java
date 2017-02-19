@@ -23,6 +23,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.content.res.ColorStateList;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -58,10 +59,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.android.cards.recyclerview.view.CardRecyclerView;
+import com.android.internal.util.darkkat.SlimRecentsColorHelper;
 
 import com.android.systemui.R;
 import com.android.systemui.RecentsComponent;
-import com.android.systemui.recents.misc.Utilities;
 import com.android.systemui.statusbar.BaseStatusBar;
 
 /**
@@ -109,7 +110,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
     private int mLayoutDirection;
     private int mMainGravity;
     private int mUserGravity;
-    private int mPanelColor;
 
     private float mScaleFactor = DEFAULT_SCALE_FACTOR;
 
@@ -279,8 +279,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
         mRecentWarningContent.setBackgroundColor(Color.RED);
         VectorDrawable vd = (VectorDrawable)
                 mContext.getResources().getDrawable(R.drawable.ic_empty_recent);
-        vd.setTint(getEmptyRecentColor());
         mEmptyRecentView.setImageDrawable(vd);
+        mEmptyRecentView.setImageTintList(ColorStateList.valueOf(
+                SlimRecentsColorHelper.getPanelEmptyIconColor(mContext)));
         int padding = mContext.getResources().getDimensionPixelSize(R.dimen.slim_recents_elevation);
         if (mMainGravity == Gravity.LEFT) {
             mRecentContainer.setPadding(0, 0, padding, 0);
@@ -298,23 +299,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
         // Set custom background color (or reset to default, as the case may be
         if (mRecentContent != null) {
             mRecentContent.setElevation(50);
-            if (mPanelColor != 0x00ffffff) {
-                mRecentContent.setBackgroundColor(mPanelColor);
-            } else {
-                mRecentContent.setBackgroundColor(
-                        mContext.getResources().getColor(R.color.recent_panel_background_color));
-            }
-        }
-    }
-
-    private int getEmptyRecentColor() {
-        if (Utilities.computeContrastBetweenColors(mPanelColor,
-                Color.WHITE) < 3f) {
-            return mContext.getResources().getColor(
-                    R.color.recents_empty_dark_color);
-        } else {
-            return mContext.getResources().getColor(
-                    R.color.recents_empty_light_color);
+            mRecentContent.setBackgroundColor(SlimRecentsColorHelper.getPanelBackgroundColor(mContext));
         }
     }
 
@@ -564,9 +549,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST),
                     false, this, UserHandle.USER_ALL);
-//            resolver.registerContentObserver(Settings.System.getUriFor(
-//                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR),
-//                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_SHOW_RUNNING_TASKS),
                     false, this, UserHandle.USER_ALL);
@@ -618,17 +600,10 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     UserHandle.USER_CURRENT) == 1);
             }
 
-            // Update colors in RecentPanelView
-            mPanelColor = Settings.System.getIntForUser(resolver,
-                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR, 0x00ffffff, UserHandle.USER_CURRENT);
-
             mRecentContent.setElevation(50);
-            if (mPanelColor != 0x00ffffff) {
-                mRecentContent.setBackgroundColor(mPanelColor);
-            } else {
-                mRecentContent.setBackgroundColor(
-                        mContext.getResources().getColor(R.color.recent_panel_background_color));
-            }
+            mEmptyRecentView.setImageTintList(ColorStateList.valueOf(
+                    SlimRecentsColorHelper.getPanelEmptyIconColor(mContext)));
+            mRecentContent.setBackgroundColor(SlimRecentsColorHelper.getPanelBackgroundColor(mContext));
         }
     }
 

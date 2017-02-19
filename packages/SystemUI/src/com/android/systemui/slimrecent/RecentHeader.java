@@ -21,14 +21,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.cards.internal.CardHeader;
+import com.android.internal.util.darkkat.SlimRecentsColorHelper;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.systemui.R;
 import com.android.systemui.recents.misc.Utilities;
 
@@ -122,19 +122,15 @@ public class RecentHeader extends CardHeader {
             }
             view.setTag(holder);
         }
-        int textColor = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SLIM_RECENTS_CARD_TEXT_COLOR,
-                0x00ffffff, UserHandle.USER_CURRENT);
         holder.textView.setText(mLabel);
-        if (textColor != 0x00ffffff) {
-            holder.textView.setTextColor(textColor);
-        } else {
-            holder.textView.setTextColor(resolveTextColor());
-        }
+        holder.textView.setTextColor(resolveTextColor());
     }
 
+    // Returns the default dark/light text color
+    // or the custom text color.
     public int resolveTextColor() {
-        if (mTaskDescription.cardColor != 0) {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
             if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
                     Color.WHITE) < 3f) {
                 return mContext.getResources().getColor(
@@ -144,8 +140,7 @@ public class RecentHeader extends CardHeader {
                         R.color.recents_header_text_color_light);
             }
         }
-        return mContext.getResources().getColor(
-                    R.color.recents_default_header_text_color);
+        return SlimRecentsColorHelper.getCardHeaderTextColor(mContext);
     }
 
     static class ViewHolder {

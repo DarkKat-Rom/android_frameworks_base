@@ -49,6 +49,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.android.internal.util.darkkat.ColorHelper;
+import com.android.internal.util.darkkat.SlimRecentsColorHelper;
+import com.android.internal.util.darkkat.ThemeHelper;
 
 import com.android.cards.view.base.CardViewWrapper;
 import com.android.cards.view.component.CardHeaderView;
@@ -76,20 +78,14 @@ public class RecentCard extends Card {
 
     private static final int TRANSPARENT_WHITE = 0x00ffffff;
 
+    private final Context mContext;
+
     private RecentHeader mHeader;
     private ImageView mExpandButton;
     private RecentAppIcon mRecentIcon;
     private RecentExpandedCard mExpandedCard;
 
     private int mPersistentTaskId;
-
-    private final int mDefaultCardBgColor;
-    private final int mCustomCardBgColor;
-    private int mCardBgColor;
-    private final int mDefaultHeaderIconColor;
-    private final int mCustomHeaderIconColor;
-    private int mHeaderIconColor;
-
     private TaskDescription mTaskDescription;
 
     public RecentCard(Context context, TaskDescription td, float scaleFactor) {
@@ -99,18 +95,7 @@ public class RecentCard extends Card {
     public RecentCard(Context context, int innerLayout, TaskDescription td, float scaleFactor) {
         super(context, innerLayout);
 
-        Resources res = context.getResources();
-        ContentResolver resolver = context.getContentResolver();
-
-        mDefaultCardBgColor = res.getColor(R.color.recents_default_card_background_color);
-        mCustomCardBgColor = Settings.System.getIntForUser(resolver,
-                Settings.System.SLIM_RECENTS_CARD_BG_COLOR, TRANSPARENT_WHITE,
-                UserHandle.USER_CURRENT);
-        mDefaultHeaderIconColor = res.getColor(R.color.recents_default_header_icon_color);
-        mCustomHeaderIconColor = Settings.System.getIntForUser(resolver,
-                Settings.System.SLIM_RECENTS_CARD_ICON_COLOR, TRANSPARENT_WHITE,
-                UserHandle.USER_CURRENT);
-
+        mContext = context;
         constructBaseCard(context, td, scaleFactor);
     }
 
@@ -132,20 +117,7 @@ public class RecentCard extends Card {
         mExpandedCard = new RecentExpandedCard(context, td, scaleFactor);
         initExpandedState(td);
 
-        // set custom background
-        if (mCustomCardBgColor != TRANSPARENT_WHITE) {
-            mCardBgColor = mCustomCardBgColor;
-        } else {
-            mCardBgColor = resolveCardBgColor();
-        }
-
-        if (mCustomHeaderIconColor != TRANSPARENT_WHITE) {
-            mHeaderIconColor = mCustomHeaderIconColor;
-        } else {
-            mHeaderIconColor = resolveHeaderIconColor();
-        }
-
-        this.setBackgroundResource(new ColorDrawable(mCardBgColor));
+        this.setBackgroundResource(new ColorDrawable(resolveHeaderBgColor()));
 
         // Finally add header, icon and expanded area to our card.
         addCardHeader(mHeader);
@@ -156,16 +128,30 @@ public class RecentCard extends Card {
     }
 
     // Returns the activity's primary color
-    // or the default card background color.
-    public int resolveCardBgColor() {
-        if (mTaskDescription != null && mTaskDescription.cardColor != 0) {
+    // or the default/custom card header background color.
+    public int resolveHeaderBgColor() {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
             return mTaskDescription.cardColor;
         }
-        return mDefaultCardBgColor;
+        return SlimRecentsColorHelper.getCardHeaderBackgroundColor(mContext);
     }
 
+    // Returns a darker/lighter activity's primary color
+    // or the default/custom card header background color.
+    public int resolveHeaderActivatedBgColor() {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
+            return ColorHelper.getLightenOrDarkenColor(mTaskDescription.cardColor);
+        }
+        return SlimRecentsColorHelper.getCardHeaderActivatedBackgroundColor(mContext);
+    }
+
+    // Returns the default dark/light icon color
+    // or the custom icon color.
     public int resolveHeaderIconColor() {
-        if (mTaskDescription != null && mTaskDescription.cardColor != 0) {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
             if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
                     Color.WHITE) < 3f) {
                 return mContext.getResources().getColor(
@@ -175,24 +161,12 @@ public class RecentCard extends Card {
                         R.color.recents_header_icon_color_light);
             }
         }
-        return mDefaultHeaderIconColor;
+        return SlimRecentsColorHelper.getCardHeaderIconColor(mContext);
     }
 
-    public int getOptionsIconColor(int optionsBgColor) {
-        if (Utilities.computeContrastBetweenColors(optionsBgColor,
-                Color.WHITE) < 3f) {
-            return mContext.getResources().getColor(
-                    R.color.recents_header_icon_color_dark);
-        } else {
-            return mContext.getResources().getColor(
-                    R.color.recents_header_icon_color_light);
-        }
-    }
-
-    private void setButtonIconColor(ImageView iv, int backgroundColor) {
+    private void setButtonIconColor(ImageView iv) {
         if (iv != null) {
-            iv.setImageTintList(ColorStateList.valueOf(backgroundColor == mCardBgColor
-                    ? mHeaderIconColor : getOptionsIconColor(backgroundColor)));
+            iv.setImageTintList(ColorStateList.valueOf(resolveHeaderIconColor()));
         }
     }
 
@@ -216,21 +190,8 @@ public class RecentCard extends Card {
         }
         mPersistentTaskId = td.persistentTaskId;
 
-        // set custom background
-        if (mCustomCardBgColor != TRANSPARENT_WHITE) {
-            mCardBgColor = mCustomCardBgColor;
-        } else {
-            mCardBgColor = resolveCardBgColor();
-        }
-
-        if (mCustomHeaderIconColor != TRANSPARENT_WHITE) {
-            mHeaderIconColor = mCustomHeaderIconColor;
-        } else {
-            mHeaderIconColor = resolveHeaderIconColor();
-        }
-
-        this.setBackgroundResource(new ColorDrawable(mCardBgColor));
-        setButtonIconColor(mExpandButton, mCardBgColor);
+        this.setBackgroundResource(new ColorDrawable(resolveHeaderBgColor()));
+        setButtonIconColor(mExpandButton);
     }
 
     // Set initial expanded state of our card.
@@ -299,19 +260,17 @@ public class RecentCard extends Card {
         super.setCardView(wrapper);
         CardHeaderView chv = (CardHeaderView) ((CardView) wrapper).findViewById(R.id.card_header_layout);
         mExpandButton = (ImageView) chv.getImageButtonExpand();
-        setButtonIconColor(mExpandButton, mCardBgColor);
+        setButtonIconColor(mExpandButton);
     }
 
 
     @Override
     public void setupOptionsItems(final CardView cv) {
         ViewGroup options = (ViewGroup) cv.findViewById(R.id.card_options);
-        int optionsBgColor = ColorHelper.getLightenOrDarkenColor(mCardBgColor);
-        // set custom background
-        options.setBackgroundColor(optionsBgColor);
+        options.setBackgroundColor(resolveHeaderActivatedBgColor());
 
         for (int i = 0; i < options.getChildCount(); i++) {
-            setButtonIconColor((ImageView) options.getChildAt(i), optionsBgColor);
+            setButtonIconColor((ImageView) options.getChildAt(i));
         }
         if (!checkAppInstaller(mTaskDescription.packageName, AMAZON_REFERENCE)
                 && !checkAppInstaller(mTaskDescription.packageName, PLAYSTORE_REFERENCE)) {

@@ -30,12 +30,13 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.cards.internal.CardExpand;
+import com.android.internal.util.darkkat.ColorHelper;
+import com.android.internal.util.darkkat.SlimRecentsColorHelper;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.systemui.R;
 
 import java.io.IOException;
@@ -59,9 +60,6 @@ public class RecentExpandedCard extends CardExpand {
     private int mBottomPadding;
     private float mScaleFactor;
     private boolean mScaleFactorChanged;
-
-    private int mDefaultCardBgColor;
-    private int mCustomCardBgColor;
 
     private BitmapDownloaderTask mTask;
 
@@ -91,12 +89,6 @@ public class RecentExpandedCard extends CardExpand {
         mLabel = (String) td.getLabel();
         mScaleFactor = scaleFactor;
 
-        mDefaultCardBgColor = mContext.getResources().getColor(
-                R.color.recents_default_card_background_color);
-        mCustomCardBgColor = Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.SLIM_RECENTS_CARD_BG_COLOR,
-                mDefaultCardBgColor, UserHandle.USER_CURRENT);
-
         initDimensions();
     }
 
@@ -118,15 +110,6 @@ public class RecentExpandedCard extends CardExpand {
         }
     }
 
-    // Returns the activity's primary color
-    // or the default card background color.
-    public int resolveCardBgColor() {
-        if (mTaskDescription != null && mTaskDescription.cardColor != 0) {
-            return mTaskDescription.cardColor;
-        }
-        return mDefaultCardBgColor;
-    }
-
     // Setup main dimensions we need.
     private void initDimensions() {
         final Resources res = mContext.getResources();
@@ -138,9 +121,18 @@ public class RecentExpandedCard extends CardExpand {
         mBottomPadding = (int) (res.getDimensionPixelSize(
                 R.dimen.recent_thumbnail_bottom_padding) * mScaleFactor);
 
-        mDefaultThumbnailBackground = new ColorDrawableWithDimensions(
-                res.getColor(R.color.recent_card_background_expanded_color),
+        mDefaultThumbnailBackground = new ColorDrawableWithDimensions(resolveBgColor(),
                 mThumbnailWidth, mThumbnailHeight);
+    }
+
+    // Returns the activity's primary color
+    // or the default/custom card background color.
+    public int resolveBgColor() {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
+            return mTaskDescription.cardColor;
+        }
+        return SlimRecentsColorHelper.getCardBackgroundColor(mContext);
     }
 
     @Override
@@ -205,12 +197,7 @@ public class RecentExpandedCard extends CardExpand {
             }
         }
 
-        // set custom background
-        if (mCustomCardBgColor != 0x00ffffff) {
-            parent.setBackgroundColor(mCustomCardBgColor);
-        } else {
-            parent.setBackgroundColor(resolveCardBgColor());
-        }
+        parent.setBackgroundColor(resolveBgColor());
     }
 
     static class ViewHolder {

@@ -3746,11 +3746,43 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
-         * Recent card icon color
+         * Wether to use slim recents color values from global theme 
+         * @hide
+         */
+        public static final String SLIM_RECENTS_USE_THEME_COLORS =
+                "slim_recents_use_theme_colors";
+
+        /**
+         * Recent panel empty icon color
          *
          * @hide
          */
-        public static final String SLIM_RECENTS_CARD_ICON_COLOR = "slim_recents_card_icon_color";
+        public static final String SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR =
+                "slim_recents_panel_empty_icon_color";
+
+        /**
+         * Recent card header background color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_HEADER_BG_COLOR =
+                "slim_recents_card_header_bg_color";
+
+        /**
+         * Recent card header activated background color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_HEADER_ACTIVATED_BG_COLOR =
+                "slim_recents_card_header_activated_bg_color";
+
+        /**
+         * Recent card header icon color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_HEADER_ICON_COLOR =
+                "slim_recents_card_header_icon_color";
 
         /**
          *  Whether to show the music visualizer on the lock screen
@@ -4159,11 +4191,11 @@ public final class Settings {
         public static final String SLIM_RECENTS_CARD_BG_COLOR = "slim_recents_card_bg_color";
 
         /**
-         * Recent card text color
+         * Recent card header text color
          *
          * @hide
          */
-        public static final String SLIM_RECENTS_CARD_TEXT_COLOR = "slim_recents_card_text_color";
+        public static final String SLIM_RECENTS_CARD_HEADER_TEXT_COLOR = "slim_recents_card_header_text_color";
 
         /**
          * Whether to use slim recents
