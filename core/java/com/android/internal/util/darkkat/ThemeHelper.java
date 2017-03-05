@@ -167,16 +167,25 @@ public class ThemeHelper {
     public static int getSlimRecentsPanelBgColor(Context context) {
         if (getTheme(context) == THEME_DARKKAT) {
             return ColorConstants.DARKKAT_BLUE_GREY;
+        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            return ColorConstants.WHITE;
         } else {
             return ColorConstants.BLACK;
         }
     }
 
-    public static int getSlimRecentsPanelEmptyIconColor() {
-        return (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24) | (ColorConstants.WHITE & 0x00ffffff);
-    }
+    public static int getSlimRecentsPanelEmptyIconColor(Context context) {
+        int color;
+        int alpha;
 
-    public static int getSlimRecentsCardHeaderActivatedBgColor(Context context) {
-        return ColorHelper.getLightenOrDarkenColor(getColorBackgroundFloating(context));
+        if (getTheme(context) == THEME_MATERIAL_LIGHT) {
+            color = ColorConstants.BLACK;
+            alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+        } else {
+            color = ColorConstants.WHITE;
+            alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+        }
+
+        return (alpha << 24) | (color & 0x00ffffff);
     }
 }

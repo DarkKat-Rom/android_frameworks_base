@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2016 - 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -91,18 +91,24 @@
     <!-- Start and end margin of the QS bar scroller -->
     <dimen name="qs_scroller_margin_start_end">12dp</dimen>
 
-    <!-- SlimRoms additions -->
-
     <!-- Slim recent app screen -->
-
-    <!-- Slim recent -->
-    <dimen name="recent_width">230dp</dimen>
-    <dimen name="slim_recents_elevation">20dp</dimen>
-    <dimen name="recent_app_icon_size">48dp</dimen>
-    <dimen name="recent_favorite_icon_size">18dp</dimen>
-    <dimen name="recent_thumbnail_width">198dp</dimen>
-    <dimen name="recent_thumbnail_height">140dp</dimen>
-    <dimen name="recent_header_width">120dp</dimen>
-    <dimen name="recent_text_size">20dp</dimen>
-    <dimen name="recent_thumbnail_bottom_padding">3dp</dimen>
+    <dimen name="recent_panel_width">212dp</dimen>
+    <dimen name="slim_recents_elevation">2dp</dimen>
+    <dimen name="recent_content_padding">4dp</dimen>
+    <dimen name="recent_card_view_width">196dp</dimen>
+    <dimen name="recent_card_view_margin">4dp</dimen>
+    <dimen name="recent_card_view_corner_radius">2dp</dimen>
+    <dimen name="recent_card_view_header_height">72dp</dimen>
+    <dimen name="recent_card_view_header_padding">16dp</dimen>
+    <dimen name="recent_card_view_header_app_icon_size">40dp</dimen>
+    <dimen name="recent_card_view_header_favorite_icon_size">18dp</dimen>
+    <dimen name="recent_card_view_header_title_padding_start">16dp</dimen>
+    <dimen name="recent_card_view_thumbnail_view_height">196dp</dimen>
+    <dimen name="recent_card_view_thumbnail_width">192dp</dimen>
+    <dimen name="recent_card_view_thumbnail_height">192dp</dimen>
+    <dimen name="recent_card_view_action_divider_height">1dp</dimen>
+    <dimen name="recent_card_view_actions_height">48dp</dimen>
+    <dimen name="recent_card_view_actions_padding_start_end">0dp</dimen>
+    <dimen name="recent_card_view_actions_padding_top_bottom">0dp</dimen>
+    <dimen name="recent_card_view_action_button_size">48dp</dimen>
 </resources>

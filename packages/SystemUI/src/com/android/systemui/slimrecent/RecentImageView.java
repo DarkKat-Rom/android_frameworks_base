@@ -40,7 +40,8 @@ import android.widget.ImageView;
  */
 
 public class RecentImageView extends ImageView {
-    private boolean mBlockLayout;
+    private boolean mUseBlockLayout = false;
+    private boolean mBlockLayout = false;
 
     public RecentImageView(Context context) {
         super(context);
@@ -54,6 +55,10 @@ public class RecentImageView extends ImageView {
         super(context, attrs, defStyle);
     }
 
+    public void setUseBlockLayout() {
+        mUseBlockLayout = true;
+    }
+
     @Override
     public void requestLayout() {
         if (!mBlockLayout) {
@@ -63,9 +68,13 @@ public class RecentImageView extends ImageView {
 
     @Override
     public void setImageDrawable(Drawable drawable) {
-        mBlockLayout = true;
+        if (mUseBlockLayout) {
+            mBlockLayout = true;
+        }
         super.setImageDrawable(drawable);
-        mBlockLayout = false;
+        if (mUseBlockLayout) {
+            mBlockLayout = false;
+        }
     }
 
     @Override

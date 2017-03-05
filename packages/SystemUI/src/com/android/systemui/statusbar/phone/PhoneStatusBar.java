@@ -649,33 +649,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.QS_TILE_BATTERY_METER_CUT_OUT_TEXT),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.USE_SLIM_RECENTS), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_USE_THEME_COLORS),
+                    Settings.System.USE_SLIM_RECENTS),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_BG_COLOR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_BG_COLOR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ACTIVATED_BG_COLOR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ICON_COLOR), false, this,
-                    UserHandle.USER_ALL);
- 
         }
 
         @Override
@@ -825,23 +800,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.USE_SLIM_RECENTS))) {
                 updateRecents();
-            } else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_USE_THEME_COLORS))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_BG_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_BG_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ACTIVATED_BG_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR))
-                    || uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ICON_COLOR))) {
-                rebuildRecentsScreen();
             }
         }
     }
@@ -2835,7 +2793,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (ThemeHelper.statusBarExpandedUseThemeColors(mContext)) {
             updateStatusBarExpandedColors();
         }
-        rebuildRecentsScreen();
+        updateRecentsScreenColors();
     }
 
     private void updateStatusBarExpandedUseThemeColors() {

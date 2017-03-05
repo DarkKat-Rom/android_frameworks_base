@@ -34,12 +34,14 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -58,7 +60,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.android.cards.recyclerview.view.CardRecyclerView;
 import com.android.internal.util.darkkat.SlimRecentsColorHelper;
 
 import com.android.systemui.R;
@@ -88,9 +89,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
     // Animation state.
     private int mAnimationState = ANIMATION_STATE_NONE;
 
-    public static float DEFAULT_SCALE_FACTOR = 1.0f;
-
     private Context mContext;
+    private ContentResolver mResolver;
+
     private WindowManager mWindowManager;
     private IWindowManager mWindowManagerService;
 
@@ -110,8 +111,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
     private int mLayoutDirection;
     private int mMainGravity;
     private int mUserGravity;
-
-    private float mScaleFactor = DEFAULT_SCALE_FACTOR;
 
     // Main panel view.
     private RecentPanelView mRecentPanelView;
@@ -140,6 +139,8 @@ public class RecentController implements RecentPanelView.OnExitListener,
 
     public RecentController(Context context, int layoutDirection) {
         mContext = context;
+        mResolver = mContext.getContentResolver();
+
         mLayoutDirection = layoutDirection;
 
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -168,8 +169,8 @@ public class RecentController implements RecentPanelView.OnExitListener,
         mRecentWarningContent =
                 (LinearLayout) mRecentContainer.findViewById(R.id.recent_warning_content);
 
-        final CardRecyclerView cardRecyclerView =
-                (CardRecyclerView) mRecentContainer.findViewById(R.id.recent_list);
+        final RecyclerView cardRecyclerView =
+                (RecyclerView) mRecentContainer.findViewById(R.id.recent_recycler_view);
 
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setReverseLayout(true);
@@ -231,6 +232,51 @@ public class RecentController implements RecentPanelView.OnExitListener,
         observer.observe();
     }
 
+    public void updateColors() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateColors();
+        }
+        updatePanelBackgroundColor();
+        updatePanelEmptyIconColor();
+    }
+
+    private void updatePanelBackgroundColor() {
+        if (mRecentContent != null) {
+            mRecentContent.setBackgroundColor(SlimRecentsColorHelper.getPanelBackgroundColor(mContext));
+        }
+    }
+
+    private void updatePanelEmptyIconColor() {
+        if (mEmptyRecentView != null) {
+            mEmptyRecentView.setImageTintList(ColorStateList.valueOf(
+                    SlimRecentsColorHelper.getPanelEmptyIconColor(mContext)));
+        }
+    }
+
+    private void updateCardBackgroundColor() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateCardBackgroundColor();
+        }
+    }
+
+    private void updateCardHeaderTextColor() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateCardHeaderTextColor();
+        }
+    }
+
+    private void updateCardActionIconColor() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateCardActionIconColor();
+        }
+    }
+
+    private void updateCardActionRippleColor() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateCardActionRippleColor();
+        }
+    }
+
     /**
      * External call from theme engines to apply
      * new styles.
@@ -238,16 +284,56 @@ public class RecentController implements RecentPanelView.OnExitListener,
     public void rebuildRecentsScreen() {
         // Set new layout parameters and backgrounds.
         if (mRecentContainer != null) {
-            final ViewGroup.LayoutParams layoutParams = mRecentContainer.getLayoutParams();
-            layoutParams.width = (int) (mContext.getResources()
-                    .getDimensionPixelSize(R.dimen.recent_width) * mScaleFactor);
-            mRecentContainer.setLayoutParams(layoutParams);
-
             setGravityAndImageResources();
         }
         // Rebuild complete adapter and lists to force style updates.
         if (mRecentPanelView != null) {
             mRecentPanelView.buildCardListAndAdapter();
+        }
+    }
+
+    public void updateThumbnailAspectRatio() {
+        if (mRecentPanelView != null) {
+            mRecentPanelView.updateThumbnailAspectRatio();
+        }
+    }
+
+    public void updatePanelExpandedMode() {
+        if (mRecentPanelView != null) {
+            int defaultMode = mRecentPanelView.EXPANDED_MODE_AUTO;
+            int mode = Settings.System.getIntForUser(mResolver,
+                    Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE,
+                    defaultMode, UserHandle.USER_CURRENT);
+
+            mRecentPanelView.setExpandedMode(mode);
+        }
+    }
+
+    public void updatePanelGravity() {
+        mUserGravity = Settings.System.getIntForUser(mResolver,
+                Settings.System.SLIM_RECENTS_PANEL_GRAVITY, Gravity.RIGHT,
+                UserHandle.USER_CURRENT);
+
+        setGravityAndImageResources();
+    }
+
+    public void updatePanelShowRunningTask() {
+        if (mRecentPanelView != null) {
+            boolean show = Settings.System.getIntForUser(mResolver,
+                    Settings.System.SLIM_RECENTS_SHOW_RUNNING_TASKS, 0,
+                    UserHandle.USER_CURRENT) == 1;
+
+            mRecentPanelView.setShowOnlyRunningTasks(show);
+        }
+    }
+
+    public void updatePanelShowTopmost() {
+        if (mRecentPanelView != null) {
+            boolean show = Settings.System.getIntForUser(mResolver,
+                    Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST, 0,
+                    UserHandle.USER_CURRENT) == 1;
+
+            mRecentPanelView.setShowTopTask(show);
         }
     }
 
@@ -282,12 +368,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
         mEmptyRecentView.setImageDrawable(vd);
         mEmptyRecentView.setImageTintList(ColorStateList.valueOf(
                 SlimRecentsColorHelper.getPanelEmptyIconColor(mContext)));
-        int padding = mContext.getResources().getDimensionPixelSize(R.dimen.slim_recents_elevation);
         if (mMainGravity == Gravity.LEFT) {
-            mRecentContainer.setPadding(0, 0, padding, 0);
             mEmptyRecentView.setRotation(180);
         } else {
-            mRecentContainer.setPadding(padding, 0, 0, 0);
             mEmptyRecentView.setRotation(0);
         }
 
@@ -298,8 +381,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
 
         // Set custom background color (or reset to default, as the case may be
         if (mRecentContent != null) {
-            mRecentContent.setElevation(50);
-            mRecentContent.setBackgroundColor(SlimRecentsColorHelper.getPanelBackgroundColor(mContext));
+            updatePanelBackgroundColor();
         }
     }
 
@@ -373,8 +455,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
      * @return LayoutParams
      */
     private WindowManager.LayoutParams generateLayoutParameter() {
-        final int width = (int) (mContext.getResources()
-                .getDimensionPixelSize(R.dimen.recent_width) * mScaleFactor);
+        final int width = mContext.getResources().getDimensionPixelSize(R.dimen.recent_panel_width);
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 width,
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -455,7 +536,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
             mIsToggled = false;
             mIsShowing = false;
             mRecentPanelView.setTasksLoaded(false);
-            mRecentPanelView.dismissPopup();
             if (forceHide) {
                 if (DEBUG) Log.d(TAG, "force hide recent window");
                 CacheController.getInstance(mContext).setRecentScreenShowing(false);
@@ -536,74 +616,90 @@ public class RecentController implements RecentPanelView.OnExitListener,
         }
 
         void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_GRAVITY),
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_USE_THEME_COLORS),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_SCALE_FACTOR),
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_BG_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST),
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_GRAVITY),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
+            mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_SHOW_RUNNING_TASKS),
                     false, this, UserHandle.USER_ALL);
-            update();
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST),
+                    false, this, UserHandle.USER_ALL);
+
+//            updateThumbnailAspectRatio();
+            updatePanelExpandedMode();
+            updatePanelGravity();
+            updatePanelShowRunningTask();
+            updatePanelShowTopmost();
         }
 
         @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-            update();
-        }
-
-        public void update() {
-            // Close recent panel if it is opened.
-            hideRecents(false);
-
-            ContentResolver resolver = mContext.getContentResolver();
-
-            // Get user gravity.
-            mUserGravity = Settings.System.getIntForUser(
-                    resolver, Settings.System.SLIM_RECENTS_PANEL_GRAVITY, Gravity.RIGHT,
-                    UserHandle.USER_CURRENT);
-
-            // Set main gravity and background images.
-            setGravityAndImageResources();
-
-            // Get user scale factor.
-            float scaleFactor = Settings.System.getIntForUser(
-                    resolver, Settings.System.SLIM_RECENTS_PANEL_SCALE_FACTOR, 100,
-                    UserHandle.USER_CURRENT) / 100.0f;
-
-            // If changed set new scalefactor, rebuild the recent panel
-            // and notify RecentPanelView about new value.
-            if (scaleFactor != mScaleFactor) {
-                mScaleFactor = scaleFactor;
-                rebuildRecentsScreen();
-            }
-            if (mRecentPanelView != null) {
-                mRecentPanelView.setScaleFactor(mScaleFactor);
-                mRecentPanelView.setExpandedMode(Settings.System.getIntForUser(
-                    resolver, Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE,
-                    mRecentPanelView.EXPANDED_MODE_AUTO,
-                    UserHandle.USER_CURRENT));
-                mRecentPanelView.setShowTopTask(Settings.System.getIntForUser(
-                    resolver, Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST, 0,
-                    UserHandle.USER_CURRENT) == 1);
-                mRecentPanelView.setShowOnlyRunningTasks(Settings.System.getIntForUser(
-                    resolver, Settings.System.SLIM_RECENTS_SHOW_RUNNING_TASKS, 0,
-                    UserHandle.USER_CURRENT) == 1);
+        public void onChange(boolean selfChange, Uri uri) {
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_USE_THEME_COLORS))) {
+                updateColors();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_BG_COLOR))) {
+                updatePanelBackgroundColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR))) {
+                updatePanelEmptyIconColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_BG_COLOR))) {
+                updateCardBackgroundColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR))) {
+                updateCardHeaderTextColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR))) {
+                updateCardActionIconColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR))) {
+                updateCardActionRippleColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO))) {
+                updateThumbnailAspectRatio();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE))) {
+                updatePanelExpandedMode();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_GRAVITY))) {
+                updatePanelGravity();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_SHOW_RUNNING_TASKS))) {
+                updatePanelShowRunningTask();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST))) {
+                updatePanelShowTopmost();
             }
 
-            mRecentContent.setElevation(50);
-            mEmptyRecentView.setImageTintList(ColorStateList.valueOf(
-                    SlimRecentsColorHelper.getPanelEmptyIconColor(mContext)));
-            mRecentContent.setBackgroundColor(SlimRecentsColorHelper.getPanelBackgroundColor(mContext));
         }
     }
 
@@ -628,10 +724,10 @@ public class RecentController implements RecentPanelView.OnExitListener,
 
         // Views we need and are passed trough the constructor.
         private LinearLayout mRecentWarningContent;
-        private CardRecyclerView mCardRecyclerView;
+        private RecyclerView mCardRecyclerView;
 
         RecentListOnScaleGestureListener(
-                LinearLayout recentWarningContent, CardRecyclerView cardRecyclerView) {
+                LinearLayout recentWarningContent, RecyclerView cardRecyclerView) {
             mRecentWarningContent = recentWarningContent;
             mCardRecyclerView = cardRecyclerView;
         }

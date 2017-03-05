@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 - 2017 DarkKat
+<!-- Copyright (C) 2015 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,16 +13,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
-
-    <!-- Battery bar -->
-    <style name="BatteryBarStyle" parent="@android:style/Widget.Material.ProgressBar.Horizontal">
-        <item name="android:indeterminate">false</item>
-        <item name="android:minHeight">1dp</item>
-        <item name="android:maxHeight">1dp</item>
-    </style>
-
-    <!-- Slim recent app screen -->
-    <style name="RecentCardViewButton.Borderless.Small"
-            parent="@android:style/Widget.Material.Light.Button.Borderless.Small" />
-</resources>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval" >
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+</ripple>

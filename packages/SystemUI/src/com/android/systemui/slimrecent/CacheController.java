@@ -164,8 +164,8 @@ public class CacheController {
         final int size = screenWidth * screenHeight * 4;
 
         // Calculate how much thumbnails we can put per screen page
-        final int thumbnailWidth = res.getDimensionPixelSize(R.dimen.recent_thumbnail_width);
-        final int thumbnailHeight = res.getDimensionPixelSize(R.dimen.recent_thumbnail_height);
+        final int thumbnailWidth = res.getDimensionPixelSize(R.dimen.recent_card_view_thumbnail_width);
+        final int thumbnailHeight = res.getDimensionPixelSize(R.dimen.recent_card_view_thumbnail_height);
         final float thumbnailsPerPage =
                 (screenWidth / thumbnailWidth) * (screenHeight / thumbnailHeight);
 
@@ -173,7 +173,7 @@ public class CacheController {
         float neededPages = maxNumTasksToLoad / thumbnailsPerPage;
 
         // Calculate how much app icons we can put per screen page
-        final int iconSize = res.getDimensionPixelSize(R.dimen.recent_app_icon_size);
+        final int iconSize = res.getDimensionPixelSize(R.dimen.recent_card_view_header_app_icon_size);
         final float iconsPerPage = (screenWidth / iconSize) * (screenHeight / iconSize);
 
         // Needed screen pages for max thumbnails and max app icons we can get.

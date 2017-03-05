@@ -3761,28 +3761,20 @@ public final class Settings {
                 "slim_recents_panel_empty_icon_color";
 
         /**
-         * Recent card header background color
+         * Recent card action icon color
          *
          * @hide
          */
-        public static final String SLIM_RECENTS_CARD_HEADER_BG_COLOR =
-                "slim_recents_card_header_bg_color";
+        public static final String SLIM_RECENTS_CARD_ACTION_ICON_COLOR =
+                "slim_recents_card_action_icon_color";
 
         /**
-         * Recent card header activated background color
+         * Recent card action ripple effect color
          *
          * @hide
          */
-        public static final String SLIM_RECENTS_CARD_HEADER_ACTIVATED_BG_COLOR =
-                "slim_recents_card_header_activated_bg_color";
-
-        /**
-         * Recent card header icon color
-         *
-         * @hide
-         */
-        public static final String SLIM_RECENTS_CARD_HEADER_ICON_COLOR =
-                "slim_recents_card_header_icon_color";
+        public static final String SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR =
+                "slim_recents_card_action_ripple_color";
 
         /**
          *  Whether to show the music visualizer on the lock screen
@@ -4172,6 +4164,18 @@ public final class Settings {
          */
         public static final String POWER_MENU_SHOW_ADVANCED_REBOOT = "power_menu_show_advanced_reboot";
 
+        /**
+         * Slim Rexents thumbnail aspect ratio
+         * 0 -  1 : 1
+         * 1 -  5 : 4
+         * 2 -  4 : 3
+         * 3 - 16 : 9
+         * default: 0
+         * @hide
+         */
+        public static final String SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO =
+                "slim_recents_thumbnail_aspect_ratio";
+
         // DarkKat additions end
 
         // SlimRoms additions
@@ -4204,36 +4208,6 @@ public final class Settings {
         public static final String USE_SLIM_RECENTS = "use_slim_recents";
 
         /**
-         * Whether to only show actually running tasks
-         * @hide
-         */
-        public static final String SLIM_RECENTS_SHOW_RUNNING_TASKS = "slim_recents_show_running_tasks";
-
-        /**
-         * Amount of apps to show in recents
-         * @hide
-         */
-        public static final String SLIM_RECENTS_MAX_APPS = "slim_recents_max_apps";
-
-        /**
-         * Whether recent panel gravity is left or right (default = Gravity.RIGHT).
-         * @hide
-         */
-        public static final String SLIM_RECENTS_PANEL_GRAVITY = "slim_recents_panel_gravity";
-
-        /**
-         * Size of recent panel view in percent (default = 100).
-         * @hide
-         */
-        public static final String SLIM_RECENTS_PANEL_SCALE_FACTOR = "slim_recents_panel_scale_factor";
-
-        /**
-         * User favorite tasks for recent panel.
-         * @hide
-         */
-        public static final String SLIM_RECENTS_PANEL_FAVORITES = "slim_recents_panel_favorites";
-
-        /**
          * Recent panel expanded mode (auto = 0, always = 1, never = 2).
          * default = 0.
          *
@@ -4243,11 +4217,35 @@ public final class Settings {
                 "slim_recents_panel_expanded_mode";
 
         /**
+         * Whether recent panel gravity is left or right (default = Gravity.RIGHT).
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_GRAVITY = "slim_recents_panel_gravity";
+
+        /**
+         * Whether to only show actually running tasks
+         * @hide
+         */
+        public static final String SLIM_RECENTS_SHOW_RUNNING_TASKS = "slim_recents_show_running_tasks";
+
+        /**
          * Recent panel: Show topmost task
          *
          * @hide
          */
         public static final String SLIM_RECENTS_PANEL_SHOW_TOPMOST = "slim_recents_panel_show_topmost";
+
+        /**
+         * Amount of apps to show in recents
+         * @hide
+         */
+        public static final String SLIM_RECENTS_MAX_APPS = "slim_recents_max_apps";
+
+        /**
+         * User favorite tasks for recent panel.
+         * @hide
+         */
+        public static final String SLIM_RECENTS_PANEL_FAVORITES = "slim_recents_panel_favorites";
 
         // SlimRoms additions end
 

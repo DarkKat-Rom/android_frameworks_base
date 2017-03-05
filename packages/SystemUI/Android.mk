@@ -25,11 +25,11 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v7-recyclerview \
     android-support-v7-preference \
     android-support-v7-appcompat \
+    android-support-v7-cardview \
     android-support-v14-preference \
     android-support-v17-leanback \
     android-support-v7-palette \
     android-support-v4 \
-    android-opt-cards \
     framework-protos \
     SystemUI-proto-tags
 
@@ -47,14 +47,13 @@ LOCAL_RESOURCE_DIR := \
     frameworks/support/v7/preference/res \
     frameworks/support/v14/preference/res \
     frameworks/support/v7/appcompat/res \
+    frameworks/support/v7/cardview/res \
     frameworks/support/v7/recyclerview/res \
     frameworks/support/v17/leanback/res \
-    $(LOCAL_PATH)/../../../../frameworks/opt/cards/res
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay \
     --extra-packages com.android.keyguard:android.support.v7.recyclerview:android.support.v7.preference:android.support.v14.preference:android.support.v7.appcompat \
-    --extra-packages android.support.v17.leanback
-LOCAL_AAPT_FLAGS += --extra-packages com.android.cards
+    --extra-packages android.support.v7.cardview:android.support.v17.leanback
 
 ifneq ($(SYSTEM_UI_INCREMENTAL_BUILDS),)
     LOCAL_PROGUARD_ENABLED := disabled

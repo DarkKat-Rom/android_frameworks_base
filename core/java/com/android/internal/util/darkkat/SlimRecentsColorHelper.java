@@ -41,12 +41,12 @@ public class SlimRecentsColorHelper {
         int alpha;
 
         if (ThemeHelper.slimRecentsUseThemeColors(context)) {
-            color = ThemeHelper.getSlimRecentsPanelEmptyIconColor();
+            color = ThemeHelper.getSlimRecentsPanelEmptyIconColor(context);
             alpha = Color.alpha(color);
         } else {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR,
-                    ThemeHelper.getSlimRecentsPanelEmptyIconColor());
+                    ThemeHelper.getSlimRecentsPanelEmptyIconColor(context));
             if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
             } else {
@@ -66,34 +66,6 @@ public class SlimRecentsColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_CARD_BG_COLOR,
                     ThemeHelper.getColorBackgroundFloating(context));
-        }
-
-        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
-    }
-
-    public static int getCardHeaderBackgroundColor(Context context) {
-        int color;
-
-        if (ThemeHelper.slimRecentsUseThemeColors(context)) {
-            color = ThemeHelper.getColorBackgroundFloating(context);
-        } else {
-            color = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_BG_COLOR,
-                    ThemeHelper.getColorBackgroundFloating(context));
-        }
-
-        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
-    }
-
-    public static int getCardHeaderActivatedBackgroundColor(Context context) {
-        int color;
-
-        if (ThemeHelper.slimRecentsUseThemeColors(context)) {
-            color = ThemeHelper.getSlimRecentsCardHeaderActivatedBgColor(context);
-        } else {
-            color = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ACTIVATED_BG_COLOR,
-                    ThemeHelper.getColorBackground(context));
         }
 
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
@@ -120,7 +92,7 @@ public class SlimRecentsColorHelper {
         return (alpha << 24) | (color & 0x00ffffff);
     }
 
-    public static int getCardHeaderIconColor(Context context) {
+    public static int getCardActionIconColor(Context context) {
         int color;
         int alpha;
 
@@ -129,12 +101,33 @@ public class SlimRecentsColorHelper {
             alpha = Color.alpha(color);
         } else {
             color = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.SLIM_RECENTS_CARD_HEADER_ICON_COLOR,
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR,
                     ThemeHelper.getIconColor(context));
             if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
             } else {
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+            }
+        }
+
+        return (alpha << 24) | (color & 0x00ffffff);
+    }
+
+    public static int getCardActionRippleColor(Context context) {
+        int color;
+        int alpha;
+
+        if (ThemeHelper.slimRecentsUseThemeColors(context)) {
+            color = ThemeHelper.getRippleColor(context);
+            alpha = Color.alpha(color);
+        } else {
+            color = Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR,
+                    ThemeHelper.getRippleColor(context));
+            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
+                alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
+            } else {
+                alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
             }
         }
 

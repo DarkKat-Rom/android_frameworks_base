@@ -1386,6 +1386,12 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
     }
 
+    protected void updateRecentsScreenColors() {
+        if (mShowSlimRecents && mSlimRecents != null) {
+            mSlimRecents.updateColors();
+        }
+    }
+
     /** Proxy for RecentsComponent */
 
     protected void showRecents(boolean triggeredFromAltTab, boolean fromHome) {

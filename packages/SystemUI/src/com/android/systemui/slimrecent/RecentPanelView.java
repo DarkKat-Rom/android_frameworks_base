@@ -51,11 +51,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.android.cards.recyclerview.internal.BaseRecyclerViewAdapter.CardViewHolder;
-import com.android.cards.recyclerview.internal.CardArrayRecyclerViewAdapter;
-import com.android.cards.recyclerview.view.CardRecyclerView;
-import com.android.cards.internal.Card;
 import com.android.systemui.R;
+import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnCardClickListener;
+import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnAppIconLongClickListener;
+import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnCardExpandListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,13 +99,13 @@ public class RecentPanelView {
     private final Context mContext;
     private final ImageView mEmptyRecentView;
 
-    private final CardRecyclerView mCardRecyclerView;
-    private CardArrayRecyclerViewAdapter mCardAdapter;
+    private final RecyclerView mRecyclerView;
+    private RecentRecyclerViewAdapter mCardAdapter;
 
     private final RecentController mController;
 
     // Array list of all current cards
-    private ArrayList<Card> mCards;
+    private ArrayList<RecentCard> mCards;
     // Our first task which is not displayed but needed for internal references.
     protected TaskDescription mFirstTask;
     // Array list of all expanded states of apps accessed during the session
@@ -118,7 +117,6 @@ public class RecentPanelView {
     private boolean mIsLoading;
 
     private int mMainGravity;
-    private float mScaleFactor;
     private int mExpandedMode = EXPANDED_MODE_AUTO;
     private boolean mShowTopTask;
     private boolean mOnlyShowRunningTasks;
@@ -142,9 +140,9 @@ public class RecentPanelView {
     }
 
     public RecentPanelView(Context context, RecentController controller,
-            CardRecyclerView recyclerView, ImageView emptyRecentView) {
+            RecyclerView recyclerView, ImageView emptyRecentView) {
         mContext = context;
-        mCardRecyclerView = recyclerView;
+        mRecyclerView = recyclerView;
         mEmptyRecentView = emptyRecentView;
         mController = controller;
 
@@ -158,9 +156,10 @@ public class RecentPanelView {
      */
     protected void buildCardListAndAdapter() {
         mCards = new ArrayList<>();
-        mCardAdapter = new CardArrayRecyclerViewAdapter(mContext, mCards);
-        if (mCardRecyclerView != null) {
-            mCardRecyclerView.setAdapter(mCardAdapter);
+        mCardAdapter = new RecentRecyclerViewAdapter(mContext, mCards);
+        assignListeners();
+        if (mRecyclerView != null) {
+            mRecyclerView.setAdapter(mCardAdapter);
         }
     }
 
@@ -175,7 +174,7 @@ public class RecentPanelView {
             @Override
             public void onSwiped(ViewHolder viewHolder, int direction) {
                 int pos = viewHolder.getAdapterPosition();
-                RecentCard card = (RecentCard) mCards.get(pos);
+                RecentCard card = mCards.get(pos);
                 mCards.remove(pos);
                 removeApplication(card.getTaskDescription());
                 mCardAdapter.notifyItemRemoved(pos);
@@ -190,64 +189,53 @@ public class RecentPanelView {
                 return makeMovementFlags(dragFlags, swipeFlags);
             }
         });
-        touchHelper.attachToRecyclerView(mCardRecyclerView);
+        touchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     /**
      * Assign the listeners to the card.
      */
-    private RecentCard assignListeners(final RecentCard card, final TaskDescription td) {
+    private void assignListeners() {
         if (DEBUG) Log.v(TAG, "add listeners to task card");
 
         // Listen for onClick to start the app with custom animation
-        card.setOnClickListener(new Card.OnCardClickListener() {
+        mCardAdapter.setOnCardClickListener(new OnCardClickListener() {
             @Override
-            public void onClick(Card card, View view) {
-                startApplication(td);
+            public void onClick(RecentCard card) {
+                startApplication(card.getTaskDescription());
             }
         });
 
         // App icon has own onLongClick action. Listen for it and
         // process the favorite action for it.
-        card.addPartialOnLongClickListener(Card.CLICK_LISTENER_THUMBNAIL_VIEW,
-                new Card.OnLongCardClickListener() {
+        mCardAdapter.setOnAppIconLongClickListener(new OnAppIconLongClickListener() {
             @Override
-            public boolean onLongClick(Card card, View view) {
-                RecentImageView favoriteIcon =
-                        (RecentImageView) view.findViewById(R.id.card_thumbnail_favorite);
-                favoriteIcon.setVisibility(td.getIsFavorite() ? View.INVISIBLE : View.VISIBLE);
-                handleFavoriteEntry(td);
+            public boolean onLongClick(RecentCard card) {
+                handleFavoriteEntry(card.getTaskDescription());
                 return true;
             }
         });
 
-        // Listen for card is expanded to save current value for next recent call
-        card.setOnExpandAnimatorEndListener(new Card.OnExpandAnimatorEndListener() {
+        mCardAdapter.setOnCardExpandListener(new OnCardExpandListener() {
             @Override
-            public void onExpandEnd(Card card) {
-                if (DEBUG) Log.v(TAG, td.getLabel() + " is expanded");
-                final int oldState = td.getExpandedState();
-                int state = EXPANDED_STATE_EXPANDED;
-                if ((oldState & EXPANDED_STATE_BY_SYSTEM) != 0) {
-                    state |= EXPANDED_STATE_BY_SYSTEM;
+            public void onCardExpand(TaskDescription td, boolean expanded) {
+                int oldState = td.getExpandedState();
+                int state;
+                if (expanded) {
+                    state = EXPANDED_STATE_COLLAPSED;
+                    if ((oldState & EXPANDED_STATE_BY_SYSTEM) != 0) {
+                        state |= EXPANDED_STATE_BY_SYSTEM;
+                    }
+                } else {
+                    state = EXPANDED_STATE_EXPANDED;
+                    if ((oldState & EXPANDED_STATE_BY_SYSTEM) != 0) {
+                        state |= EXPANDED_STATE_BY_SYSTEM;
+                    }
                 }
                 td.setExpandedState(state);
+                notifyDataSetChanged(true);
             }
         });
-        // Listen for card is collapsed to save current value for next recent call
-        card.setOnCollapseAnimatorEndListener(new Card.OnCollapseAnimatorEndListener() {
-            @Override
-            public void onCollapseEnd(Card card) {
-                if (DEBUG) Log.v(TAG, td.getLabel() + " is collapsed");
-                final int oldState = td.getExpandedState();
-                int state = EXPANDED_STATE_COLLAPSED;
-                if ((oldState & EXPANDED_STATE_BY_SYSTEM) != 0) {
-                    state |= EXPANDED_STATE_BY_SYSTEM;
-                }
-                td.setExpandedState(state);
-            }
-        });
-        return card;
     }
 
     /**
@@ -286,6 +274,7 @@ public class RecentPanelView {
                 resolver, Settings.System.SLIM_RECENTS_PANEL_FAVORITES,
                 entryToSave,
                 UserHandle.USER_CURRENT);
+        notifyDataSetChanged(true);
     }
 
     /**
@@ -314,11 +303,11 @@ public class RecentPanelView {
             am.removeTask(td.persistentTaskId);
 
             // Accessibility feedback
-            mCardRecyclerView.setContentDescription(
+            mRecyclerView.setContentDescription(
                     mContext.getString(R.string.accessibility_recents_item_dismissed,
                             td.getLabel()));
-            mCardRecyclerView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
-            mCardRecyclerView.setContentDescription(null);
+            mRecyclerView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+            mRecyclerView.setContentDescription(null);
 
             // Remove app from task, cache and expanded state list.
             removeApplicationBitmapCacheAndExpandedState(td);
@@ -340,7 +329,7 @@ public class RecentPanelView {
         boolean hasFavorite = false;
         int size = mCards.size() - 1;
         for (int i = size; i >= 0; i--) {
-            RecentCard card = (RecentCard) mCards.get(i);;
+            RecentCard card = mCards.get(i);
             TaskDescription td = card.getTaskDescription();
             // User favorites are not removed.
             if (td.getIsFavorite()) {
@@ -428,8 +417,8 @@ public class RecentPanelView {
         if (mFirstTask != null && uriReference.equals(mFirstTask.packageName)) {
             return true;
         }
-        for (Card c : mCards) {
-            TaskDescription task = ((RecentCard) c).getTaskDescription();
+        for (RecentCard card : mCards) {
+            TaskDescription task = card.getTaskDescription();
             if (uriReference.equals(task.packageName)) {
                 return true;
             }
@@ -507,7 +496,32 @@ public class RecentPanelView {
      */
     private void setVisibility() {
         mEmptyRecentView.setVisibility(mCards.size() == 0 ? View.VISIBLE : View.GONE);
-        mCardRecyclerView.setVisibility(mCards.size() == 0 ? View.GONE : View.VISIBLE);
+        mRecyclerView.setVisibility(mCards.size() == 0 ? View.GONE : View.VISIBLE);
+    }
+
+    private void setExpandedTaskStates() {
+        final int firstExpandedItems =
+                mContext.getResources().getInteger(R.integer.expanded_items_default);
+        for (int i = 0; i < mCards.size(); i++) {
+            RecentCard card = (RecentCard) mCards.get(i);
+            TaskDescription td = card.getTaskDescription();
+            int state = td.getExpandedState();
+            if ((state & EXPANDED_STATE_BY_SYSTEM) != 0) {
+                state &= ~EXPANDED_STATE_BY_SYSTEM;
+            }
+            if (i < firstExpandedItems) {
+                if (mExpandedMode != EXPANDED_MODE_NEVER) {
+                    state |= EXPANDED_STATE_BY_SYSTEM;
+                }
+            } else {
+                if (mExpandedMode == EXPANDED_MODE_ALWAYS) {
+                    state |= EXPANDED_STATE_BY_SYSTEM;
+                }
+            }
+            td.setExpandedState(state);
+            card.setTaskDescription(td);
+        }
+        updateExpandedTaskStates();
     }
 
     /**
@@ -515,8 +529,8 @@ public class RecentPanelView {
      * Update the List for actual apps.
      */
     private void updateExpandedTaskStates() {
-        for (Card card : mCards) {
-            TaskDescription item = ((RecentCard) card).getTaskDescription();
+        for (RecentCard card : mCards) {
+            TaskDescription item = card.getTaskDescription();
             boolean updated = false;
             for (TaskExpandedStates expandedState : mExpandedTaskStates) {
                 if (item.identifier.equals(expandedState.getIdentifier())) {
@@ -567,9 +581,6 @@ public class RecentPanelView {
         if (forceupdate || !mController.isShowing()) {
             // We want to have the list scrolled down before it is visible for the user.
             // Whoever calls notifyDataSetChanged() first (not visible) do it now.
-            if (mCardRecyclerView != null) {
-               // mCardRecyclerView.setSelection(mCards.size() - 1);
-            }
             mCardAdapter.notifyDataSetChanged();
         }
     }
@@ -593,35 +604,79 @@ public class RecentPanelView {
         return mTasksLoaded;
     }
 
-    protected void dismissPopup() {
-        for (Card card : mCards) {
-            card.hideOptions(-1, -1);
+    public void updateColors() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setColors();
+            }
+            notifyDataSetChanged(true);
         }
+    }
+
+    public void updateCardBackgroundColor() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setBackgroundColor();
+            }
+            notifyDataSetChanged(true);
+        }
+    }
+
+    public void updateCardHeaderTextColor() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setHeaderTextColor();
+            }
+            notifyDataSetChanged(true);
+        }
+    }
+
+    public void updateCardActionIconColor() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setActionIconColor();
+            }
+            notifyDataSetChanged(true);
+        }
+    }
+
+    public void updateCardActionRippleColor() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setActionRippleColor();
+            }
+            notifyDataSetChanged(true);
+        }
+    }
+
+    public void updateThumbnailAspectRatio() {
+        if (mCardAdapter != null) {
+            mCardAdapter.setThumbnailAspectRatio();
+            notifyDataSetChanged(true);
+        }
+    }
+
+    protected void setExpandedMode(int mode) {
+        mExpandedMode = mode;
+        setExpandedTaskStates();
+        notifyDataSetChanged(true);
     }
 
     protected void setMainGravity(int gravity) {
         mMainGravity = gravity;
     }
 
-    protected void setScaleFactor(float factor) {
-        mScaleFactor = factor;
-    }
-
-    protected void setExpandedMode(int mode) {
-        mExpandedMode = mode;
+    protected void setShowOnlyRunningTasks(boolean enabled) {
+        mOnlyShowRunningTasks = enabled;
     }
 
     protected void setShowTopTask(boolean enabled) {
         mShowTopTask = enabled;
     }
 
-    protected void setShowOnlyRunningTasks(boolean enabled) {
-        mOnlyShowRunningTasks = enabled;
-    }
-
     protected boolean hasFavorite() {
-        for (Card card : mCards) {
-            TaskDescription td = ((RecentCard) card).getTaskDescription();
+        for (RecentCard card : mCards) {
+            TaskDescription td = card.getTaskDescription();
             if (td.getIsFavorite()) {
                 return true;
             }
@@ -630,8 +685,8 @@ public class RecentPanelView {
     }
 
     protected boolean hasClearableTasks() {
-        for (Card card : mCards) {
-            TaskDescription td = ((RecentCard) card).getTaskDescription();
+        for (RecentCard card : mCards) {
+            TaskDescription td = card.getTaskDescription();
             if (!td.getIsFavorite()) {
                 return true;
             }
@@ -660,7 +715,7 @@ public class RecentPanelView {
     }
 
     protected void scrollToFirst() {
-        LinearLayoutManager lm = (LinearLayoutManager) mCardRecyclerView.getLayoutManager();
+        LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         lm.scrollToPositionWithOffset(0, 0);
     }
 
@@ -672,8 +727,8 @@ public class RecentPanelView {
      *
      * Note: App icons as well the app screenshots are loaded in other
      *       async tasks.
-     *       See #link:RecentCard, #link:RecentExpandedCard
-     *       #link:RecentAppIcon and #link AppIconLoader
+     *       See #link:RecentCard, #link:AppIconLoader 
+     *       and #link:ThumbnailLoader
      */
     private class CardLoader extends AsyncTask<Void, Void, Boolean> {
 
@@ -793,7 +848,7 @@ public class RecentPanelView {
                                 oldState |= EXPANDED_STATE_TOPTASK;
                             }
                             item.setExpandedState(oldState);
-                            addCard(item, oldSize, true);
+                            addCard(item, oldSize);
                             mFirstTask = item;
                         } else {
                             // Skip the first task for our list but save it for later use.
@@ -820,7 +875,7 @@ public class RecentPanelView {
                             }
                             item.setExpandedState(oldState);
                             // The first tasks are always added to the task list.
-                            addCard(item, oldSize, false);
+                            addCard(item, oldSize);
                         } else {
                             if (mExpandedMode == EXPANDED_MODE_ALWAYS) {
                                 oldState |= EXPANDED_STATE_BY_SYSTEM;
@@ -829,7 +884,7 @@ public class RecentPanelView {
                             // Favorite tasks are added next. Non favorite
                             // we hold for a short time in an extra list.
                             if (item.getIsFavorite()) {
-                                addCard(item, oldSize, false);
+                                addCard(item, oldSize);
                             } else {
                                 nonFavoriteTasks.add(item);
                             }
@@ -842,7 +897,7 @@ public class RecentPanelView {
 
             // Add now the non favorite tasks to the final task list.
             for (TaskDescription item : nonFavoriteTasks) {
-                addCard(item, oldSize, false);
+                addCard(item, oldSize);
             }
 
             // We may have unused cards left. Eg app was uninstalled but present
@@ -858,7 +913,7 @@ public class RecentPanelView {
             return true;
         }
 
-        private void addCard(TaskDescription task, int oldSize, boolean topTask) {
+        private void addCard(TaskDescription task, int oldSize) {
             RecentCard card = null;
 
             // We may have allready constructed and inflated card.
@@ -867,16 +922,14 @@ public class RecentPanelView {
                 card = (RecentCard) mCards.get(mCounter);
                 if (card != null) {
                     if (DEBUG) Log.v(TAG, "loading tasks - update old card");
-                    card.updateCardContent(task, mScaleFactor);
-                    card = assignListeners(card, task);
+                    card.updateCardContent(task);
                 }
             }
 
             // No old card was present to update....so add a new one.
             if (card == null) {
                 if (DEBUG) Log.v(TAG, "loading tasks - create new card");
-                card = new RecentCard(mContext, task, mScaleFactor);
-                card = assignListeners(card, task);
+                card = new RecentCard(mContext, task);
                 mCards.add(card);
             }
         }

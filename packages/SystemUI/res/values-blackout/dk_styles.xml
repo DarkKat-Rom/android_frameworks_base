@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,20 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <resources>
 
-    <!-- Day theme
-        (additional colors) -->
-    <color name="system_primary_color">#ff263238</color><!-- material blue grey 900 -->
-
-    <color name="qs_tile_adapter_bg">#ff384248</color>
-
     <!-- Slim recent app screen -->
-
-    <!-- Header text and icon colors on dark/light colored backgrounds -->
-    <color name="recents_header_text_color_light">#ffffffff</color>
-    <color name="recents_header_text_color_dark">#de000000</color>
-    <color name="recents_header_icon_color_light">#b3ffffff</color>
-    <color name="recents_header_icon_color_dark">#8a000000</color>
+    <style name="RecentCardViewButton.Borderless.Small"
+            parent="@android:style/Widget.Material.Button.Borderless.Small" />
 </resources>
