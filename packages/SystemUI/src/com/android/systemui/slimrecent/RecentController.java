@@ -271,9 +271,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
         }
     }
 
-    private void updateCardActionRippleColor() {
+    private void updateCardRippleColor() {
         if (mRecentPanelView != null) {
-            mRecentPanelView.updateCardActionRippleColor();
+            mRecentPanelView.updateCardRippleColor();
         }
     }
 
@@ -306,6 +306,15 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     defaultMode, UserHandle.USER_CURRENT);
 
             mRecentPanelView.setExpandedMode(mode);
+        }
+    }
+    public void updateShowActionsWhenCollapsed() {
+        if (mRecentPanelView != null) {
+            boolean show = Settings.System.getIntForUser(mResolver,
+                    Settings.System.SLIM_RECENTS_SHOW_ACTIONS_WHEN_COLLAPSED,
+                    0, UserHandle.USER_CURRENT) == 1;
+
+            mRecentPanelView.setShowActionsWhenCollapsed(show);
         }
     }
 
@@ -617,6 +626,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
 
         void observe() {
             mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_USE_AUTO_COLORS),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_USE_THEME_COLORS),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
@@ -629,19 +641,22 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     Settings.System.SLIM_RECENTS_CARD_BG_COLOR),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_RIPPLE_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE),
+                    false, this, UserHandle.USER_ALL);
+            mResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_SHOW_ACTIONS_WHEN_COLLAPSED),
                     false, this, UserHandle.USER_ALL);
             mResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_GRAVITY),
@@ -653,8 +668,8 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     Settings.System.SLIM_RECENTS_PANEL_SHOW_TOPMOST),
                     false, this, UserHandle.USER_ALL);
 
-//            updateThumbnailAspectRatio();
             updatePanelExpandedMode();
+            updateShowActionsWhenCollapsed();
             updatePanelGravity();
             updatePanelShowRunningTask();
             updatePanelShowTopmost();
@@ -663,6 +678,9 @@ public class RecentController implements RecentPanelView.OnExitListener,
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_USE_AUTO_COLORS))) {
+                updateCardBackgroundColor();
+            } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_USE_THEME_COLORS))) {
                 updateColors();
             } else if (uri.equals(Settings.System.getUriFor(
@@ -675,20 +693,23 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     Settings.System.SLIM_RECENTS_CARD_BG_COLOR))) {
                 updateCardBackgroundColor();
             } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_CARD_RIPPLE_COLOR))) {
+                updateCardRippleColor();
+            } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR))) {
                 updateCardHeaderTextColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR))) {
                 updateCardActionIconColor();
             } else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR))) {
-                updateCardActionRippleColor();
-            } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO))) {
                 updateThumbnailAspectRatio();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_EXPANDED_MODE))) {
                 updatePanelExpandedMode();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SLIM_RECENTS_SHOW_ACTIONS_WHEN_COLLAPSED))) {
+                updateShowActionsWhenCollapsed();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.SLIM_RECENTS_PANEL_GRAVITY))) {
                 updatePanelGravity();

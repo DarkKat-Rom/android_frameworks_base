@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.provider.Settings;
 
 import com.android.internal.util.darkkat.ColorConstants;
 import com.android.internal.util.darkkat.ColorHelper;
@@ -44,7 +45,7 @@ public class RecentCard {
     private ColorStateList mDividerTint;
     private int mHeaderTextColor;
     private ColorStateList mActionIconTint;
-    private ColorStateList mActionRippleColor;
+    private ColorStateList mRippleColor;
 
     public RecentCard(Context context, TaskDescription td) {
 
@@ -66,13 +67,21 @@ public class RecentCard {
 
     public void setColors() {
         setBackgroundColor();
+        setRippleColor();
         setHeaderTextColor();
         setActionIconColor();
-        setActionRippleColor();
     }
 
     public void setBackgroundColor() {
         mBackgroundColor = resolveBackgroundColor();
+        mRippleColor = ColorStateList.valueOf(resolveRippleColor());
+        mHeaderTextColor = resolveHeaderTextColor();
+        mActionIconTint = ColorStateList.valueOf(resolveActionIconColor());
+        mDividerTint = ColorStateList.valueOf((31  << 24) | (resolveActionIconColor() & 0x00ffffff));
+    }
+
+    public void setRippleColor() {
+        mRippleColor = ColorStateList.valueOf(resolveRippleColor());
     }
 
     public void setHeaderTextColor() {
@@ -82,10 +91,6 @@ public class RecentCard {
     public void setActionIconColor() {
         mActionIconTint = ColorStateList.valueOf(resolveActionIconColor());
         mDividerTint = ColorStateList.valueOf((31  << 24) | (resolveActionIconColor() & 0x00ffffff));
-    }
-
-    public void setActionRippleColor() {
-        mActionRippleColor = ColorStateList.valueOf(resolveActionRippleColor());
     }
 
     public void setTaskDescription(TaskDescription td) {
@@ -109,6 +114,10 @@ public class RecentCard {
         return mBackgroundColor;
     }
 
+    public ColorStateList getRippleColor() {
+        return mRippleColor;
+    }
+
     public ColorStateList getThumbnailFrameTint() {
         return ColorStateList.valueOf(
                 (31  << 24) | (resolveThumbnailFrameColor(mBackgroundColor) & 0x00ffffff));
@@ -126,20 +135,36 @@ public class RecentCard {
         return mActionIconTint;
     }
 
-    public ColorStateList getActionRippleColor() {
-        return mActionRippleColor;
-    }
-
     public boolean isFavorite() {
         return getTaskDescription().getIsFavorite();
     }
 
+    private boolean cardUseAutoColors() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.SLIM_RECENTS_CARD_USE_AUTO_COLORS, 1) == 1;
+    }
+
     private int resolveBackgroundColor() {
         if (mTaskDescription != null && mTaskDescription.cardColor != 0
-                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
+                && cardUseAutoColors()) {
             return mTaskDescription.cardColor;
         }
         return SlimRecentsColorHelper.getCardBackgroundColor(mContext);
+    }
+
+    public int resolveRippleColor() {
+        if (mTaskDescription != null && mTaskDescription.cardColor != 0
+                && cardUseAutoColors()) {
+            if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
+                    Color.WHITE) < 3f) {
+                return mContext.getResources().getColor(
+                        R.color.recents_ripple_color_dark);
+            } else {
+                return mContext.getResources().getColor(
+                        R.color.recents_ripple_color_light);
+            }
+        }
+        return SlimRecentsColorHelper.getCardRippleColor(mContext);
     }
 
     public int resolveThumbnailFrameColor(int backgroundColor) {
@@ -152,7 +177,7 @@ public class RecentCard {
 
     public int resolveHeaderTextColor() {
         if (mTaskDescription != null && mTaskDescription.cardColor != 0
-                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
+                && cardUseAutoColors()) {
             if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
                     Color.WHITE) < 3f) {
                 return mContext.getResources().getColor(
@@ -167,7 +192,7 @@ public class RecentCard {
 
     public int resolveActionIconColor() {
         if (mTaskDescription != null && mTaskDescription.cardColor != 0
-                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
+                && cardUseAutoColors()) {
             if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
                     Color.WHITE) < 3f) {
                 return mContext.getResources().getColor(
@@ -178,21 +203,6 @@ public class RecentCard {
             }
         }
         return SlimRecentsColorHelper.getCardActionIconColor(mContext);
-    }
-
-    public int resolveActionRippleColor() {
-        if (mTaskDescription != null && mTaskDescription.cardColor != 0
-                && ThemeHelper.slimRecentsUseThemeColors(mContext)) {
-            if (Utilities.computeContrastBetweenColors(mTaskDescription.cardColor,
-                    Color.WHITE) < 3f) {
-                return mContext.getResources().getColor(
-                        R.color.recents_header_icon_color_dark);
-            } else {
-                return mContext.getResources().getColor(
-                        R.color.recents_header_icon_color_light);
-            }
-        }
-        return SlimRecentsColorHelper.getCardActionRippleColor(mContext);
     }
 
     public void loadAppicon(RecentImageView appIconView) {

@@ -64,20 +64,46 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
 
     private float mThumbnailAspectRatio;
 
-    private OnCardClickListener mOnCardClickListener;
-    private OnAppIconLongClickListener mOnAppIconLongClickListener;
-    private OnCardExpandListener mOnCardExpandListener;
+    private OnCardClickListeners mOnCardClickListeners;
 
-    public interface OnCardClickListener {
-        public void onClick(RecentCard card);
-    }
+    // Interface definition for a callback to be invoked when a view of the card is (long) clicked
+    public interface OnCardClickListeners {
 
-    public interface OnAppIconLongClickListener {
-        public boolean onLongClick(RecentCard card);
-    }
+        /**
+         * Called when the card or card header has been clicked.
+         *
+         * @param card The RecentCard model of the card that was clicked.
+         */
+        public void onCardOrHeaderClick(RecentCard card);
 
-    public interface OnCardExpandListener {
-        public void onCardExpand(TaskDescription td, boolean expanded);
+        /**
+         * Called when the card header has been long clicked.
+         *
+         * @param td The TaskDescription of the card which card header was long clicked.
+         * @param actionsVisible The current actions visibility of the card which card header was long clicked.
+         */
+        public boolean onCardHeaderLongClick(TaskDescription td, boolean actionsVisible);
+
+        /**
+         * Called when the card app icon has been long clicked.
+         *
+         * @param card The RecentCard model of the card which app icon was long clicked.
+         */
+        public boolean onAppIconLongClick(RecentCard card);
+
+        /**
+         * Called when the card multi window action has been clicked.
+         *
+         */
+        public void onMultiWindowClick();
+
+        /**
+         * Called when the card expand action has been clicked.
+         *
+         * @param td The TaskDescription of the card which expand action was clicked.
+         * @param expanded The current expanded state of the card which expand action was clicked.
+         */
+        public void onCardExpandClick(TaskDescription td, boolean expanded);
     }
 
     public RecentRecyclerViewAdapter(Context context, List<RecentCard> cards) {
@@ -94,12 +120,14 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CardView mCardView;
+        public View mHeaderLayout;
         public View mAppIconLayout;
         public RecentImageView mAppIcon;
         public RecentImageView mFavoriteIcon;
         public TextView mAppTitle;
         public RecentImageView mThumbnail;
         public View mActionDivider;
+        public View mActionsLayout;
         public ImageView mActionInfo;
         public ImageView mActionMultiWindow;
         public ImageView mActionShop;
@@ -109,12 +137,14 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
         public ViewHolder(View v) {
             super(v);
             mCardView = (CardView) v.findViewById(R.id.recent_card_view);
+            mHeaderLayout = v.findViewById(R.id.recent_card_view_header_layout);
             mAppIconLayout = v.findViewById(R.id.recent_card_view_header_app_icon_layout);
             mAppIcon = (RecentImageView) v.findViewById(R.id.recent_card_view_header_app_icon);
             mFavoriteIcon = (RecentImageView) v.findViewById(R.id.recent_card_view_header_favorite_icon);
             mAppTitle = (TextView) v.findViewById(R.id.recent_card_view_header_app_title);
             mThumbnail = (RecentImageView) v.findViewById(R.id.recent_card_view_thumbnail);
             mActionDivider = v.findViewById(R.id.recent_card_view_action_divider);
+            mActionsLayout = v.findViewById(R.id.recent_card_view_actions);
             mActionInfo = (ImageView) v.findViewById(R.id.recent_card_view_action_info);
             mActionMultiWindow = (ImageView) v.findViewById(R.id.recent_card_view_action_multi_window);
             mActionShop = (ImageView) v.findViewById(R.id.recent_card_view_action_shop);
@@ -153,6 +183,15 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
         final boolean isExpanded =
                 ((isSystemExpanded && !isUserCollapsed) || isUserExpanded) && !isTopTask;
 
+        final boolean actionsVisibleBySystem =
+                (td.getActionVisibilityState() & RecentPanelView.ACTION_VISIBILITY_STATE_BY_SYSTEM) != 0;
+        final boolean actionsVisibleByUser =
+                (td.getActionVisibilityState() & RecentPanelView.ACTION_VISIBILITY_STATE_VISIBLE) != 0;
+        final boolean actionsHiddenByUser =
+                (td.getActionVisibilityState() & RecentPanelView.ACTION_VISIBILITY_STATE_HIDDEN) != 0;
+        final boolean actionsVisible =
+                isExpanded || actionsVisibleByUser || (actionsVisibleBySystem && !actionsHiddenByUser);
+
         boolean showFavorite = card.isFavorite();
         boolean showShop = checkAppInstaller(td.packageName, AMAZON_REFERENCE)
                 || checkAppInstaller(td.packageName, PLAYSTORE_REFERENCE);
@@ -163,16 +202,41 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnCardClickListener != null) {
-                    mOnCardClickListener.onClick(card);
+                if (mOnCardClickListeners != null) {
+                    mOnCardClickListeners.onCardOrHeaderClick(card);
                 }
             }
         });
+
+        holder.mHeaderLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnCardClickListeners != null) {
+                    mOnCardClickListeners.onCardOrHeaderClick(card);
+                }
+            }
+        });
+
+        if (!isExpanded) {
+            holder.mHeaderLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mOnCardClickListeners != null) {
+                        return mOnCardClickListeners.onCardHeaderLongClick(td, actionsVisible);
+                    }
+                    return false;
+                }
+            });
+        } else {
+            holder.mHeaderLayout.setOnLongClickListener(null);
+        }
+
         holder.mAppIconLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (mOnAppIconLongClickListener != null) {
-                    return mOnAppIconLongClickListener.onLongClick(card);
+                if (mOnCardClickListeners != null) {
+                    TransitionManager.beginDelayedTransition(mRecyclerView);
+                    return mOnCardClickListeners.onAppIconLongClick(card);
                 }
                 return false;
             }
@@ -201,6 +265,9 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
                             .startActivityFromRecents(card.getPersistentTaskId(), options.toBundle());
                 } catch (RemoteException e) {
                 }
+                if (mOnCardClickListeners != null) {
+                    mOnCardClickListeners.onMultiWindowClick();
+                }
             }
         });
 
@@ -224,8 +291,8 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
             holder.mActionExpand.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mOnCardExpandListener != null) {
-                        mOnCardExpandListener.onCardExpand(td, isExpanded);
+                    if (mOnCardClickListeners != null) {
+                        mOnCardClickListeners.onCardExpandClick(td, isExpanded);
                         TransitionManager.beginDelayedTransition(mRecyclerView);
                     }
                 }
@@ -270,13 +337,16 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
         holder.mActionMultiWindow.setImageTintList(card.getActionIconTint());
         holder.mActionExpand.setImageTintList(card.getActionIconTint());
         holder.mActionScreenPinning.setImageTintList(card.getActionIconTint());
-        setActionRippleColor(holder.mActionInfo, card);
-        setActionRippleColor(holder.mActionShop, card);
-        setActionRippleColor(holder.mActionMultiWindow, card);
-        setActionRippleColor(holder.mActionExpand, card);
-        setActionRippleColor(holder.mActionScreenPinning, card);
+        setRippleColor(holder.mHeaderLayout, card);
+        setRippleColor(holder.mActionInfo, card);
+        setRippleColor(holder.mActionShop, card);
+        setRippleColor(holder.mActionMultiWindow, card);
+        setRippleColor(holder.mActionExpand, card);
+        setRippleColor(holder.mActionScreenPinning, card);
 
         holder.mFavoriteIcon.setVisibility(showFavorite ? View.VISIBLE : View.INVISIBLE);
+        holder.mActionDivider.setVisibility(actionsVisible ? View.VISIBLE : View.GONE);
+        holder.mActionsLayout.setVisibility(actionsVisible ? View.VISIBLE : View.GONE);
         holder.mThumbnail.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.mActionDivider.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
         holder.mActionShop.setVisibility(showShop ? View.VISIBLE : View.INVISIBLE);
@@ -319,21 +389,13 @@ public class RecentRecyclerViewAdapter extends RecyclerView.Adapter<RecentRecycl
         }
     }
 
-    public void setOnCardClickListener(OnCardClickListener onClickListener) {
-        mOnCardClickListener = onClickListener;
+    public void setOnCardClickListeners(OnCardClickListeners onClickListeners) {
+        mOnCardClickListeners = onClickListeners;
     }
 
-    public void setOnAppIconLongClickListener(OnAppIconLongClickListener onLongClickListener) {
-        mOnAppIconLongClickListener = onLongClickListener;
-    }
-
-    public void setOnCardExpandListener(OnCardExpandListener onCardExpandListener) {
-        mOnCardExpandListener = onCardExpandListener;
-    }
-
-    public void setActionRippleColor(ImageView iv, RecentCard card) {
-        if (iv != null && iv.getBackground() instanceof RippleDrawable) {
-            ((RippleDrawable) iv.getBackground()).setColor(card.getActionRippleColor());
+    public void setRippleColor(View v, RecentCard card) {
+        if (v != null && v.getBackground() instanceof RippleDrawable) {
+            ((RippleDrawable) v.getBackground()).setColor(card.getRippleColor());
         }
     }
 

@@ -32,12 +32,13 @@ public final class TaskDescription {
 
     private String mLabel; // application package label
     private int mExpandedState;
+    private int mActionVisibilityState;
     private boolean mIsFavorite;
 
     public TaskDescription(int _taskId, int _persistentTaskId,
             ResolveInfo _resolveInfo, Intent _intent,
             String _packageName, String _identifier, CharSequence _description,
-            boolean isFavorite, int expandedState, int activityColor) {
+            boolean isFavorite, int expandedState, int actionVisibilityState, int activityColor) {
         resolveInfo = _resolveInfo;
         intent = _intent;
         taskId = _taskId;
@@ -48,6 +49,7 @@ public final class TaskDescription {
         identifier = _identifier;
 
         mExpandedState = expandedState;
+        mActionVisibilityState = actionVisibilityState;
         mIsFavorite = isFavorite;
         cardColor = activityColor;
     }
@@ -81,6 +83,14 @@ public final class TaskDescription {
 
     public void setExpandedState(int expandedState) {
         mExpandedState = expandedState;
+    }
+
+    public int getActionVisibilityState() {
+        return mActionVisibilityState;
+    }
+
+    public void setActionVisibilityState(int actionVisibilityState) {
+        mActionVisibilityState = actionVisibilityState;
     }
 
     public boolean getIsFavorite() {

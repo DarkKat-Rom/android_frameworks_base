@@ -25,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/recent_card_view_header_height"
         android:padding="@dimen/recent_card_view_header_padding"
+        android:background="@drawable/ripple_drawable_rectangle"
         android:gravity="center_vertical">
 
         <RelativeLayout

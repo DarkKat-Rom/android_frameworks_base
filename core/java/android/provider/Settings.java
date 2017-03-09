@@ -3746,6 +3746,15 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
+         * Wether to use the primary activity color (when available) as background color for the card,
+         * also set all other card colors related to the primary activity color (when available)
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_USE_AUTO_COLORS =
+                "colors_slim_recents_card_use_auto_colors";
+
+        /**
          * Wether to use slim recents color values from global theme 
          * @hide
          */
@@ -3761,20 +3770,20 @@ public final class Settings {
                 "slim_recents_panel_empty_icon_color";
 
         /**
+         * Recent card ripple effect color
+         *
+         * @hide
+         */
+        public static final String SLIM_RECENTS_CARD_RIPPLE_COLOR =
+                "slim_recents_card_ripple_color";
+
+        /**
          * Recent card action icon color
          *
          * @hide
          */
         public static final String SLIM_RECENTS_CARD_ACTION_ICON_COLOR =
                 "slim_recents_card_action_icon_color";
-
-        /**
-         * Recent card action ripple effect color
-         *
-         * @hide
-         */
-        public static final String SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR =
-                "slim_recents_card_action_ripple_color";
 
         /**
          *  Whether to show the music visualizer on the lock screen
@@ -4175,6 +4184,13 @@ public final class Settings {
          */
         public static final String SLIM_RECENTS_THUMBNAIL_ASPECT_RATIO =
                 "slim_recents_thumbnail_aspect_ratio";
+
+        /**
+         * Whether to show actions when the card is collapsed
+         * @hide
+         */
+        public static final String SLIM_RECENTS_SHOW_ACTIONS_WHEN_COLLAPSED =
+                "slim_recents_show_actions_when_collapsed";
 
         // DarkKat additions end
 

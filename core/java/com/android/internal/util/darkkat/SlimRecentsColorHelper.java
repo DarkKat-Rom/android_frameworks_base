@@ -71,6 +71,27 @@ public class SlimRecentsColorHelper {
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
+    public static int getCardRippleColor(Context context) {
+        int color;
+        int alpha;
+
+        if (ThemeHelper.slimRecentsUseThemeColors(context)) {
+            color = ThemeHelper.getRippleColor(context);
+            alpha = Color.alpha(color);
+        } else {
+            color = Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.SLIM_RECENTS_CARD_RIPPLE_COLOR,
+                    ThemeHelper.getRippleColor(context));
+            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
+                alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
+            } else {
+                alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
+            }
+        }
+
+        return (alpha << 24) | (color & 0x00ffffff);
+    }
+
     public static int getCardHeaderTextColor(Context context) {
         int color;
         int alpha;
@@ -107,27 +128,6 @@ public class SlimRecentsColorHelper {
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
             } else {
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
-            }
-        }
-
-        return (alpha << 24) | (color & 0x00ffffff);
-    }
-
-    public static int getCardActionRippleColor(Context context) {
-        int color;
-        int alpha;
-
-        if (ThemeHelper.slimRecentsUseThemeColors(context)) {
-            color = ThemeHelper.getRippleColor(context);
-            alpha = Color.alpha(color);
-        } else {
-            color = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.SLIM_RECENTS_CARD_ACTION_RIPPLE_COLOR,
-                    ThemeHelper.getRippleColor(context));
-            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-                alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
-            } else {
-                alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
             }
         }
 

@@ -52,9 +52,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.android.systemui.R;
-import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnCardClickListener;
-import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnAppIconLongClickListener;
-import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnCardExpandListener;
+import com.android.systemui.slimrecent.RecentRecyclerViewAdapter.OnCardClickListeners;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +84,11 @@ public class RecentPanelView {
     private static final int EXPANDED_MODE_ALWAYS = 1;
     private static final int EXPANDED_MODE_NEVER  = 2;
 
+    private static final int ACTION_VISIBILITY_STATE_UNKNOWN  = 0;
+    public static final int ACTION_VISIBILITY_STATE_VISIBLE   = 1;
+    public static final int ACTION_VISIBILITY_STATE_HIDDEN    = 2;
+    public static final int ACTION_VISIBILITY_STATE_BY_SYSTEM = 4;
+
     private static final int MENU_APP_DETAILS_ID   = 0;
     private static final int MENU_APP_PLAYSTORE_ID = 1;
     private static final int MENU_APP_AMAZON_ID    = 2;
@@ -111,6 +114,9 @@ public class RecentPanelView {
     // Array list of all expanded states of apps accessed during the session
     private final ArrayList<TaskExpandedStates> mExpandedTaskStates =
             new ArrayList<TaskExpandedStates>();
+    // Array list of all action visibility states of apps accessed during the session
+    private final ArrayList<ActionVisibilityTaskStates> mActionVisibilityTaskStates =
+            new ArrayList<ActionVisibilityTaskStates>();
 
     private boolean mCancelledByUser;
     private boolean mTasksLoaded;
@@ -118,6 +124,7 @@ public class RecentPanelView {
 
     private int mMainGravity;
     private int mExpandedMode = EXPANDED_MODE_AUTO;
+    private boolean mShowActionsWhenCollapsed = false;
     private boolean mShowTopTask;
     private boolean mOnlyShowRunningTasks;
 
@@ -198,27 +205,45 @@ public class RecentPanelView {
     private void assignListeners() {
         if (DEBUG) Log.v(TAG, "add listeners to task card");
 
-        // Listen for onClick to start the app with custom animation
-        mCardAdapter.setOnCardClickListener(new OnCardClickListener() {
+        mCardAdapter.setOnCardClickListeners(new OnCardClickListeners() {
             @Override
-            public void onClick(RecentCard card) {
+            public void onCardOrHeaderClick(RecentCard card) {
                 startApplication(card.getTaskDescription());
             }
-        });
 
-        // App icon has own onLongClick action. Listen for it and
-        // process the favorite action for it.
-        mCardAdapter.setOnAppIconLongClickListener(new OnAppIconLongClickListener() {
             @Override
-            public boolean onLongClick(RecentCard card) {
+            public boolean onCardHeaderLongClick(TaskDescription td, boolean actionsVisible) {
+                int oldState = td.getActionVisibilityState();
+                int state;
+                if (actionsVisible) {
+                    state = ACTION_VISIBILITY_STATE_HIDDEN;
+                    if ((oldState & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 0) {
+                        state |= ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                    }
+                } else {
+                    state = ACTION_VISIBILITY_STATE_VISIBLE;
+                    if ((oldState & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 0) {
+                        state |= ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                    }
+                }
+                td.setActionVisibilityState(state);
+                notifyDataSetChanged(true);
+                return true;
+            }
+
+            @Override
+            public boolean onAppIconLongClick(RecentCard card) {
                 handleFavoriteEntry(card.getTaskDescription());
                 return true;
             }
-        });
 
-        mCardAdapter.setOnCardExpandListener(new OnCardExpandListener() {
             @Override
-            public void onCardExpand(TaskDescription td, boolean expanded) {
+            public void onMultiWindowClick() {
+                mController.closeRecents();
+            }
+
+            @Override
+            public void onCardExpandClick(TaskDescription td, boolean expanded) {
                 int oldState = td.getExpandedState();
                 int state;
                 if (expanded) {
@@ -366,6 +391,7 @@ public class RecentPanelView {
                 .removeBitmapFromMemCache(td.identifier);
         // Remove from expanded state list.
         removeExpandedTaskState(td.identifier);
+        removeActionVisibilityTaskState(td.identifier);
     }
 
     /**
@@ -431,7 +457,7 @@ public class RecentPanelView {
      */
     private TaskDescription createTaskDescription(int taskId, int persistentTaskId,
             Intent baseIntent, ComponentName origActivity,
-            CharSequence description, boolean isFavorite, int expandedState,
+            CharSequence description, boolean isFavorite, int expandedState, int visibilityState,
             ActivityManager.TaskDescription td) {
 
         final Intent intent = new Intent(baseIntent);
@@ -464,7 +490,7 @@ public class RecentPanelView {
 
                 final TaskDescription item = new TaskDescription(taskId,
                         persistentTaskId, resolveInfo, baseIntent, info.packageName,
-                        identifier, description, isFavorite, expandedState, color);
+                        identifier, description, isFavorite, expandedState, visibilityState, color);
                 item.setLabel(title);
                 return item;
             } else {
@@ -484,6 +510,7 @@ public class RecentPanelView {
         if (DEBUG) Log.v(TAG, "loading tasks");
         mIsLoading = true;
         updateExpandedTaskStates();
+        updateActionVisibilityTaskStates();
 
         // We have all needed tasks now.
         // Let us load the cards for it in background.
@@ -577,6 +604,68 @@ public class RecentPanelView {
         }
     }
 
+    private void setActionVisibilityTaskStates() {
+        for (int i = 0; i < mCards.size(); i++) {
+            RecentCard card = (RecentCard) mCards.get(i);
+            TaskDescription td = card.getTaskDescription();
+            int state = td.getActionVisibilityState();
+
+            if (mShowActionsWhenCollapsed) {
+                if ((state & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 1) {
+                    state |= ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                }
+            } else {
+                if ((state & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 0) {
+                    state &= ~ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                }
+            }
+            td.setActionVisibilityState(state);
+            card.setTaskDescription(td);
+        }
+        updateActionVisibilityTaskStates();
+    }
+
+    private void updateActionVisibilityTaskStates() {
+        for (RecentCard card : mCards) {
+            TaskDescription item = card.getTaskDescription();
+            boolean updated = false;
+            for (ActionVisibilityTaskStates visibilityState : mActionVisibilityTaskStates) {
+                if (item.identifier.equals(visibilityState.getIdentifier())) {
+                    updated = true;
+                    visibilityState.setVisibilityState(item.getActionVisibilityState());
+                }
+            }
+            if (!updated) {
+                mActionVisibilityTaskStates.add(
+                        new ActionVisibilityTaskStates(
+                                item.identifier, item.getActionVisibilityState()));
+            }
+        }
+    }
+
+    private int getActionVisibilityTaskState(TaskDescription item) {
+        for (ActionVisibilityTaskStates oldTask : mActionVisibilityTaskStates) {
+            if (DEBUG) Log.v(TAG, "old task launch uri = "+ oldTask.getIdentifier()
+                    + " new task launch uri = " + item.identifier);
+            if (item.identifier.equals(oldTask.getIdentifier())) {
+                    return oldTask.getVisibilityState();
+            }
+        }
+        return ACTION_VISIBILITY_STATE_UNKNOWN;
+    }
+
+    private void removeActionVisibilityTaskState(String identifier) {
+        ActionVisibilityTaskStates visibilityStateToDelete = null;
+        for (ActionVisibilityTaskStates visibilityState : mActionVisibilityTaskStates) {
+            if (visibilityState.getIdentifier().equals(identifier)) {
+                visibilityStateToDelete = visibilityState;
+            }
+        }
+        if (visibilityStateToDelete != null) {
+            mActionVisibilityTaskStates.remove(visibilityStateToDelete);
+        }
+    }
+
     protected void notifyDataSetChanged(boolean forceupdate) {
         if (forceupdate || !mController.isShowing()) {
             // We want to have the list scrolled down before it is visible for the user.
@@ -622,6 +711,15 @@ public class RecentPanelView {
         }
     }
 
+    public void updateCardRippleColor() {
+        if (mCards.size() != 0) {
+            for (RecentCard card : mCards) {
+                card.setRippleColor();
+            }
+            notifyDataSetChanged(true);
+        }
+    }
+
     public void updateCardHeaderTextColor() {
         if (mCards.size() != 0) {
             for (RecentCard card : mCards) {
@@ -640,15 +738,6 @@ public class RecentPanelView {
         }
     }
 
-    public void updateCardActionRippleColor() {
-        if (mCards.size() != 0) {
-            for (RecentCard card : mCards) {
-                card.setActionRippleColor();
-            }
-            notifyDataSetChanged(true);
-        }
-    }
-
     public void updateThumbnailAspectRatio() {
         if (mCardAdapter != null) {
             mCardAdapter.setThumbnailAspectRatio();
@@ -659,6 +748,12 @@ public class RecentPanelView {
     protected void setExpandedMode(int mode) {
         mExpandedMode = mode;
         setExpandedTaskStates();
+        notifyDataSetChanged(true);
+    }
+
+    protected void setShowActionsWhenCollapsed(boolean show) {
+        mShowActionsWhenCollapsed = show;
+        setActionVisibilityTaskStates();
         notifyDataSetChanged(true);
     }
 
@@ -830,7 +925,8 @@ public class RecentPanelView {
                 TaskDescription item = createTaskDescription(recentInfo.id,
                         recentInfo.persistentId, recentInfo.baseIntent,
                         recentInfo.origActivity, recentInfo.description,
-                        false, EXPANDED_STATE_UNKNOWN, recentInfo.taskDescription);
+                        false, EXPANDED_STATE_UNKNOWN, ACTION_VISIBILITY_STATE_UNKNOWN,
+                        recentInfo.taskDescription);
 
                 if (item != null) {
                     for (String fav : favList) {
@@ -840,14 +936,26 @@ public class RecentPanelView {
                         }
                     }
 
+                    int oldActionVisibilityState = getActionVisibilityTaskState(item);
+                    if (mShowActionsWhenCollapsed) {
+                        if ((oldActionVisibilityState & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 1) {
+                            oldActionVisibilityState |= ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                        }
+                    } else {
+                        if ((oldActionVisibilityState & ACTION_VISIBILITY_STATE_BY_SYSTEM) != 0) {
+                            oldActionVisibilityState &= ~ACTION_VISIBILITY_STATE_BY_SYSTEM;
+                        }
+                    }
+                    item.setActionVisibilityState(oldActionVisibilityState);
+
                     if (topTask) {
                         if (mShowTopTask || screenPinningEnabled()) {
                             // User want to see actual running task. Set it here
-                            int oldState = getExpandedState(item);
-                            if ((oldState & EXPANDED_STATE_TOPTASK) == 0) {
-                                oldState |= EXPANDED_STATE_TOPTASK;
+                            int oldExpandedState = getExpandedState(item);
+                            if ((oldExpandedState & EXPANDED_STATE_TOPTASK) == 0) {
+                                oldExpandedState |= EXPANDED_STATE_TOPTASK;
                             }
-                            item.setExpandedState(oldState);
+                            item.setExpandedState(oldExpandedState);
                             addCard(item, oldSize);
                             mFirstTask = item;
                         } else {
@@ -861,26 +969,26 @@ public class RecentPanelView {
                         // On all other items we check if they were expanded from the user
                         // in last known recent app list and restore the state. This counts as well
                         // if expanded mode is always or never.
-                        int oldState = getExpandedState(item);
-                        if ((oldState & EXPANDED_STATE_BY_SYSTEM) != 0) {
-                            oldState &= ~EXPANDED_STATE_BY_SYSTEM;
+                        int oldExpandedState = getExpandedState(item);
+                        if ((oldExpandedState & EXPANDED_STATE_BY_SYSTEM) != 0) {
+                            oldExpandedState &= ~EXPANDED_STATE_BY_SYSTEM;
                         }
-                        if ((oldState & EXPANDED_STATE_TOPTASK) != 0) {
-                            oldState &= ~EXPANDED_STATE_TOPTASK;
+                        if ((oldExpandedState & EXPANDED_STATE_TOPTASK) != 0) {
+                            oldExpandedState &= ~EXPANDED_STATE_TOPTASK;
                         }
-                        if (DEBUG) Log.v(TAG, "old expanded state = " + oldState);
+                        if (DEBUG) Log.v(TAG, "old expanded state = " + oldExpandedState);
                         if (firstItems < firstExpandedItems) {
                             if (mExpandedMode != EXPANDED_MODE_NEVER) {
-                                oldState |= EXPANDED_STATE_BY_SYSTEM;
+                                oldExpandedState |= EXPANDED_STATE_BY_SYSTEM;
                             }
-                            item.setExpandedState(oldState);
+                            item.setExpandedState(oldExpandedState);
                             // The first tasks are always added to the task list.
                             addCard(item, oldSize);
                         } else {
                             if (mExpandedMode == EXPANDED_MODE_ALWAYS) {
-                                oldState |= EXPANDED_STATE_BY_SYSTEM;
+                                oldExpandedState |= EXPANDED_STATE_BY_SYSTEM;
                             }
-                            item.setExpandedState(oldState);
+                            item.setExpandedState(oldExpandedState);
                             // Favorite tasks are added next. Non favorite
                             // we hold for a short time in an extra list.
                             if (item.getIsFavorite()) {
@@ -993,6 +1101,28 @@ public class RecentPanelView {
 
         public void setExpandedState(int expandedState) {
             mExpandedState = expandedState;
+        }
+    }
+
+    private static final class ActionVisibilityTaskStates {
+        private String mIdentifier;
+        private int mVisibilityState;
+
+        public ActionVisibilityTaskStates(String identifier, int visibilityState) {
+            mIdentifier = identifier;
+            mVisibilityState = visibilityState;
+        }
+
+        public String getIdentifier() {
+            return mIdentifier;
+        }
+
+        public int getVisibilityState() {
+            return mVisibilityState;
+        }
+
+        public void setVisibilityState(int visibilityState) {
+            mVisibilityState = visibilityState;
         }
     }
 }
