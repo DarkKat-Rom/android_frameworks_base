@@ -532,6 +532,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -691,6 +694,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR))) {
                 updateStatusBarExpandedBatteryTextColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR))) {
+                updateNavigationBarIconColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_SHOW))
                 || uri.equals(Settings.System.getUriFor(
@@ -2830,6 +2836,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private void updateStatusBarExpandedBatteryTextColor() {
         updateQSAndHeaderBatteryTextColor();
+    }
+
+    private void updateNavigationBarIconColor() {
+        if (mNavigationBarView != null) {
+            mNavigationBarView.updateIconColor();
+        }
     }
 
     private void updateQSAndHeaderColors() {

@@ -31,6 +31,8 @@ import android.view.RenderNodeAnimator;
 import android.view.View;
 import android.view.animation.Interpolator;
 
+import com.android.internal.util.darkkat.NavigationBarColorHelper;
+
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 
@@ -43,6 +45,8 @@ public class KeyButtonRipple extends Drawable {
     private static final float GLOW_MAX_ALPHA = 0.2f;
     private static final int ANIMATION_DURATION_SCALE = 350;
     private static final int ANIMATION_DURATION_FADE = 450;
+
+    private final Context mContext;
 
     private Paint mRipplePaint;
     private CanvasProperty<Float> mLeftProp;
@@ -66,7 +70,8 @@ public class KeyButtonRipple extends Drawable {
     private final ArrayList<Animator> mTmpArray = new ArrayList<>();
 
     public KeyButtonRipple(Context ctx, View targetView) {
-        mMaxWidth =  ctx.getResources().getDimensionPixelSize(R.dimen.key_button_ripple_max_width);
+        mContext = ctx;
+        mMaxWidth =  mContext.getResources().getDimensionPixelSize(R.dimen.key_button_ripple_max_width);
         mTargetView = targetView;
     }
 
@@ -74,8 +79,8 @@ public class KeyButtonRipple extends Drawable {
         if (mRipplePaint == null) {
             mRipplePaint = new Paint();
             mRipplePaint.setAntiAlias(true);
-            mRipplePaint.setColor(0xffffffff);
         }
+        mRipplePaint.setColor(NavigationBarColorHelper.getRippleColor(mContext));
         return mRipplePaint;
     }
 
