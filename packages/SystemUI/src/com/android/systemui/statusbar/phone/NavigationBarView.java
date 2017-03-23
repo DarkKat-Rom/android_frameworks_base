@@ -646,6 +646,12 @@ public class NavigationBarView extends LinearLayout {
         return uiCarModeChanged;
     }
 
+    public void updateIconColor() {
+        if (mNavigationInflaterView != null) {
+            mNavigationInflaterView.inflateLayout();
+        }
+    }
+
     /*
     @Override
     protected void onLayout (boolean changed, int left, int top, int right, int bottom) {

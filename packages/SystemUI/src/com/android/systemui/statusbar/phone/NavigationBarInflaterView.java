@@ -16,8 +16,10 @@ package com.android.systemui.statusbar.phone;
 
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.PorterDuff.Mode;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -26,6 +28,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Space;
+
+import com.android.internal.util.darkkat.NavigationBarColorHelper;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.KeyButtonView;
@@ -147,6 +151,13 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         }
     }
 
+    public void inflateLayout() {
+        if (mCurrentLayout != null) {
+            clearViews();
+            inflateLayout(mCurrentLayout);
+        }
+    }
+
     public void setButtonDispatchers(SparseArray<ButtonDispatcher> buttonDisatchers) {
         mButtonDispatchers = buttonDisatchers;
         for (int i = 0; i < buttonDisatchers.size(); i++) {
@@ -247,18 +258,23 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
             if (landscape && isSw600Dp()) {
                 setupLandButton(v);
             }
+            setIconColor((KeyButtonView) v);
         } else if (BACK.equals(button)) {
             v = inflater.inflate(R.layout.back, parent, false);
             if (landscape && isSw600Dp()) {
                 setupLandButton(v);
             }
+            setIconColor((KeyButtonView) v);
         } else if (RECENT.equals(button)) {
             v = inflater.inflate(R.layout.recent_apps, parent, false);
             if (landscape && isSw600Dp()) {
                 setupLandButton(v);
             }
+            setIconColor((KeyButtonView) v);
         } else if (MENU_IME.equals(button)) {
             v = inflater.inflate(R.layout.menu_ime, parent, false);
+            setIconColor((KeyButtonView) v.findViewById(R.id.menu));
+            setIconColor((KeyButtonView) v.findViewById(R.id.ime_switcher));
         } else if (NAVSPACE.equals(button)) {
             v = inflater.inflate(R.layout.nav_key_space, parent, false);
         } else if (CLIPBOARD.equals(button)) {
@@ -291,6 +307,12 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
             mLastRot0 = v;
         }
         return v;
+    }
+
+    private void setIconColor(KeyButtonView kbv) {
+        ColorStateList tint = ColorStateList.valueOf(NavigationBarColorHelper.getIconColor(mContext));
+        kbv.setImageTintMode(Mode.MULTIPLY);
+        kbv.setImageTintList(tint);
     }
 
     public static String extractImage(String buttonSpec) {

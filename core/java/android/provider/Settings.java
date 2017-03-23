@@ -3746,6 +3746,20 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
+         * Color of the icons on the navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_ICON_COLOR =
+                "navigation_bar_icon_color";
+
+        /**
+         * Color of the ripple effect on the navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_RIPPLE_COLOR =
+                "navigation_bar_expanded_ripple_color";
+
+        /**
          * Wether to use the primary activity color (when available) as background color for the card,
          * also set all other card colors related to the primary activity color (when available)
          *
