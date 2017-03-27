@@ -41,6 +41,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.android.internal.logging.MetricsLogger;
+import com.android.internal.util.darkkat.LockscreenHelper;
 import com.android.keyguard.KeyguardStatusView;
 import com.android.systemui.AutoReinflateContainer;
 import com.android.systemui.AutoReinflateContainer.InflateListener;
@@ -1109,7 +1110,7 @@ public class NotificationPanelView extends PanelView implements
                     .start();
         } else if (statusBarState == StatusBarState.KEYGUARD
                 || statusBarState == StatusBarState.SHADE_LOCKED) {
-            if (!mDozing) {
+            if (!mDozing || showBatteryInfoWhenDozing()) {
                 mKeyguardBottomArea.setVisibility(View.VISIBLE);
             }
             mKeyguardBottomArea.setAlpha(1f);
@@ -2064,9 +2065,17 @@ public class NotificationPanelView extends PanelView implements
     private void updateDozingVisibilities(boolean animate) {
         if (mDozing) {
             mKeyguardStatusBar.setVisibility(View.INVISIBLE);
-            mKeyguardBottomArea.setVisibility(View.INVISIBLE);
+            if (showBatteryInfoWhenDozing()) {
+                mKeyguardBottomArea.setDozing(true);
+            } else {
+                mKeyguardBottomArea.setVisibility(View.INVISIBLE);
+            }
         } else {
-            mKeyguardBottomArea.setVisibility(View.VISIBLE);
+            if (showBatteryInfoWhenDozing()) {
+                mKeyguardBottomArea.setDozing(false);
+            } else {
+                mKeyguardBottomArea.setVisibility(View.VISIBLE);
+            }
             mKeyguardStatusBar.setVisibility(View.VISIBLE);
             if (animate) {
                 animateKeyguardStatusBarIn(DOZE_ANIMATION_DURATION);
@@ -2350,5 +2359,9 @@ public class NotificationPanelView extends PanelView implements
 
     public void setGroupManager(NotificationGroupManager groupManager) {
         mGroupManager = groupManager;
+    }
+
+    private boolean showBatteryInfoWhenDozing() {
+        return LockscreenHelper.showBatteryInfoOnAmbientDisplay(mContext);
     }
 }
