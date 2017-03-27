@@ -3826,6 +3826,13 @@ public final class Settings {
                 "lock_screen_show_battery_charging_info";
 
         /**
+         *  Whether to show battery info on ambient display
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_BATTERY_INFO_ON_AMBIENT_DISPLAY =
+                "lock_screen_show_battery_info_on_ambient_display";
+
+        /**
          *  Whether to show advanced battery charging info on the lock screen
          * @hide
          */

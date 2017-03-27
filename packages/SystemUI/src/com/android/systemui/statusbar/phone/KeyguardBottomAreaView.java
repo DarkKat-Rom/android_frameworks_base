@@ -53,6 +53,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.LockscreenHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
@@ -631,6 +632,20 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         }
     }
 
+    public void setDozing(boolean dozing) {
+        if (dozing) {
+            mPreviewContainer.setVisibility(View.INVISIBLE);
+            mLeftAffordanceView.setVisibility(View.INVISIBLE);
+            mLockIcon.setVisibility(View.INVISIBLE);
+            mCameraImageView.setVisibility(View.INVISIBLE);
+        } else {
+            mPreviewContainer.setVisibility(View.VISIBLE);
+            mLeftAffordanceView.setVisibility(View.VISIBLE);
+            mLockIcon.setVisibility(View.VISIBLE);
+            mCameraImageView.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void startFinishDozeAnimation() {
         long delay = 0;
         if (mLeftAffordanceView.getVisibility() == View.VISIBLE) {
@@ -642,11 +657,13 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (mCameraImageView.getVisibility() == View.VISIBLE) {
             startFinishDozeAnimationElement(mCameraImageView, delay);
         }
-        mIndicationText.setAlpha(0f);
-        mIndicationText.animate()
-                .alpha(1f)
-                .setInterpolator(Interpolators.LINEAR_OUT_SLOW_IN)
-                .setDuration(NotificationPanelView.DOZE_ANIMATION_DURATION);
+        if (!showBatteryInfoWhenDozing()) {
+            mIndicationText.setAlpha(0f);
+            mIndicationText.animate()
+                    .alpha(1f)
+                    .setInterpolator(Interpolators.LINEAR_OUT_SLOW_IN)
+                    .setDuration(NotificationPanelView.DOZE_ANIMATION_DURATION);
+        }
     }
 
     private void startFinishDozeAnimationElement(View element, long delay) {
@@ -740,5 +757,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void onKeyguardShowingChanged() {
         updateLeftAffordance();
         inflateCameraPreview();
+    }
+
+    private boolean showBatteryInfoWhenDozing() {
+        return LockscreenHelper.showBatteryInfoOnAmbientDisplay(mContext);
     }
 }
