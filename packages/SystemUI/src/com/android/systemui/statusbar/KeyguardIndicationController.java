@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.android.internal.app.IBatteryStats;
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
 import com.android.systemui.R;
@@ -150,7 +151,7 @@ public class KeyguardIndicationController {
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
     public void showTransientIndication(String transientIndication) {
-        showTransientIndication(transientIndication, Color.WHITE);
+        showTransientIndication(transientIndication, LockScreenColorHelper.getPrimaryTextColor(mContext));
     }
 
     /**
@@ -187,7 +188,7 @@ public class KeyguardIndicationController {
 
             if (!mUserManager.isUserUnlocked(ActivityManager.getCurrentUser())) {
                 mTextView.switchIndication(com.android.internal.R.string.lockscreen_storage_locked);
-                mTextView.setTextColor(Color.WHITE);
+                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
             } else if (!TextUtils.isEmpty(mTransientIndication)) {
                 mTextView.switchIndication(mTransientIndication);
                 mTextView.setTextColor(mTransientTextColor);
@@ -198,18 +199,18 @@ public class KeyguardIndicationController {
                         indication += ",  " + (mMaxChargingMicroWatt / 1000) + " mW";
                     }
                     mTextView.switchIndication(indication);
-                    mTextView.setTextColor(Color.WHITE);
+                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
                 } else {
                     mTextView.switchIndication(mRestingIndication);
-                    mTextView.setTextColor(Color.WHITE);
+                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
                 }
             } else if (showBatteryInfo) {
                 String indication = computePowerIndication();
                 mTextView.switchIndication(indication);
-                mTextView.setTextColor(Color.WHITE);
+                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
             } else {
                 mTextView.switchIndication(mRestingIndication);
-                mTextView.setTextColor(Color.WHITE);
+                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
             }
         }
     }

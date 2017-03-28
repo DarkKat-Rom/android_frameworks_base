@@ -3655,6 +3655,25 @@ public final class Settings {
                 "detailed_weather_card_ripple_color";
 
         /**
+         * Wether to colorize the music visualizer on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_COLORIZE_VISUALIZER =
+                "lock_screen_colorize_visualizer";
+
+        /**
+         * Color of the text on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_TEXT_COLOR = "lock_screen_text_color";
+
+        /**
+         * Color of the icons on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_ICON_COLOR = "lock_screen_icon_color";
+
+        /**
          * Color of the text on the status bar
          * @hide
          */

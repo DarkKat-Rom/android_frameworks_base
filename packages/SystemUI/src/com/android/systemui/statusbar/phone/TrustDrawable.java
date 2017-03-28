@@ -31,6 +31,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Interpolator;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
+
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 
@@ -82,7 +84,7 @@ public class TrustDrawable extends Drawable {
 
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(LockScreenColorHelper.getIconColor(context));
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(mThickness);
     }
