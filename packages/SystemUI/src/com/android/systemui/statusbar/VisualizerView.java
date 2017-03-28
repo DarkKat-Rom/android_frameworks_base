@@ -33,6 +33,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
+
 public class VisualizerView extends View implements Palette.PaletteAsyncListener {
 
     private static final String TAG = VisualizerView.class.getSimpleName();
@@ -55,6 +57,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
     private boolean mOccluded = false;
 
     private int mColor;
+    private int mCustomColor;
+    private int mColorToUse;
     private Bitmap mCurrentBitmap;
 
     private SettingsObserver mObserver;
@@ -139,10 +143,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         super(context, attrs, defStyle);
 
         mColor = Color.TRANSPARENT;
-
+        mCustomColor = LockScreenColorHelper.getIconColor(mContext);
+        mColorToUse = LockScreenColorHelper.colorizeVisualizer(mContext) ? mCustomColor : mColor;
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(mColor);
+        mPaint.setColor(mColorToUse);
 
         mFFTPoints = new float[128];
         mValueAnimators = new ValueAnimator[32];
@@ -184,6 +189,7 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         mObserver = new SettingsObserver(new Handler());
         mObserver.observe();
         mObserver.update();
+        mObserver.updateColor();
     }
 
     @Override
@@ -289,7 +295,10 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
         if (bitmap != null) {
             Palette.generateAsync(bitmap, this);
         } else {
-            setColor(Color.TRANSPARENT);
+            mColor = Color.TRANSPARENT;
+            if (!LockScreenColorHelper.colorizeVisualizer(mContext)) {
+                setColor(mColor);
+            }
         }
     }
 
@@ -305,7 +314,10 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             }
         }
 
-        setColor(color);
+        mColor = color;
+        if (!LockScreenColorHelper.colorizeVisualizer(mContext)) {
+            setColor(mColor);
+        }
     }
 
     private void setColor(int color) {
@@ -315,8 +327,8 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
 
         color = Color.argb(140, Color.red(color), Color.green(color), Color.blue(color));
 
-        if (mColor != color) {
-            mColor = color;
+        if (mColorToUse != color) {
+            mColorToUse = color;
 
             if (mVisualizer != null) {
                 if (mVisualizerColorAnimator != null) {
@@ -324,12 +336,12 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                 }
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
-                        mPaint.getColor(), mColor);
+                        mPaint.getColor(), mColorToUse);
                 mVisualizerColorAnimator.setStartDelay(600);
                 mVisualizerColorAnimator.setDuration(1200);
                 mVisualizerColorAnimator.start();
             } else {
-                mPaint.setColor(mColor);
+                mPaint.setColor(mColorToUse);
             }
         }
     }
@@ -373,6 +385,12 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             getContext().getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.LOCK_SCREEN_SHOW_VISUALIZER),
                     false, this);
+            getContext().getContentResolver().registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.LOCK_SCREEN_COLORIZE_VISUALIZER),
+                    false, this);
+            getContext().getContentResolver().registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.LOCK_SCREEN_ICON_COLOR),
+                    false, this);
         }
 
         protected void unobserve() {
@@ -384,6 +402,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
             if (uri.equals(Settings.System.getUriFor(
                     Settings.System.LOCK_SCREEN_SHOW_VISUALIZER))) {
                 update();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_COLORIZE_VISUALIZER))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_ICON_COLOR))) {
+                updateColor();
             }
         }
 
@@ -392,6 +415,11 @@ public class VisualizerView extends View implements Palette.PaletteAsyncListener
                     Settings.System.LOCK_SCREEN_SHOW_VISUALIZER, 0) == 1;
             checkStateChanged();
             updateViewVisibility();
+        }
+
+        protected void updateColor() {
+            mCustomColor = LockScreenColorHelper.getIconColor(mContext);
+            setColor(LockScreenColorHelper.colorizeVisualizer(mContext) ? mCustomColor : mColor);
         }
     }
 }

@@ -22,6 +22,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.CanvasProperty;
 import android.graphics.Color;
@@ -35,6 +36,9 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+
+import com.android.internal.util.darkkat.ColorHelper;
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -54,8 +58,8 @@ public class KeyguardAffordanceView extends ImageView {
 
     private final int mMinBackgroundRadius;
     private final Paint mCirclePaint;
-    private final int mInverseColor;
-    private final int mNormalColor;
+    private int mInverseColor;
+    protected int mNormalColor;
     private final ArgbEvaluator mColorInterpolator;
     private final FlingAnimationUtils mFlingAnimationUtils;
     private float mCircleRadius;
@@ -126,15 +130,13 @@ public class KeyguardAffordanceView extends ImageView {
         super(context, attrs, defStyleAttr, defStyleRes);
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
-        mCircleColor = 0xffffffff;
-        mCirclePaint.setColor(mCircleColor);
 
-        mNormalColor = 0xffffffff;
-        mInverseColor = 0xff000000;
         mMinBackgroundRadius = mContext.getResources().getDimensionPixelSize(
                 R.dimen.keyguard_affordance_min_background_radius);
         mColorInterpolator = new ArgbEvaluator();
         mFlingAnimationUtils = new FlingAnimationUtils(mContext, 0.3f);
+
+        updateColorSettings();
     }
 
     @Override
@@ -165,11 +167,10 @@ public class KeyguardAffordanceView extends ImageView {
     }
 
     private void updateIconColor() {
-        Drawable drawable = getDrawable().mutate();
         float alpha = mCircleRadius / mMinBackgroundRadius;
         alpha = Math.min(1.0f, alpha);
         int color = (int) mColorInterpolator.evaluate(alpha, mNormalColor, mInverseColor);
-        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        setImageTintList(ColorStateList.valueOf(color));
     }
 
     private void drawBackgroundCircle(Canvas canvas) {
@@ -546,5 +547,15 @@ public class KeyguardAffordanceView extends ImageView {
 
     public void setLaunchingAffordance(boolean launchingAffordance) {
         mLaunchingAffordance = launchingAffordance;
+    }
+
+    public void updateColorSettings() {
+        final int iconColor = LockScreenColorHelper.getIconColor(mContext);
+        mCircleColor = iconColor;
+        mNormalColor = iconColor;
+        mInverseColor = ColorHelper.isColorDark(iconColor) ? 0xffffffff : 0xff000000;
+
+        mCirclePaint.setColor(mCircleColor);
+        setImageTintList(LockScreenColorHelper.getIconTint(mContext));
     }
 }

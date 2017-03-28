@@ -19,6 +19,7 @@ package com.android.keyguard;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.UserHandle;
@@ -33,6 +34,7 @@ import android.widget.GridLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.internal.widget.LockPatternUtils;
 
 import java.util.Locale;
@@ -153,6 +155,7 @@ public class KeyguardStatusView extends GridLayout {
 
         refreshTime();
         refreshAlarmStatus(nextAlarm);
+        updateColors();
     }
 
     void refreshAlarmStatus(AlarmManager.AlarmClockInfo nextAlarm) {
@@ -221,6 +224,15 @@ public class KeyguardStatusView extends GridLayout {
     @Override
     public boolean hasOverlappingRendering() {
         return false;
+    }
+
+    private void updateColors() {
+        mAlarmStatusView.setTextColor(LockScreenColorHelper.getSecondaryTextColor(mContext));
+        mAlarmStatusView.setCompoundDrawableTintList(
+                ColorStateList.valueOf(LockScreenColorHelper.getSecondaryTextColor(mContext)));
+        mDateView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
+        mClockView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
+        mOwnerInfo.setTextColor(LockScreenColorHelper.getSecondaryTextColor(mContext));
     }
 
     // DateFormat.getBestDateTimePattern is extremely expensive, and refresh is called often.

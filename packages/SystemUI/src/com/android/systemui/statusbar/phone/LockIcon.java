@@ -25,6 +25,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
+
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.KeyguardAffordanceView;
@@ -273,6 +275,18 @@ public class LockIcon extends KeyguardAffordanceView {
             return STATE_LOCKED;
         }
     }
+
+    @Override
+    public void updateColorSettings() {
+        mNormalColor = LockScreenColorHelper.getIconColor(mContext);
+        setImageTintList(LockScreenColorHelper.getIconTint(mContext));
+        if (mTrustDrawable != null) {
+            mTrustDrawable.stop();
+            mTrustDrawable = new TrustDrawable(getContext());
+            setBackground(mTrustDrawable);
+        }
+    }
+
 
     /**
      * A wrapper around another Drawable that overrides the intrinsic size.
