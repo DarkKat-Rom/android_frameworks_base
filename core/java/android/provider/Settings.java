@@ -3573,6 +3573,42 @@ public final class Settings {
         // DarkKat additions start
 
         /**
+         * Wether to show the color picker help screen
+         * @hide
+         */
+        public static final String COLOR_PICKER_SHOW_HELP_SCREEN = "color_picker_show_help_screen";
+
+        /**
+         * Wether to show the color picker favorites
+         * @hide
+         */
+        public static final String COLOR_PICKER_SHOW_FAVORITES = "color_picker_show_favorites";
+
+        /**
+         * Color of the color picker favorite 1
+         * @hide
+         */
+        public static final String COLOR_PICKER_FAVORITE_1 = "color_picker_favorite_1";
+
+        /**
+         * Color of the color picker favorite 2
+         * @hide
+         */
+        public static final String COLOR_PICKER_FAVORITE_2 = "color_picker_favorite_2";
+
+        /**
+         * Color of the color picker favorite 3
+         * @hide
+         */
+        public static final String COLOR_PICKER_FAVORITE_3 = "color_picker_favorite_3";
+
+        /**
+         * Color of the color picker favorite 4
+         * @hide
+         */
+        public static final String COLOR_PICKER_FAVORITES_4 = "color_picker_favorite_4";
+
+        /**
          * Wether to use detailed weather view color values from global theme
          * @hide
          */
