@@ -21,9 +21,13 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.android.systemui.R;
 
 /**
  * A view that can be used for both the dimmed and normal background of an notification.
@@ -104,6 +108,15 @@ public class NotificationBackgroundView extends View {
             mBackground.clearColorFilter();
         }
         invalidate();
+    }
+
+    public void setNormalOrDimmedBackground(int color) {
+        if (mBackground instanceof LayerDrawable) {
+            if (((LayerDrawable) mBackground).findDrawableByLayerId(R.id.backgroundFill) != null) {
+                ((GradientDrawable) ((LayerDrawable) mBackground).findDrawableByLayerId(
+                        R.id.backgroundFill)).setColor(color);
+            }
+        }
     }
 
     public void setActualHeight(int actualHeight) {
