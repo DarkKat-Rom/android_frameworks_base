@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2014 The Android Open Source Project
+  ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License
   -->
-<ripple xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@id/backgroundFill">
-        <shape>
-            <solid android:color="@color/notification_material_background_dimmed_color" />
-        </shape>
-    </item>
-</ripple>
+
+<com.android.systemui.statusbar.AlphaOptimizedView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_more_divider"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/notification_divider_height"
+    android:background="#FF9E9E9E" />
