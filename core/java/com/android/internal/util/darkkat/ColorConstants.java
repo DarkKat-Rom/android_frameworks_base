@@ -135,7 +135,15 @@ public class ColorConstants {
     // Notifications
 
     // Notifications (All themes)
-    public static final int NOTIFICATION_BG_DIMMED_ALPHA = 204;
+    public static final int NOTIFICATION_BG_DIMMED_ALPHA                  = 204;
+    public static final int NOTIFICATION_REMOTE_INPUT_TEXT_ENABLED_DARK   = TEXT_PRIMARY_ALPHA_NIGHT;
+    public static final int NOTIFICATION_REMOTE_INPUT_ICON_ENABLED_DARK   = TEXT_PRIMARY_ALPHA_NIGHT;
+    public static final int NOTIFICATION_REMOTE_INPUT_TEXT_DISABLED_DARK  = 153;
+    public static final int NOTIFICATION_REMOTE_INPUT_ICON_DISABLED_DARK  = 77;
+    public static final int NOTIFICATION_REMOTE_INPUT_TEXT_ENABLED_LIGHT  = TEXT_PRIMARY_ALPHA_DAY;
+    public static final int NOTIFICATION_REMOTE_INPUT_ICON_ENABLED_LIGHT  = TEXT_SECONDARY_ALPHA_DAY;
+    public static final int NOTIFICATION_REMOTE_INPUT_TEXT_DISABLED_LIGHT = 133;
+    public static final int NOTIFICATION_REMOTE_INPUT_ICON_DISABLED_LIGHT = 66;
 
     // Slim recents
     public static final int SLIM_RECENTS_PANEL_BG_ALPHA = 128;

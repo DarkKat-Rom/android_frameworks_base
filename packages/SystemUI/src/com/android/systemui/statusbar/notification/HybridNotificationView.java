@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.android.keyguard.AlphaOptimizedLinearLayout;
 import com.android.systemui.R;
 import com.android.systemui.ViewInvertHelper;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.statusbar.CrossFadeHelper;
 import com.android.systemui.statusbar.TransformableView;
 import com.android.systemui.statusbar.ViewTransformationHelper;
@@ -124,6 +125,15 @@ public class HybridNotificationView extends AlphaOptimizedLinearLayout
             mTextView.setText(text.toString());
         }
         requestLayout();
+    }
+
+    public void setTextColor() {
+        if (mTitleView != null) {
+            mTitleView.setTextColor(NotifColorHelper.getTextColor(mContext, true));
+        }
+        if (mTextView != null) {
+            mTextView.setTextColor(NotifColorHelper.getTextColor(mContext, false));
+        }
     }
 
     public void setDark(boolean dark, boolean fade, long delay) {

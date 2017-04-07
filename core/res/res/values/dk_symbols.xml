@@ -37,6 +37,21 @@
     <java-symbol type="string" name="shutdown_reboot_dlg_message_recovery" />
     <java-symbol type="string" name="shutdown_reboot_dlg_message_bootloader" />
 
+    <!-- Notifications -->
+    <java-symbol type="id" name="notification_content_container" />
+
+    <!-- Weather notification -->
+    <java-symbol type="id" name="collapsed_content" />
+    <java-symbol type="id" name="content_image" />
+    <java-symbol type="id" name="collapsed_content_text_container" />
+    <java-symbol type="id" name="content_title" />
+    <java-symbol type="id" name="content_text" />
+    <java-symbol type="id" name="expanded_content" />
+    <java-symbol type="id" name="expanded_content_item" />
+    <java-symbol type="id" name="content_item_day" />
+    <java-symbol type="id" name="content_item_image" />
+    <java-symbol type="id" name="content_item_temp" />
+
     <!-- SlimRoms additions -->
 
     <!-- Slim recent app screen -->

@@ -41,10 +41,13 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.UserInfo;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.Icon;
+import android.graphics.drawable.RippleDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,6 +68,7 @@ import android.service.notification.NotificationListenerService.RankingMap;
 import android.service.notification.StatusBarNotification;
 import android.service.vr.IVrManager;
 import android.service.vr.IVrStateCallbacks;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.Log;
@@ -82,8 +86,10 @@ import android.view.ViewParent;
 import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,7 +99,6 @@ import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.internal.messages.SystemMessageProto.SystemMessage;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
-import com.android.internal.util.darkkat.NotificationColorHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -104,6 +109,7 @@ import com.android.systemui.RecentsComponent;
 import com.android.systemui.SwipeHelper;
 import com.android.systemui.SystemUI;
 import com.android.systemui.assist.AssistManager;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.recents.Recents;
 import com.android.systemui.slimrecent.RecentController;
 import com.android.systemui.statusbar.NotificationData.Entry;
@@ -1029,76 +1035,288 @@ public abstract class BaseStatusBar extends SystemUI implements
             entry.icon.setTag(R.id.icon_is_pre_L, entry.targetSdk < Build.VERSION_CODES.LOLLIPOP);
         }
 
-// Disabled for now
-//        updateNotificationPrimaryBgColor(entry);
-//        updateNotificationSecondaryBgColor(entry);
+        updateNotificationColors(entry);
     }
 
-    protected void updateNotificationPrimaryBgColor() {
+    protected void updateNotificationColors() {
         ArrayList<Entry> activeNotifications = mNotificationData.getActiveNotifications();
         final int notificationCount = activeNotifications.size();
         for (int i = 0; i < notificationCount; i++) {
             NotificationData.Entry entry = activeNotifications.get(i);
-            updateNotificationPrimaryBgColor(entry);
+            updateNotificationColors(entry);
         }
     }
 
-    protected void updateNotificationSecondaryBgColor() {
-        ArrayList<Entry> activeNotifications = mNotificationData.getActiveNotifications();
-        final int notificationCount = activeNotifications.size();
-        for (int i = 0; i < notificationCount; i++) {
-            NotificationData.Entry entry = activeNotifications.get(i);
-            updateNotificationSecondaryBgColor(entry);
-        }
-    }
-
-    private void updateNotificationPrimaryBgColor(NotificationData.Entry entry) {
-        final ActivatableNotificationView anv = (ActivatableNotificationView) entry.row;
-        if (anv != null) {
-            anv.setNormalColor();
-        }
-    }
-
-    private void updateNotificationSecondaryBgColor(NotificationData.Entry entry) {
+    private void updateNotificationColors(NotificationData.Entry entry) {
+        final ExpandableNotificationRow enr = (ExpandableNotificationRow) entry.row;
+        final NotificationContentView contentContainer = entry.row.getPrivateLayout();
+        final NotificationContentView contentContainerPublic = entry.row.getPublicLayout();
+        final View publicView = entry.getPublicContentView();
+        final View privateView = entry.getContentView();
         final View expandedView = entry.getExpandedContentView();
         final View headsUpView = entry.getHeadsUpContentView();
+        View header = null;
+        View weatherContent = null;
         LinearLayout actionList = null;
+        LinearLayout mediaActionList = null;
+        View progressBar = null;
+
+        int notificationColor = entry.notification.getNotification().color;
+        if (notificationColor == Notification.COLOR_DEFAULT) {
+            notificationColor = 0;
+        }
+        final int mediaNotificationColor = isMediaNotification(entry)
+                ? notificationColor : 0;
+        final int actionListBgColor = notificationColor == 0
+                ? NotifColorHelper.getSecondaryBackgroundColor(mContext) : notificationColor;
+
+        if (enr != null) {
+            if (mediaNotificationColor != 0) {
+                enr.setNormalColor(mediaNotificationColor);
+            } else {
+                enr.setNormalColor();
+            }
+            enr.updateColor();
+            if (enr.getChildrenContainer() != null) {
+                enr.getChildrenContainer().setTextColor();
+                enr.getChildrenContainer().setIconColor();
+            }
+        }
+
+        if (contentContainer != null) {
+            contentContainer.setTextColor();
+        }
+
+        if (contentContainerPublic != null) {
+            contentContainerPublic.setTextColor();
+        }
+
+        if (publicView != null) {
+            header = publicView.findViewById(com.android.internal.R.id.notification_header);
+            mediaActionList = (LinearLayout) publicView.findViewById(com.android.internal.R.id.media_actions);
+            progressBar = publicView.findViewById(com.android.internal.R.id.progress);
+            weatherContent = publicView.findViewById(com.android.internal.R.id.collapsed_content);
+
+            if (header != null) {
+                updateNotificationHeaderTextColor(header, mediaNotificationColor);
+                updateNotificationHeaderIconColor(header, mediaNotificationColor);
+            }
+            updateNotificationContentTextColor(publicView, mediaNotificationColor);
+            if (weatherContent != null) {
+                updateNotificationWeatherContentColor(weatherContent);
+            }
+            if (mediaActionList != null) {
+                updateNotificationMediaActionIconColor(mediaActionList, mediaNotificationColor);
+            }
+            if (progressBar instanceof ProgressBar) {
+                setNotificationProgressBarColor((ProgressBar) progressBar, mediaNotificationColor);
+            }
+        }
+
+        if (privateView != null) {
+            header = privateView.findViewById(com.android.internal.R.id.notification_header);
+            mediaActionList = (LinearLayout) privateView.findViewById(com.android.internal.R.id.media_actions);
+            progressBar = privateView.findViewById(com.android.internal.R.id.progress);
+            weatherContent = privateView.findViewById(com.android.internal.R.id.collapsed_content);
+
+            if (header != null) {
+                updateNotificationHeaderTextColor(header, mediaNotificationColor);
+                updateNotificationHeaderIconColor(header, mediaNotificationColor);
+            }
+            updateNotificationContentTextColor(privateView, mediaNotificationColor);
+            if (weatherContent != null) {
+                updateNotificationWeatherContentColor(weatherContent);
+            }
+            if (mediaActionList != null) {
+                updateNotificationMediaActionIconColor(mediaActionList, mediaNotificationColor);
+            }
+            if (progressBar instanceof ProgressBar) {
+                setNotificationProgressBarColor((ProgressBar) progressBar, mediaNotificationColor);
+            }
+        }
 
         if (expandedView != null) {
+            header = expandedView.findViewById(com.android.internal.R.id.notification_header);
             actionList = (LinearLayout) expandedView.findViewById(com.android.internal.R.id.actions);
+            mediaActionList = (LinearLayout) expandedView.findViewById(com.android.internal.R.id.media_actions);
+            progressBar = expandedView.findViewById(com.android.internal.R.id.progress);
+            weatherContent = expandedView.findViewById(com.android.internal.R.id.expanded_content);
+
+            if (header != null) {
+                updateNotificationHeaderTextColor(header, mediaNotificationColor);
+                updateNotificationHeaderIconColor(header, mediaNotificationColor);
+            }
+            updateNotificationContentTextColor(expandedView, mediaNotificationColor);
+            updateNotificationMessagingTextColor(expandedView);
+            if (weatherContent != null) {
+                updateNotificationWeatherContentColor(weatherContent);
+            }
+            if (mediaActionList != null) {
+                updateNotificationMediaActionIconColor(mediaActionList, mediaNotificationColor);
+            }
+            if (progressBar instanceof ProgressBar) {
+                setNotificationProgressBarColor((ProgressBar) progressBar, mediaNotificationColor);
+            }
             if (actionList != null) {
-                if (actionList.getBackground() instanceof ColorDrawable) {
-                    ((ColorDrawable) actionList.getBackground()).setColor(
-                            NotificationColorHelper.getSecondaryBackgroundColor(mContext));
-                }
-                for (int i = 0; i < actionList.getChildCount(); i++) {
-                    if (actionList.getChildAt(i).getId() == com.android.internal.R.id.button_holder) {
-                        if (actionList.getChildAt(i).getBackground() instanceof ColorDrawable) {
-                            ((ColorDrawable) actionList.getChildAt(i).getBackground()).setColor(
-                            NotificationColorHelper.getEmphazisedActionBackgroundColor(mContext));
-                        }
-                    }
-                }
+                actionList.setBackgroundColor(actionListBgColor);
+                setNotificationActionBackgroundColor(actionList, actionListBgColor);
+                updateNotificationActionTextColor(actionList, notificationColor);
             }
         }
+
         if (headsUpView != null) {
+            header = headsUpView.findViewById(com.android.internal.R.id.notification_header);
             actionList = (LinearLayout) headsUpView.findViewById(com.android.internal.R.id.actions);
+            mediaActionList = (LinearLayout) headsUpView.findViewById(com.android.internal.R.id.media_actions);
+            progressBar = headsUpView.findViewById(com.android.internal.R.id.progress);
+            weatherContent = headsUpView.findViewById(com.android.internal.R.id.expanded_content);
+
+            if (header != null) {
+                updateNotificationHeaderTextColor(header, mediaNotificationColor);
+                updateNotificationHeaderIconColor(header, mediaNotificationColor);
+            }
+            updateNotificationContentTextColor(headsUpView, mediaNotificationColor);
+            updateNotificationMessagingTextColor(headsUpView);
+            if (weatherContent != null) {
+                updateNotificationWeatherContentColor(weatherContent);
+            }
+            if (mediaActionList != null) {
+                updateNotificationMediaActionIconColor(mediaActionList, mediaNotificationColor);
+            }
+            if (progressBar instanceof ProgressBar) {
+                setNotificationProgressBarColor((ProgressBar) progressBar, mediaNotificationColor);
+            }
             if (actionList != null) {
-                if (actionList.getBackground() instanceof ColorDrawable) {
-                    ((ColorDrawable) actionList.getBackground()).setColor(
-                            NotificationColorHelper.getSecondaryBackgroundColor(mContext));
-                }
-                for (int i = 0; i < actionList.getChildCount(); i++) {
-                    if (actionList.getChildAt(i).getId() == com.android.internal.R.id.button_holder) {
-                        if (actionList.getChildAt(i).getBackground() instanceof ColorDrawable) {
-                            ((ColorDrawable) actionList.getChildAt(i).getBackground()).setColor(
-                            NotificationColorHelper.getEmphazisedActionBackgroundColor(mContext));
-                        }
-                    }
-                }
+                actionList.setBackgroundColor(actionListBgColor);
+                setNotificationActionBackgroundColor(actionList, actionListBgColor);
+                updateNotificationActionTextColor(actionList, notificationColor);
             }
         }
-                
+    }
+
+    private void setNotificationActionBackgroundColor(LinearLayout actionList, int actionListBgColor) {
+        for (int i = 0; i < actionList.getChildCount(); i++) {
+            if (actionList.getChildAt(i) instanceof ViewGroup) {
+                boolean oddAction = i % 2 != 0;
+                int color = NotifColorHelper.getEmphazisedActionBackgroundColor(
+                        actionListBgColor, oddAction);
+                ColorDrawable bg = null;
+                if (!oddAction) {
+                    bg =  new ColorDrawable(color);
+                }
+                actionList.getChildAt(i).setBackground(bg);
+            }
+        }
+    }
+
+    private void updateNotificationHeaderTextColor(View header, int mediaNotificationColor) {
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.app_name_text),
+                true, mediaNotificationColor);
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.header_text_divider),
+                false, mediaNotificationColor);
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.header_text),
+                false, mediaNotificationColor);
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.time_divider),
+                false, mediaNotificationColor);
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.time),
+                false, mediaNotificationColor);
+        setNotificationTextColor(header.findViewById(com.android.internal.R.id.chronometer),
+                false, mediaNotificationColor);
+    }
+
+    private void updateNotificationContentTextColor(View v, int mediaNotificationColor) {
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.title),
+                true, mediaNotificationColor);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.text_line_1),
+                false, mediaNotificationColor);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.text),
+                false, mediaNotificationColor);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.big_text),
+                false, mediaNotificationColor);
+    }
+
+    private void updateNotificationMessagingTextColor(View v) {
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text0), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text1), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text2), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text3), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text4), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text5), false, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.inbox_text6), false, 0);
+    }
+
+    private void updateNotificationWeatherContentColor(View v) {
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.content_title), true, 0);
+        setNotificationTextColor(v.findViewById(com.android.internal.R.id.content_text), false, 0);
+        setNotificationIconColor(v.findViewById(com.android.internal.R.id.content_image), true, 0);
+        if (v instanceof LinearLayout) {
+            LinearLayout expandedContent = (LinearLayout) v;
+            for (int i = 0; i < expandedContent.getChildCount(); i++) {
+                setNotificationTextColor(expandedContent.getChildAt(i).findViewById(
+                        com.android.internal.R.id.content_item_day), true, 0);
+                setNotificationIconColor(expandedContent.getChildAt(i).findViewById(
+                        com.android.internal.R.id.content_item_image), true, 0);
+                setNotificationTextColor(expandedContent.getChildAt(i).findViewById(
+                        com.android.internal.R.id.content_item_temp), false, 0);
+            }
+        }
+    }
+
+    private void updateNotificationActionTextColor(LinearLayout actionList, int notificationColor) {
+        for (int i = 0; i < actionList.getChildCount(); i++) {
+            if (actionList.getChildAt(i) instanceof ViewGroup) {
+                setNotificationTextColor(actionList.getChildAt(i).findViewById(
+                        com.android.internal.R.id.action0), true, notificationColor);
+            } else {
+                setNotificationTextColor(actionList.getChildAt(i), true, notificationColor);
+            }
+        }
+    }
+
+    private void setNotificationTextColor(View v, boolean isPrimary, int notificationColor) {
+        if (v instanceof TextView) {
+            int color = notificationColor != 0
+                    ? NotifColorHelper.getMediaTextColor(mContext, notificationColor, isPrimary)
+                    : NotifColorHelper.getTextColor(mContext, isPrimary);
+            if (((TextView) v).getText() instanceof Spanned) {
+                String s = ((Spanned) ((TextView) v).getText()).toString();
+                ((TextView) v).setText(s);
+            }
+            ((TextView) v).setTextColor(color);
+        }
+    }
+
+    private void updateNotificationHeaderIconColor(View header, int notificationColor) {
+        setNotificationIconColor(header.findViewById(com.android.internal.R.id.icon),
+                true, notificationColor);
+        setNotificationIconColor(header.findViewById(com.android.internal.R.id.expand_button),
+                false, notificationColor);
+    }
+
+    private void updateNotificationMediaActionIconColor(LinearLayout mediaActionList, int notificationColor) {
+        for (int i = 0; i < mediaActionList.getChildCount(); i++) {
+            if (mediaActionList.getChildAt(i) instanceof ImageView) {
+                setNotificationIconColor(mediaActionList.getChildAt(i), true, notificationColor);
+            }
+        }
+    }
+
+    private void setNotificationIconColor(View v, boolean fullyOpaque, int mediaNotificationColor) {
+        if (v instanceof ImageView) {
+            int color = mediaNotificationColor != 0
+                    ? NotifColorHelper.getMediaIconColor(mContext, mediaNotificationColor, fullyOpaque)
+                    : NotifColorHelper.getIconColor(mContext, fullyOpaque);
+            ((ImageView) v).setColorFilter(color);
+        }
+    }
+
+    private void setNotificationProgressBarColor(ProgressBar progressBar, int mediaNotificationColor) {
+        progressBar.setProgressTintList(NotifColorHelper.getProgressColorList(
+                mContext, mediaNotificationColor));
+        progressBar.setProgressBackgroundTintList(NotifColorHelper.getProgressColorList(
+                mContext, mediaNotificationColor));
+        progressBar.setIndeterminateTintList(NotifColorHelper.getProgressColorList(
+                mContext, mediaNotificationColor));
     }
 
     public boolean isMediaNotification(NotificationData.Entry entry) {

@@ -209,14 +209,41 @@ public class ThemeHelper {
         }
     }
 
-    public static int getNotificationTextColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT << 24)
-                | (ColorConstants.WHITE & 0x00ffffff);
+    public static int getNotificationTextColor(Context context, boolean isPrimary) {
+        int color = getTheme(context) == THEME_MATERIAL_LIGHT
+                ? ColorConstants.BLACK : ColorConstants.WHITE;
+
+        return (getNotificationTextAlpha(context, isPrimary) << 24) | (color & 0x00ffffff);
+    }
+
+    public static int getNotificationIconColor(Context context, boolean fullyOpaque) {
+        int alpha;
+        int color;
+
+        if (fullyOpaque) {
+            alpha = ColorConstants.FULLY_OPAQUE_ALPHA;
         } else {
-            return (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
-                | (ColorConstants.BLACK & 0x00ffffff);
+            alpha = getTheme(context) == THEME_MATERIAL_LIGHT
+                    ? ColorConstants.ICON_NORMAL_ALPHA_DAY : ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
         }
+        color = getTheme(context) == THEME_MATERIAL_LIGHT
+                ? ColorConstants.BLACK : ColorConstants.WHITE;
+
+        return (alpha << 24) | (color & 0x00ffffff);
+    }
+
+    public static int getNotificationTextAlpha(Context context, boolean isPrimary) {
+        int alpha;
+
+        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
+            alpha = isPrimary
+                    ? ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT : ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT;
+        } else {
+            alpha =  isPrimary
+                    ? ColorConstants.TEXT_PRIMARY_ALPHA_DAY : ColorConstants.TEXT_SECONDARY_ALPHA_DAY;
+        }
+
+        return alpha;
     }
 
     public static int getNotificationDismissAllTextColor() {

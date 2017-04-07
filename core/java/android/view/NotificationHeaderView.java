@@ -297,7 +297,7 @@ public class NotificationHeaderView extends ViewGroup {
             drawableId = com.android.internal.R.drawable.ic_expand_notification;
         }
         mExpandButton.setImageDrawable(getContext().getDrawable(drawableId));
-        mExpandButton.setColorFilter(mOriginalNotificationColor);
+//        mExpandButton.setColorFilter(mOriginalNotificationColor);
     }
 
     public void setShowWorkBadgeAtEnd(boolean showWorkBadgeAtEnd) {

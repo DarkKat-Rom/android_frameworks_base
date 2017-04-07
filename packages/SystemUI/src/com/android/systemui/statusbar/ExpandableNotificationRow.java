@@ -1690,4 +1690,13 @@ public class ExpandableNotificationRow extends ActivatableNotificationView {
     public interface OnExpandClickListener {
         void onExpandClicked(NotificationData.Entry clickedEntry, boolean nowExpanded);
     }
+
+    public void updateColor() {
+        if (mSettingsIconRow != null) {
+            mSettingsIconRow.setGearIconColor();
+        }
+        if (mGuts != null) {
+            mGuts.setColor();
+        }
+    }
 }

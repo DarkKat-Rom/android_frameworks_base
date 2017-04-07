@@ -29,6 +29,7 @@
         android:padding="@dimen/notification_gear_padding"
         android:src="@drawable/ic_settings"
         android:tint="@color/notification_gear_color"
+        android:tintMode="src_in"
         android:alpha="0"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         />

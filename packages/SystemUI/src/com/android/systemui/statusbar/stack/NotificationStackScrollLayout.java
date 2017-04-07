@@ -57,11 +57,11 @@ import android.widget.ScrollView;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
-import com.android.internal.util.darkkat.NotificationColorHelper;
 import com.android.systemui.ExpandHelper;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.SwipeHelper;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.classifier.FalsingManager;
 import com.android.systemui.statusbar.ActivatableNotificationView;
 import com.android.systemui.statusbar.DismissView;
@@ -450,7 +450,7 @@ public class NotificationStackScrollLayout extends ViewGroup
     }
 
     public void setBgColor() {
-        mBgColor = NotificationColorHelper.getSecondaryBackgroundColor(getContext());
+        mBgColor = NotifColorHelper.getSecondaryBackgroundColor(getContext());
         mBackgroundPaint.setColor(mBgColor);
         invalidate();
     }
