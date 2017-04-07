@@ -18,6 +18,7 @@ package com.android.systemui.statusbar.stack;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.service.notification.StatusBarNotification;
@@ -26,11 +27,13 @@ import android.view.LayoutInflater;
 import android.view.NotificationHeaderView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.android.systemui.R;
 import com.android.systemui.ViewInvertHelper;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.statusbar.CrossFadeHelper;
 import com.android.systemui.statusbar.ExpandableNotificationRow;
 import com.android.systemui.statusbar.NotificationHeaderUtil;
@@ -198,11 +201,13 @@ public class NotificationChildrenContainer extends ViewGroup {
      */
     public void addNotification(ExpandableNotificationRow row, int childIndex) {
         int newIndex = childIndex < 0 ? mChildren.size() : childIndex;
+        ColorStateList tint = ColorStateList.valueOf(NotifColorHelper.getIconColor(mContext, true));
         mChildren.add(newIndex, row);
         addView(row);
         row.setUserLocked(mUserLocked);
 
         View divider = inflateDivider();
+        divider.setBackgroundTintList(tint);
         addView(divider);
         mDividers.add(newIndex, divider);
 
@@ -257,6 +262,8 @@ public class NotificationChildrenContainer extends ViewGroup {
             header.reapply(getContext(), mNotificationHeader);
             mNotificationHeaderWrapper.notifyContentUpdated(notification);
         }
+        setHeaderTextColor();
+        setIconColor();
         updateChildrenHeaderAppearance();
     }
 
@@ -567,7 +574,8 @@ public class NotificationChildrenContainer extends ViewGroup {
             expandFraction = getGroupExpandFraction();
         }
         final boolean dividersVisible = mUserLocked
-                || mNotificationParent.isGroupExpansionChanging();
+                || mNotificationParent.isGroupExpansionChanging()
+                || mNotificationParent.isGroupExpanded();
         for (int i = 0; i < childCount; i++) {
             ExpandableNotificationRow child = mChildren.get(i);
             StackViewState viewState = state.getViewStateForView(child);
@@ -614,7 +622,8 @@ public class NotificationChildrenContainer extends ViewGroup {
         ViewState tmpState = new ViewState();
         float expandFraction = getGroupExpandFraction();
         final boolean dividersVisible = mUserLocked
-                || mNotificationParent.isGroupExpansionChanging();
+                || mNotificationParent.isGroupExpansionChanging()
+                || mNotificationParent.isGroupExpanded();
         for (int i = childCount - 1; i >= 0; i--) {
             ExpandableNotificationRow child = mChildren.get(i);
             StackViewState viewState = state.getViewStateForView(child);
@@ -837,6 +846,7 @@ public class NotificationChildrenContainer extends ViewGroup {
             addView(divider, index);
             mDividers.set(i, divider);
         }
+        setDividerColor();
         removeView(mOverflowNumber);
         mOverflowNumber = null;
         mOverflowInvertHelper = null;
@@ -855,7 +865,7 @@ public class NotificationChildrenContainer extends ViewGroup {
 
     public void onNotificationUpdated() {
         mHybridGroupManager.setOverflowNumberColor(mOverflowNumber,
-                mNotificationParent.getNotificationColor());
+                NotifColorHelper.getTextColor(mContext, true));
     }
 
     public int getPositionInLinearLayout(View childInGroup) {
@@ -875,5 +885,38 @@ public class NotificationChildrenContainer extends ViewGroup {
             }
         }
         return 0;
+    }
+
+    public void setTextColor() {
+        mHybridGroupManager.setOverflowNumberColor(mOverflowNumber,
+                NotifColorHelper.getTextColor(mContext, true));
+        setHeaderTextColor();
+    }
+
+    public void setHeaderTextColor() {
+        if (mNotificationHeader != null) {
+            ((TextView) findViewById(com.android.internal.R.id.app_name_text)).setTextColor(
+                    NotifColorHelper.getTextColor(mContext, true));
+            ((TextView) findViewById(com.android.internal.R.id.header_text)).setTextColor(
+                    NotifColorHelper.getTextColor(mContext, false));
+        }
+    }
+
+    public void setIconColor() {
+        if (mNotificationHeader != null) {
+            ((ImageView) findViewById(com.android.internal.R.id.icon)).setColorFilter(
+                    NotifColorHelper.getIconColor(mContext, true));
+            mNotificationHeader.getExpandButton().setColorFilter(
+                    NotifColorHelper.getIconColor(mContext, false));
+            setDividerColor();
+        }
+    }
+
+    public void setDividerColor() {
+        int childCount = Math.min(mChildren.size(), NUMBER_OF_CHILDREN_WHEN_CHILDREN_EXPANDED);
+        ColorStateList tint = ColorStateList.valueOf(NotifColorHelper.getIconColor(mContext, true));
+        for (int i = 0; i < childCount; i++) {
+            mDividers.get(i).setBackgroundTintList(tint);
+        }
     }
 }

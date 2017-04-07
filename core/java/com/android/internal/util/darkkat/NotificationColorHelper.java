@@ -17,6 +17,7 @@
 package com.android.internal.util.darkkat;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.provider.Settings;
 
 public class NotificationColorHelper {
@@ -30,23 +31,6 @@ public class NotificationColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.NOTIFICATION_PRIMARY_BACKGROUND_COLOR,
                     ThemeHelper.getNotificationPrimaryBgColor(context));
-        }
-
-        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
-    }
-
-    public static int getDimmedBackgroundColor(Context context) {
-        return (ColorConstants.NOTIFICATION_BG_DIMMED_ALPHA << 24)
-                | (getPrimaryBackgroundColor(context) & 0x00ffffff);
-    }
-
-    public static int getLowBackgroundColor(Context context) {
-        int color;
-
-        if (ThemeHelper.notificationUseThemeColors(context)) {
-            color = ThemeHelper.getNotificationLowBgColor(context);
-        } else {
-            color = ColorHelper.getLightenOrDarkenColor(getPrimaryBackgroundColor(context));
         }
 
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
@@ -66,27 +50,6 @@ public class NotificationColorHelper {
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
-    public static int getEmphazisedActionBackgroundColor(Context context) {
-        int color = getSecondaryBackgroundColor(context);
-        if (ThemeHelper.notificationUseThemeColors(context)) {
-            switch (ThemeHelper.getTheme(context)) {
-                default:
-                case ThemeHelper.THEME_DARKKAT:
-                    color = ColorConstants.NOTIFICATION_BG_EMPHASIZED_DARKKAT;
-                    break;
-                case ThemeHelper.THEME_MATERIAL_LIGHT:
-                    color = ColorConstants.NOTIFICATION_BG_EMPHASIZED_DAY;
-                    break;
-                case ThemeHelper.THEME_BLACKOUT:
-                    color = ColorConstants.NOTIFICATION_BG_EMPHASIZED_BLACKOUT;
-                    break;
-            }
-        } else {
-            color = ColorHelper.getLightenOrDarkenColor(color);
-        }
-        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
-    }
-
     public static int getAccentColor(Context context) {
         int color;
 
@@ -101,18 +64,39 @@ public class NotificationColorHelper {
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
-    public static int getTextColor(Context context) {
+    public static int getTextColor(Context context, boolean isPrimary) {
         int color;
 
         if (ThemeHelper.notificationUseThemeColors(context)) {
-            color = ThemeHelper.getNotificationTextColor(context);
+            color = ThemeHelper.getNotificationTextColor(context, isPrimary);
         } else {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.NOTIFICATION_TEXT_COLOR,
-                    ThemeHelper.getNotificationTextColor(context));
+                    ThemeHelper.getNotificationTextColor(context, isPrimary));
         }
 
-        return (getTextAlpha(context) << 24) | (color & 0x00ffffff);
+        return (ThemeHelper.getNotificationTextAlpha(context, isPrimary) << 24) | (color & 0x00ffffff);
+    }
+
+    public static int getIconColor(Context context, boolean fullyOpaque) {
+        int alpha;
+        int color;
+
+        if (fullyOpaque) {
+            alpha = ColorConstants.FULLY_OPAQUE_ALPHA;
+        } else {
+            alpha = ThemeHelper.getTheme(context) == ThemeHelper.THEME_MATERIAL_LIGHT
+                    ? ColorConstants.ICON_NORMAL_ALPHA_DAY : ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+        }
+        if (ThemeHelper.notificationUseThemeColors(context)) {
+            color = ThemeHelper.getNotificationIconColor(context, fullyOpaque);
+        } else {
+            color = Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.NOTIFICATION_ICON_COLOR,
+                    ThemeHelper.getNotificationIconColor(context, fullyOpaque));
+        }
+
+        return (alpha << 24) | (color & 0x00ffffff);
     }
 
     public static int getDismissAllTextColor(Context context) {
@@ -129,33 +113,7 @@ public class NotificationColorHelper {
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
-    public static int getTextAlpha(Context context) {
-        int alpha;
-
-        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-            alpha = ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT;
-        } else {
-            alpha = ColorConstants.TEXT_PRIMARY_ALPHA_DAY;
-        }
-
-        return alpha;
-    }
-
 /*
-    public static int getIconColor(Context context) {
-        int color;
-
-        if (ThemeHelper.notificationUseThemeColors(context)) {
-            color = ThemeHelper.getNotificationIconColor(context);
-        } else {
-            color = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.NOTIFICATION_ICON_COLOR,
-                    ThemeHelper.getNotificationIconColor(context));
-        }
-
-        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
-    }
-
     public static int getRippleColor(Context context) {
         if (ThemeHelper.notificationUseThemeColors(context)) {
             return ThemeHelper.getNotificationRippleColor(context);

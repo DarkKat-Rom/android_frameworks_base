@@ -27,6 +27,7 @@ import android.widget.FrameLayout;
 
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 
 public class NotificationSettingsIconRow extends FrameLayout implements View.OnClickListener {
 
@@ -83,6 +84,7 @@ public class NotificationSettingsIconRow extends FrameLayout implements View.OnC
         super.onFinishInflate();
         mGearIcon = (AlphaOptimizedImageView) findViewById(R.id.gear_icon);
         mGearIcon.setOnClickListener(this);
+        setGearIconColor();
         setOnClickListener(this);
         mHorizSpaceForGear =
                 getResources().getDimensionPixelOffset(R.dimen.notification_gear_width);
@@ -294,5 +296,9 @@ public class NotificationSettingsIconRow extends FrameLayout implements View.OnC
         } else {
             // Do nothing when the background is touched.
         }
+    }
+
+    public void setGearIconColor() {
+        mGearIcon.setImageTintList(NotifColorHelper.getIconTint(mContext, false));
     }
 }

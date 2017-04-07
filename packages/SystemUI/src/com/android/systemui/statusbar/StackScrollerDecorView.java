@@ -22,9 +22,8 @@ import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
 
-import com.android.internal.util.darkkat.NotificationColorHelper;
-
 import com.android.systemui.Interpolators;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 
 /**
  * A common base class for all views in the notification stack scroller which don't have a
@@ -139,7 +138,7 @@ public abstract class StackScrollerDecorView extends ExpandableView {
     public void setTextColor() {
         if (mContent instanceof TextView) {
             ((TextView) mContent).setTextColor(
-                    NotificationColorHelper.getDismissAllTextColor(getContext()));
+                    NotifColorHelper.getDismissAllTextColor(getContext()));
         }
     }
 

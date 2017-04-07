@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 DarkKat
+<!-- Copyright (C) 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,16 +13,17 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-<resources>
-
-    <!-- Blackout theme
-        (additional colors) -->
-    <color name="system_primary_color">#ff000000</color>
-    <color name="system_secondary_color">#ff000000</color>
-    <color name="system_accent_color">#ff1976D2</color><!-- blue 700 -->
-
-    <color name="notification_guts_seekbar_tick_mark_tint">#ffffffff</color>
-    <color name="notification_children_divider_color">#1fffffff</color>
-    <color name="qs_tile_adapter_bg">@color/system_secondary_color</color>
+    <!-- Weather notification -->
+    <item type="id" name="collapsed_content" />
+    <item type="id" name="content_image" />
+    <item type="id" name="collapsed_content_text_container" />
+    <item type="id" name="content_title" />
+    <item type="id" name="content_text" />
+    <item type="id" name="expanded_content" />
+    <item type="id" name="expanded_content_item" />
+    <item type="id" name="content_item_day" />
+    <item type="id" name="content_item_image" />
+    <item type="id" name="content_item_temp" />
 </resources>

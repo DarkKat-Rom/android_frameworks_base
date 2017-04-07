@@ -30,9 +30,11 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.internal.util.NotificationColorUtil;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.statusbar.notification.HybridNotificationView;
 import com.android.systemui.statusbar.notification.HybridGroupManager;
 import com.android.systemui.statusbar.notification.NotificationCustomViewWrapper;
@@ -941,6 +943,7 @@ public class NotificationContentView extends FrameLayout {
         if (mIsChildInGroup) {
             mSingleLineView = mHybridGroupManager.bindFromNotification(
                     mSingleLineView, mStatusBarNotification.getNotification());
+            mSingleLineView.setTextColor();
         } else if (mSingleLineView != null) {
             removeView(mSingleLineView);
             mSingleLineView = null;
@@ -1013,10 +1016,19 @@ public class NotificationContentView extends FrameLayout {
             if (existing == null && hasRemoteInput) {
                 ViewGroup actionContainer = (FrameLayout) actionContainerCandidate;
                 if (cachedView == null) {
+                    int color = entry.notification.getNotification().color;
+                    if (color == Notification.COLOR_DEFAULT) {
+                        color = mContext.getColor(R.color.default_remote_input_background);
+                    }
                     RemoteInputView riv = RemoteInputView.inflate(
                             mContext, actionContainer, entry, mRemoteInputController);
 
                     riv.setVisibility(View.INVISIBLE);
+                    TextView tv = (TextView) riv.findViewById(R.id.remote_input_text);
+                    ImageView iv = (ImageView) riv.findViewById(R.id.remote_input_send);
+                    tv.setTextColor(NotifColorHelper.getRemoteInputTextColorList(color));
+                    tv.setHintTextColor(NotifColorHelper.getRemoteInputHintTextColor(color));
+                    iv.setImageTintList(NotifColorHelper.getRemoteInputIconColorList(color));
                     actionContainer.addView(riv, new LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT)
@@ -1034,9 +1046,10 @@ public class NotificationContentView extends FrameLayout {
                 if (color == Notification.COLOR_DEFAULT) {
                     color = mContext.getColor(R.color.default_remote_input_background);
                 }
-                existing.setBackgroundColor(NotificationColorUtil.ensureTextBackgroundColor(color,
-                        mContext.getColor(R.color.remote_input_text_enabled),
-                        mContext.getColor(R.color.remote_input_hint)));
+                existing.setBackgroundColor(color);
+//                existing.setBackgroundColor(NotificationColorUtil.ensureTextBackgroundColor(color,
+//                        mContext.getColor(R.color.remote_input_text_enabled),
+//                        mContext.getColor(R.color.remote_input_hint)));
 
                 if (existingPendingIntent != null || existing.isActive()) {
                     // The current action could be gone, or the pending intent no longer valid.
@@ -1190,5 +1203,11 @@ public class NotificationContentView extends FrameLayout {
 
     public void setFocusOnVisibilityChange() {
         mFocusOnVisibilityChange = true;
+    }
+
+    public void setTextColor() {
+        if (mSingleLineView != null) {
+            mSingleLineView.setTextColor();
+        }
     }
 }
