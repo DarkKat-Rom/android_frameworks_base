@@ -3801,6 +3801,13 @@ public final class Settings {
                 "status_bar_expanded_ripple_color";
 
         /**
+         * Notification test notification color
+         * @hide
+         */
+        public static final String NOTIFICATION_TEST_NOTIFICATION_COLOR =
+                "notification_test_notification_color";
+
+        /**
          * Wether to use notification color values from global theme 
          * @hide
          */
