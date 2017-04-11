@@ -18,7 +18,7 @@ import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.Display;
@@ -308,7 +308,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
 
     private void setIconColor(KeyButtonView kbv) {
         ColorStateList tint = ColorStateList.valueOf(NavigationBarColorHelper.getIconColor(mContext));
-        kbv.setImageTintMode(Mode.MULTIPLY);
+        kbv.setImageTintMode(PorterDuff.Mode.MULTIPLY);
         kbv.setImageTintList(tint);
     }
 
