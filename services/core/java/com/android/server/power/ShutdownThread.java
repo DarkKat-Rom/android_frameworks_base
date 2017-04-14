@@ -299,8 +299,14 @@ public final class ShutdownThread extends Thread {
                         com.android.internal.R.string.reboot_to_reset_message));
             pd.setIndeterminate(true);
         } else {
-            pd.setTitle(context.getText(com.android.internal.R.string.power_off));
-            pd.setMessage(context.getText(com.android.internal.R.string.shutdown_progress));
+            int titleResId = mReboot
+                    ? com.android.internal.R.string.shutdown_restart
+                    : com.android.internal.R.string.power_off;
+            int messageResId = mReboot
+                    ? com.android.internal.R.string.shutdown_progress_restart
+                    : com.android.internal.R.string.shutdown_progress;
+            pd.setTitle(context.getText(titleResId));
+            pd.setMessage(context.getText(messageResId));
             pd.setIndeterminate(true);
         }
         pd.setCancelable(false);
