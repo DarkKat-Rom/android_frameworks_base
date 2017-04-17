@@ -50,4 +50,10 @@ public class LockScreenColorHelper {
 
         return ColorStateList.valueOf(getIconColor(context));
     }
+
+    public static int getAmbientDisplayBatteryTextColor(Context context) {
+        int color = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.AMBIENT_DISPLAY_BATTERY_TEXT_COLOR, ColorConstants.WHITE);
+        return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
+    }
 }

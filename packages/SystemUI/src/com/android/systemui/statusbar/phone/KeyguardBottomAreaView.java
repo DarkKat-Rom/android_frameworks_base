@@ -98,6 +98,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private KeyguardAffordanceView mCameraImageView;
     private KeyguardAffordanceView mLeftAffordanceView;
     private LockIcon mLockIcon;
+    private View mIndicationLayout;
     private TextView mIndicationText;
     private ViewGroup mPreviewContainer;
 
@@ -196,6 +197,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mCameraImageView = (KeyguardAffordanceView) findViewById(R.id.camera_button);
         mLeftAffordanceView = (KeyguardAffordanceView) findViewById(R.id.left_button);
         mLockIcon = (LockIcon) findViewById(R.id.lock_icon);
+        mIndicationLayout =  findViewById(R.id.keyguard_indication_Layout);
         mIndicationText = (TextView) findViewById(R.id.keyguard_indication_text);
         watchForCameraPolicyChanges();
         updateCameraVisibility();
@@ -224,10 +226,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         super.onConfigurationChanged(newConfig);
         int indicationBottomMargin = getResources().getDimensionPixelSize(
                 R.dimen.keyguard_indication_margin_bottom);
-        MarginLayoutParams mlp = (MarginLayoutParams) mIndicationText.getLayoutParams();
+        MarginLayoutParams mlp = (MarginLayoutParams) mIndicationLayout.getLayoutParams();
         if (mlp.bottomMargin != indicationBottomMargin) {
             mlp.bottomMargin = indicationBottomMargin;
-            mIndicationText.setLayoutParams(mlp);
+            mIndicationLayout.setLayoutParams(mlp);
         }
 
         // Respect font size setting.
@@ -583,8 +585,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         return mLockIcon;
     }
 
-    public View getIndicationView() {
-        return mIndicationText;
+    public View getIndicationLayout() {
+        return mIndicationLayout;
     }
 
     @Override
@@ -647,6 +649,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             mLockIcon.setVisibility(View.VISIBLE);
             mCameraImageView.setVisibility(View.VISIBLE);
         }
+        mIndicationController.setDozing(dozing);
     }
 
     public void startFinishDozeAnimation() {
@@ -661,8 +664,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
             startFinishDozeAnimationElement(mCameraImageView, delay);
         }
         if (!showBatteryInfoWhenDozing()) {
-            mIndicationText.setAlpha(0f);
-            mIndicationText.animate()
+            mIndicationLayout.setAlpha(0f);
+            mIndicationLayout.animate()
                     .alpha(1f)
                     .setInterpolator(Interpolators.LINEAR_OUT_SLOW_IN)
                     .setDuration(NotificationPanelView.DOZE_ANIMATION_DURATION);

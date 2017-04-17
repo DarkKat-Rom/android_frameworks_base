@@ -1209,6 +1209,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mKeyguardIndicationController = new KeyguardIndicationController(mContext,
                 (KeyguardIndicationTextView) mStatusBarWindow.findViewById(
                         R.id.keyguard_indication_text),
+                (TextView) mStatusBarWindow.findViewById(
+                        R.id.keyguard_indication_battery_text),
+                (ImageView) mStatusBarWindow.findViewById(
+                        R.id.keyguard_indication_battery_icon),
                 mKeyguardBottomArea.getLockIcon());
         mKeyguardBottomArea.setKeyguardIndicationController(mKeyguardIndicationController);
 

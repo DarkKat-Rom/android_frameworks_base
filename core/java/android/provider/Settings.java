@@ -3719,6 +3719,12 @@ public final class Settings {
         public static final String LOCK_SCREEN_ICON_COLOR = "lock_screen_icon_color";
 
         /**
+         * Color of the embedded battery text on the ambient display
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_TEXT_COLOR = "ambient_display_battery_text_color";
+
+        /**
          * Color of the text on the status bar
          * @hide
          */
@@ -3890,18 +3896,66 @@ public final class Settings {
                 "lock_screen_show_battery_charging_info";
 
         /**
-         *  Whether to show battery info on ambient display
-         * @hide
-         */
-        public static final String LOCK_SCREEN_SHOW_BATTERY_INFO_ON_AMBIENT_DISPLAY =
-                "lock_screen_show_battery_info_on_ambient_display";
-
-        /**
          *  Whether to show advanced battery charging info on the lock screen
          * @hide
          */
         public static final String LOCK_SCREEN_SHOW_ADVANCED_BATTERY_CHARGING_INFO =
                 "lock_screen_show_advanced_battery_charging_info";
+
+        /**
+         *  Whether to show battery info on ambient display
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_SHOW_BATTERY_INFO =
+                "ambient_display_show_battery_info";
+
+        /**
+         * Type of the battery meter on the ambient display
+         * 0 - Battery icon portrait
+         * 1 - Battery icon landscape left
+         * 2 - Battery icon landscape right
+         * 3 - Battery icon circle
+         * 4 - Battery icon arcs
+         * 5 - Battery text only
+         * 6 - Hidden
+         * default: 0
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_METER_TYPE =
+                "ambient_display_battery_meter_type";
+
+        /**
+         *  Whether to show the percentage text embedded in the battery meter on the ambient display
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_METER_SHOW_TEXT =
+                "ambient_display_battery_meter_show_text";
+
+        /**
+         * Dot interval of the circle battery meter icon on the ambient display
+         * 0 - No dots
+         * 1 - 10
+         * default: 0
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_METER_CIRCLE_DOT_INTERVAL =
+                "ambient_display_battery_meter_circle_dot_interval";
+
+        /**
+         * Dot length of the circle battery meter icon on the ambient display
+         * 0 - 10
+         * default: 0
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_METER_CIRCLE_DOT_LENGTH =
+                "ambient_display_battery_meter_circle_dot_length";
+
+        /**
+         *  Whether to cut the embedded percentage text out of the battery meter icon on the ambient display
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_BATTERY_METER_CUT_OUT_TEXT =
+                "ambient_display_battery_meter_cut_out_text";
 
         /**
          * Wether to show the location in the detailed weather view
