@@ -17,7 +17,7 @@
 
     <!-- Lock screen -->
     <string name="keyguard_indication_discharging">Not charging%1$s</string>
-    <string name="keyguard_indication_discharging_part_time">&#160;(%1$s until empty)</string>
+    <string name="keyguard_indication_discharging_part_time">(%1$s until empty)</string>
     <string name="keyguard_indication_charging">Charging%1$s%2$s</string>
     <string name="keyguard_indication_charging_ac">Charging%1$s on AC%2$s</string>
     <string name="keyguard_indication_charging_usb">Charging%1$s over USB%2$s</string>
