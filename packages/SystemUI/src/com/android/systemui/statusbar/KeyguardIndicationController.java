@@ -28,8 +28,10 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.os.BatteryManager;
 import android.os.BatteryStats;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
@@ -37,12 +39,21 @@ import android.os.UserManager;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
+import com.android.systemui.BatteryMeterBaseDrawable;
+import com.android.systemui.BatteryMeterDrawable;
+import com.android.systemui.BatteryMeterCircleDrawable;
+import com.android.systemui.BatteryMeterArcsDrawable;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.KeyguardIndicationTextView;
 import com.android.systemui.statusbar.phone.LockIcon;
@@ -64,10 +75,25 @@ public class KeyguardIndicationController {
 
     private static final DecimalFormat ONE_DIGITS_FORMAT = new DecimalFormat("##0.#");
 
+    public static final int VERTICAL         = 0;
+    public static final int HORIZONTAL_LEFT  = 1;
+    public static final int HORIZONTAL_RIGHT = 2;
+    public static final int CIRCLE           = 3;
+    public static final int ARCS             = 4;
+    public static final int TEXT             = 5;
+
+    private static final float ROTATION_LEFT_DEGREES  = -90f;
+    private static final float ROTATION_RIGHT_DEGREES = 90f;
+    public static final float ROTATION_NONE           = 0f;
+
     private final Context mContext;
+    private final Resources mResources;
     private final ContentResolver mResolver;
     private final KeyguardIndicationTextView mTextView;
+    private final ImageView mBatteryView;
+    private final TextView mBatteryText;
     private final UserManager mUserManager;
+    private final PowerManager mPowerManager;
     private final IBatteryStats mBatteryInfo;
 
     private final int mSlowThreshold;
@@ -80,6 +106,7 @@ public class KeyguardIndicationController {
     private int mTransientTextColor;
     private boolean mVisible;
 
+    private int mLevel;
     private boolean mPowerPluggedIn;
     private boolean mPowerCharged;
     private int mPlugged;
@@ -95,18 +122,23 @@ public class KeyguardIndicationController {
     private int mChargingSpeed;
     private String mMessageToShowOnScreenOn;
 
+    private boolean mDozing = false;
+
     public KeyguardIndicationController(Context context, KeyguardIndicationTextView textView,
-                                        LockIcon lockIcon) {
+            TextView batteryText, ImageView batteryView, LockIcon lockIcon) {
         mContext = context;
         mResolver = mContext.getContentResolver();
         mTextView = textView;
+        mBatteryText = batteryText;
+        mBatteryView = batteryView;
         mLockIcon = lockIcon;
 
-        Resources res = context.getResources();
-        mSlowThreshold = res.getInteger(R.integer.config_chargingSlowlyThreshold);
-        mFastThreshold = res.getInteger(R.integer.config_chargingFastThreshold);
+        mResources =  mContext.getResources();
+        mSlowThreshold = mResources.getInteger(R.integer.config_chargingSlowlyThreshold);
+        mFastThreshold = mResources.getInteger(R.integer.config_chargingFastThreshold);
 
         mUserManager = context.getSystemService(UserManager.class);
+        mPowerManager = (PowerManager)  mContext.getSystemService(Context.POWER_SERVICE);
         mBatteryInfo = IBatteryStats.Stub.asInterface(
                 ServiceManager.getService(BatteryStats.SERVICE_NAME));
 
@@ -144,7 +176,7 @@ public class KeyguardIndicationController {
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
     public void showTransientIndication(int transientIndication) {
-        showTransientIndication(mContext.getResources().getString(transientIndication));
+        showTransientIndication(mResources.getString(transientIndication));
     }
 
     /**
@@ -185,39 +217,38 @@ public class KeyguardIndicationController {
                     Settings.System.LOCK_SCREEN_SHOW_BATTERY_CHARGING_INFO, 1) == 1;
             boolean showAdvancedBatteryChargingInfo = Settings.System.getInt(mResolver,
                     Settings.System.LOCK_SCREEN_SHOW_ADVANCED_BATTERY_CHARGING_INFO, 0) == 1;
-
+            final int batteryType = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.AMBIENT_DISPLAY_BATTERY_METER_TYPE, 0);
             if (!mUserManager.isUserUnlocked(ActivityManager.getCurrentUser())) {
                 mTextView.switchIndication(com.android.internal.R.string.lockscreen_storage_locked);
-                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
+                setBatteryDrawable();
             } else if (!TextUtils.isEmpty(mTransientIndication)) {
                 mTextView.switchIndication(mTransientIndication);
-                mTextView.setTextColor(mTransientTextColor);
+                setBatteryDrawable();
             } else if (mPowerPluggedIn) {
                 if (showBatteryChargingInfo) {
-                    String indication = computeChargingPowerIndication();
+                    String indication = computeChargingPowerIndication(batteryType);
                     if (DEBUG_CHARGING_SPEED && !showAdvancedBatteryChargingInfo) {
                         indication += ",  " + (mMaxChargingMicroWatt / 1000) + " mW";
                     }
                     mTextView.switchIndication(indication);
-                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
                 } else {
                     mTextView.switchIndication(mRestingIndication);
-                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
                 }
             } else if (showBatteryInfo) {
-                String indication = computePowerIndication();
+                String indication = computePowerIndication(batteryType);
                 mTextView.switchIndication(indication);
-                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
             } else {
                 mTextView.switchIndication(mRestingIndication);
-                mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
+                setBatteryDrawable();
             }
         }
+        mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
     }
 
-    private String computeChargingPowerIndication() {
+    private String computeChargingPowerIndication(int batteryType) {
         if (mPowerCharged) {
-            return mContext.getResources().getString(R.string.keyguard_charged);
+            return mResources.getString(R.string.keyguard_charged);
         }
 
         // Try fetching charging time from battery stats.
@@ -237,7 +268,8 @@ public class KeyguardIndicationController {
         String chargingType = "";
         String pluggedType = "";
         String chargingTime = "";
-        String chargingInfo = "";
+        String chargingInfo =  "";
+        boolean isSingleLine = true;
 
         switch (mChargingSpeed) {
             case KeyguardUpdateMonitor.BatteryStatus.CHARGING_FAST:
@@ -264,15 +296,15 @@ public class KeyguardIndicationController {
         }
 
         if (chargingTypeId > 0) {
-            chargingType = mContext.getResources().getString(chargingTypeId);
+            chargingType = mResources.getString(chargingTypeId);
         }
         if (hasChargingTime) {
             String chargingTimeFormatted = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
                     mContext, chargingTimeRemaining);
-            chargingTime = mContext.getResources().getString
+            chargingTime = mResources.getString
                     (R.string.keyguard_indication_charging_part_time, chargingTimeFormatted);
         }
-        chargingInfo = mContext.getResources().getString(pluggedTypeId, chargingType, chargingTime);
+        chargingInfo = mResources.getString(pluggedTypeId, chargingType, chargingTime);
 
         boolean onFirstRow = true;
         int count = 0;
@@ -288,6 +320,7 @@ public class KeyguardIndicationController {
                         ? (mMaxChargingMicroAmp / 1000) + " mA)" : "N/A)");
                 onFirstRow = false;
                 count += 1;
+                isSingleLine = false;
             }
             if (mCurrentMicroVolt > 0 || mMaxChargingMicroVolt > 0) {
                 if (onFirstRow) {
@@ -310,6 +343,7 @@ public class KeyguardIndicationController {
                     } else {
                         count = 0;
                     }
+                    isSingleLine = false;
                 } else {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
@@ -322,6 +356,7 @@ public class KeyguardIndicationController {
             if (mCurrentMicroWatt > 0 || mMaxChargingMicroWatt > 0) {
                 if (onFirstRow || count == 2) {
                     chargingInfo += "\n";
+                    isSingleLine = false;
                 } else {
                     chargingInfo += count == 0 ? "" : ", ";
                 }
@@ -331,10 +366,11 @@ public class KeyguardIndicationController {
                         ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroWatt/ 1000000f) + " W)" : "N/A)");
             }
         }
+        setBatteryDrawable(batteryType, isSingleLine);
         return chargingInfo;
     }
 
-    private String computePowerIndication() {
+    private String computePowerIndication(int batteryType) {
         // Try fetching battery remaining time from battery stats.
         long batteryTimeRemaining = 0;
         try {
@@ -350,21 +386,135 @@ public class KeyguardIndicationController {
         int batteryId = R.string.keyguard_indication_discharging;
         String batteryTime = "";
         String batteryInfo = "";
-
+        String newLineOrSpace = "";
         if (hasBatteryTime) {
             String batteryTimeFormatted = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
                     mContext, batteryTimeRemaining);
-            batteryTime = mContext.getResources().getString(
+            batteryTime = mResources.getString(
                     R.string.keyguard_indication_discharging_part_time, batteryTimeFormatted);
+            if (mDozing && batteryType < 6) {
+                newLineOrSpace = "\n";
+            } else {
+                newLineOrSpace = " ";
+            }
         }
-        batteryInfo = mContext.getResources().getString(batteryId, batteryTime);
+        batteryInfo = mResources.getString(batteryId, newLineOrSpace + batteryTime);
 
         if (showBatteryTemp) {
             if (mCurrentTemperature > 0) {
                 batteryInfo += (batteryInfo.isEmpty() ? "" : ", ") + mCurrentTemperature / 10 + " °C";
             }
         }
+        setBatteryDrawable(batteryType, newLineOrSpace.isEmpty());
         return batteryInfo;
+    }
+
+    private void setBatteryDrawable() {
+        // hide battery drawable
+        setBatteryDrawable(6, true);
+    }
+
+    private void setBatteryDrawable(int batteryType, boolean isSingleLine) {
+        boolean isPowerSaveMode = mPowerManager.isPowerSaveMode();
+        BatteryMeterBaseDrawable drawable = null;
+        String batteryText = null;
+        int marginStart = 0;
+        float batteryTextSize = 0f;
+
+        final int batteryWarningColor = mContext.getColor(com.android.internal.R.color.battery_saver_mode_color);
+        final int textColor = mLevel > 15 || isPowerSaveMode
+                ? LockScreenColorHelper.getPrimaryTextColor(mContext) : batteryWarningColor;
+        if (mDozing && batteryType < 6) {
+            int batteryHeight = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+            int batteryWidth = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_icon_width);
+            marginStart = mResources.getDimensionPixelSize(R.dimen.keyguard_indication_text_margin_start);
+
+            final int iconColor = LockScreenColorHelper.getIconColor(mContext);
+            final int batteryTextColor = LockScreenColorHelper.getAmbientDisplayBatteryTextColor(mContext);
+
+            final boolean showText = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.AMBIENT_DISPLAY_BATTERY_METER_SHOW_TEXT, 0) == 1;
+            final int interval = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.AMBIENT_DISPLAY_BATTERY_METER_CIRCLE_DOT_INTERVAL, 0);
+            final int length = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.AMBIENT_DISPLAY_BATTERY_METER_CIRCLE_DOT_LENGTH, 0);
+            final boolean cutOut = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.AMBIENT_DISPLAY_BATTERY_METER_CUT_OUT_TEXT, 1) == 1;
+
+            switch (batteryType) {
+                case HORIZONTAL_LEFT:
+                    drawable = new BatteryMeterDrawable(mContext, new Handler(Looper.getMainLooper()),
+                            ROTATION_LEFT_DEGREES, ROTATION_RIGHT_DEGREES);
+                    batteryWidth = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+                    break;
+                case HORIZONTAL_RIGHT:
+                    drawable = new BatteryMeterDrawable(mContext, new Handler(Looper.getMainLooper()),
+                            ROTATION_RIGHT_DEGREES, ROTATION_LEFT_DEGREES);
+                    batteryWidth = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+                    break;
+                case CIRCLE:
+                    drawable = new BatteryMeterCircleDrawable(mContext, new Handler(Looper.getMainLooper()));
+                    batteryWidth = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+                    break;
+                case ARCS:
+                    drawable = new BatteryMeterArcsDrawable(mContext, new Handler(Looper.getMainLooper()));
+                    batteryHeight = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_arcs_size);
+                    batteryWidth = mResources.getDimensionPixelSize(R.dimen.status_bar_battery_arcs_size);
+                    break;
+                case TEXT:
+                    batteryText = mDozing ? String.valueOf(mLevel) + "% - " : null;
+                    batteryTextSize = mDozing ? mResources.getDimensionPixelSize(
+                            com.android.internal.R.dimen.text_size_small_material) : 0f;
+                    break;
+                default:
+                    drawable = new BatteryMeterDrawable(mContext, new Handler(Looper.getMainLooper()),
+                            ROTATION_NONE, ROTATION_NONE);
+                    break;
+            }
+
+            if (drawable != null) {
+                drawable.setIconColor(iconColor);
+                drawable.setTextColor(batteryTextColor);
+                drawable.setTextVisibility(showText);
+                drawable.setCircleDots(interval, length);
+                drawable.setCutOutText(cutOut);
+                // The battery/charging info text already indicates the charging state,
+                // to prevent the battery drawable to draw the charging bolt,
+                // set "pluggedIn" and "charging" to false.
+                drawable.onBatteryLevelChanged(mLevel, false /* pluggedIn */, false /* charging */);
+                drawable.onPowerSaveChanged(mPowerManager.isPowerSaveMode());
+            }
+
+            LayoutParams lpiv = new LayoutParams(batteryWidth * (isSingleLine ? 1 : 2),
+                    batteryHeight * (isSingleLine ? 1 : 2));
+            lpiv.gravity = Gravity.CENTER_VERTICAL;
+            mBatteryView.setLayoutParams(lpiv);
+        }
+
+        LayoutParams lptv = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        lptv.gravity = Gravity.CENTER_VERTICAL;
+        if (marginStart != 0 && !isSingleLine) {
+            marginStart *= 2;
+        }
+        lptv.setMarginStart(marginStart);
+        mTextView.setLayoutParams(lptv);
+        mTextView.requestLayout();
+
+        mBatteryView.setImageDrawable(drawable);
+        mBatteryView.setVisibility(drawable == null ? View.GONE : View.VISIBLE);
+        mBatteryText.setText(batteryText);
+
+        if (batteryTextSize != 0f && !isSingleLine) {
+            batteryTextSize *= 2;
+        }
+        mBatteryText.setTextSize(TypedValue.COMPLEX_UNIT_PX, batteryTextSize);
+        mBatteryText.setVisibility(batteryText == null ? View.GONE : View.VISIBLE);
+        mBatteryText.setTextColor(textColor);
+    }
+
+    public void setDozing(boolean dozing) {
+        mDozing = dozing;
+        updateIndication();
     }
 
     KeyguardUpdateMonitorCallback mUpdateMonitor = new KeyguardUpdateMonitorCallback() {
@@ -377,6 +527,7 @@ public class KeyguardIndicationController {
 
             boolean isChargingOrFull = status.status == BatteryManager.BATTERY_STATUS_CHARGING
                     || status.status == BatteryManager.BATTERY_STATUS_FULL;
+            mLevel = status.level;
             mPowerPluggedIn = status.isPluggedIn() && isChargingOrFull;
             mPowerCharged = status.isCharged();
             mPlugged = status.plugged;
@@ -399,7 +550,7 @@ public class KeyguardIndicationController {
             if (!updateMonitor.isUnlockingWithFingerprintAllowed()) {
                 return;
             }
-            int errorColor = mContext.getResources().getColor(R.color.system_warning_color, null);
+            int errorColor = mResources.getColor(R.color.system_warning_color, null);
             if (mStatusBarKeyguardViewManager.isBouncerShowing()) {
                 mStatusBarKeyguardViewManager.showBouncerMessage(helpString, errorColor);
             } else if (updateMonitor.isDeviceInteractive()) {
@@ -421,7 +572,7 @@ public class KeyguardIndicationController {
                     || msgId == FingerprintManager.FINGERPRINT_ERROR_CANCELED) {
                 return;
             }
-            int errorColor = mContext.getResources().getColor(R.color.system_warning_color, null);
+            int errorColor = mResources.getColor(R.color.system_warning_color, null);
             if (mStatusBarKeyguardViewManager.isBouncerShowing()) {
                 // When swiping up right after receiving a fingerprint error, the bouncer calls
                 // authenticate leading to the same message being shown again on the bouncer.
@@ -444,7 +595,7 @@ public class KeyguardIndicationController {
         @Override
         public void onScreenTurnedOn() {
             if (mMessageToShowOnScreenOn != null) {
-                int errorColor = mContext.getResources().getColor(R.color.system_warning_color,
+                int errorColor = mResources.getColor(R.color.system_warning_color,
                         null);
                 showTransientIndication(mMessageToShowOnScreenOn, errorColor);
                 // We want to keep this message around in case the screen was off

@@ -24,17 +24,41 @@
     android:outlineProvider="none"
     android:elevation="5dp" > <!-- Put it above the status bar header -->
 
-    <com.android.systemui.statusbar.phone.KeyguardIndicationTextView
-        android:id="@+id/keyguard_indication_text"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/keyguard_indication_Layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/keyguard_indication_margin_bottom"
-        android:layout_gravity="bottom|center_horizontal"
-        android:gravity="center_horizontal"
-        android:textStyle="italic"
-        android:textColor="#ffffff"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:accessibilityLiveRegion="polite" />
+        android:layout_gravity="bottom|center_horizontal">
+
+        <TextView
+            android:id="@+id/keyguard_indication_battery_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textStyle="italic"
+            android:textColor="#ffffff"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/keyguard_indication_battery_icon"
+            android:layout_width="@dimen/status_bar_battery_icon_width"
+            android:layout_height="@dimen/status_bar_battery_icon_height"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone"/>
+
+        <com.android.systemui.statusbar.phone.KeyguardIndicationTextView
+            android:id="@+id/keyguard_indication_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textStyle="italic"
+            android:textColor="#ffffff"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:accessibilityLiveRegion="polite" />
+
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/preview_container"

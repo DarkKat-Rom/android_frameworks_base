@@ -15,6 +15,11 @@
 -->
 <resources>
 
+    <!-- Ambient display -->
+
+    <!-- Start margin of the keyguard indication text, when the battery meter is visible -->
+    <dimen name="keyguard_indication_text_margin_start">6dp</dimen>
+
     <!-- Status bar -->
 
     <!-- Weather layout start padding -->
