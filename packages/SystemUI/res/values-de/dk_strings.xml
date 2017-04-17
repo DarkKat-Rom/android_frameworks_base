@@ -17,7 +17,7 @@
 
     <!-- Lock screen -->
     <string name="keyguard_indication_discharging">Wird nicht aufgeladen%1$s</string>
-    <string name="keyguard_indication_discharging_part_time">&#160;(entladen in %1$s)</string>
+    <string name="keyguard_indication_discharging_part_time">(entladen in %1$s)</string>
     <string name="keyguard_indication_charging">%1$sAufladen%2$s</string>
     <string name="keyguard_indication_charging_ac">%1$sAufladen über Netzteil%2$s</string>
     <string name="keyguard_indication_charging_usb">%1$sAufladen über USB%2$s</string>
