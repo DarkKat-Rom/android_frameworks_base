@@ -20,9 +20,10 @@
         (additional colors) -->
     <color name="system_primary_color">#ff263238</color><!-- material blue grey 900 -->
 
-    <color name="notification_guts_seekbar_tick_mark_tint">#ff000000</color>
-    <color name="notification_children_divider_color">#1f000000</color>
     <color name="qs_tile_adapter_bg">#ff384248</color>
+
+    <color name="empty_shade_view_default_text_color">#e6ffffff</color>
+    <color name="notification_dismiss_all_default_text_color">#ffffffff</color>
 
     <!-- Slim recent app screen -->
 

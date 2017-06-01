@@ -99,6 +99,7 @@ import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.internal.messages.SystemMessageProto.SystemMessage;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -986,6 +987,9 @@ public abstract class BaseStatusBar extends SystemUI implements
                 bindGuts(entry.row);
             }
             inflateViews(entry, mStackScroller);
+            if (!entry.isDefaultNotificationTheme) {
+                entry.isDefaultNotificationTheme = true;
+            }
         }
     }
 
@@ -1038,6 +1042,10 @@ public abstract class BaseStatusBar extends SystemUI implements
         updateNotificationColors(entry);
     }
 
+    protected boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
+    }
+
     protected void updateNotificationColors() {
         ArrayList<Entry> activeNotifications = mNotificationData.getActiveNotifications();
         final int notificationCount = activeNotifications.size();
@@ -1048,6 +1056,19 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     private void updateNotificationColors(NotificationData.Entry entry) {
+        if (isDefaultNotificationTheme()) {
+            if (!entry.isDefaultNotificationTheme) {
+                entry.isDefaultNotificationTheme = true;
+                boolean exposedGuts = entry.row.getGuts() == mNotificationGutsExposed;
+                entry.row.reInflateViews();
+                if (exposedGuts) {
+                    mNotificationGutsExposed = entry.row.getGuts();
+                    bindGuts(entry.row);
+                }
+                inflateViews(entry, mStackScroller);
+            }
+            return;
+        }
         final ExpandableNotificationRow enr = (ExpandableNotificationRow) entry.row;
         final NotificationContentView contentContainer = entry.row.getPrivateLayout();
         final NotificationContentView contentContainerPublic = entry.row.getPublicLayout();
@@ -1080,6 +1101,9 @@ public abstract class BaseStatusBar extends SystemUI implements
             if (enr.getChildrenContainer() != null) {
                 enr.getChildrenContainer().setTextColor();
                 enr.getChildrenContainer().setIconColor();
+            }
+            if (entry.isDefaultNotificationTheme) {
+                entry.isDefaultNotificationTheme = false;
             }
         }
 

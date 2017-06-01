@@ -16,9 +16,12 @@
 
 package com.android.systemui.statusbar.stack;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.android.internal.util.darkkat.ThemeHelper;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.DismissView;
@@ -99,12 +102,12 @@ public class StackScrollState {
      * Apply the properties saved in {@link #mStateMap} to the children of the {@link #mHostView}.
      * The properties are only applied if they effectively changed.
      */
-    public void apply() {
+    public void apply(Context context) {
         int numChildren = mHostView.getChildCount();
         for (int i = 0; i < numChildren; i++) {
             ExpandableView child = (ExpandableView) mHostView.getChildAt(i);
             StackViewState state = mStateMap.get(child);
-            if (!applyState(child, state)) {
+            if (!applyState(context, child, state)) {
                 continue;
             }
             if (child instanceof DismissView) {
@@ -125,7 +128,7 @@ public class StackScrollState {
      *
      * @return whether the state was applied correctly
      */
-    public boolean applyState(ExpandableView view, StackViewState state) {
+    public boolean applyState(Context context, ExpandableView view, StackViewState state) {
         if (state == null) {
             Log.wtf(CHILD_NOT_FOUND_TAG, "No child state was found when applying this state " +
                     "to the hostView");
@@ -163,7 +166,9 @@ public class StackScrollState {
         view.setBelowSpeedBump(state.belowSpeedBump);
 
         // apply dark
-        view.setDark(state.dark, false /* animate */, 0 /* delay */);
+        if (isDefaultNotificationTheme(context)) {
+            view.setDark(state.dark, false /* animate */, 0 /* delay */);
+        }
 
         // apply clipping
         float oldClipTopAmount = view.getClipTopAmount();
@@ -228,5 +233,9 @@ public class StackScrollState {
         if (zTranslation != newZTranslation) {
             view.setTranslationZ(newZTranslation);
         }
+    }
+
+    private boolean isDefaultNotificationTheme(Context context) {
+        return ThemeHelper.getNotificationTheme(context) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

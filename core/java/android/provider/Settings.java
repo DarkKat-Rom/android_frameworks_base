@@ -4389,6 +4389,13 @@ public final class Settings {
         public static final String SLIM_RECENTS_SHOW_ACTIONS_WHEN_COLLAPSED =
                 "slim_recents_show_actions_when_collapsed";
 
+        /**
+         * Whether to use the global theme and colorize the notifications
+         * @hide
+         */
+        public static final String EXPERIMENTAL_ENABLE_NOTIFICATIONS_THEME_COLORS =
+                "experimental_enable_notification_theme_colors";
+
         // DarkKat additions end
 
         // SlimRoms additions
