@@ -21,9 +21,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
+
+import com.android.internal.util.darkkat.ThemeHelper;
 
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -108,11 +111,11 @@ public class StackStateAnimator {
         return !mAnimatorSet.isEmpty();
     }
 
-    public void startAnimationForEvents(
+    public void startAnimationForEvents(Context context,
             ArrayList<NotificationStackScrollLayout.AnimationEvent> mAnimationEvents,
             StackScrollState finalState, long additionalDelay) {
 
-        processAnimationEvents(mAnimationEvents, finalState);
+        processAnimationEvents(context, mAnimationEvents, finalState);
 
         int childCount = mHostLayout.getChildCount();
         mAnimationFilter.applyCombination(mNewEvents);
@@ -124,11 +127,11 @@ public class StackStateAnimator {
 
             StackViewState viewState = finalState.getViewStateForView(child);
             if (viewState == null || child.getVisibility() == View.GONE
-                    || applyWithoutAnimation(child, viewState, finalState)) {
+                    || applyWithoutAnimation(context, child, viewState, finalState)) {
                 continue;
             }
 
-            startStackAnimations(child, viewState, finalState, i, -1 /* fixedDelay */);
+            startStackAnimations(context, child, viewState, finalState, i, -1 /* fixedDelay */);
         }
         if (!isRunning()) {
             // no child has preformed any animation, lets finish
@@ -145,8 +148,8 @@ public class StackStateAnimator {
      *
      * @return true if no animation should be performed
      */
-    private boolean applyWithoutAnimation(ExpandableView child, StackViewState viewState,
-            StackScrollState finalState) {
+    private boolean applyWithoutAnimation(Context context, ExpandableView child,
+            StackViewState viewState, StackScrollState finalState) {
         if (mShadeExpanded) {
             return false;
         }
@@ -162,7 +165,7 @@ public class StackStateAnimator {
             // This is another headsUp which might move. Let's animate!
             return false;
         }
-        finalState.applyState(child, viewState);
+        finalState.applyState(context, child, viewState);
         return true;
     }
 
@@ -193,8 +196,8 @@ public class StackStateAnimator {
      *          ignored otherwise
      * @param fixedDelay a fixed delay if desired or -1 if the delay should be calculated
      */
-    public void startStackAnimations(final ExpandableView child, StackViewState viewState,
-            StackScrollState finalState, int i, long fixedDelay) {
+    public void startStackAnimations(Context context, final ExpandableView child,
+            StackViewState viewState, StackScrollState finalState, int i, long fixedDelay) {
         boolean wasAdded = mNewAddChildren.contains(child);
         long duration = mCurrentLength;
         if (wasAdded && mAnimationFilter.hasGoToFullShadeEvent) {
@@ -255,7 +258,9 @@ public class StackStateAnimator {
                 delay, duration);
 
         // start dark animation
-        child.setDark(viewState.dark, mAnimationFilter.animateDark, delay);
+        if (isDefaultNotificationTheme(context)) {
+            child.setDark(viewState.dark, mAnimationFilter.animateDark, delay);
+        }
 
         if (wasAdded) {
             child.performAddAnimation(delay, mCurrentLength);
@@ -855,7 +860,7 @@ public class StackStateAnimator {
      * @param animationEvents the animation events for the animation to perform
      * @param finalState the final state to animate to
      */
-    private void processAnimationEvents(
+    private void processAnimationEvents(Context context,
             ArrayList<NotificationStackScrollLayout.AnimationEvent> animationEvents,
             StackScrollState finalState) {
         for (NotificationStackScrollLayout.AnimationEvent event : animationEvents) {
@@ -870,7 +875,7 @@ public class StackStateAnimator {
                     // The position for this child was never generated, let's continue.
                     continue;
                 }
-                finalState.applyState(changingView, viewState);
+                finalState.applyState(context, changingView, viewState);
                 mNewAddChildren.add(changingView);
 
             } else if (event.animationType ==
@@ -928,7 +933,7 @@ public class StackStateAnimator {
                     mTmpState.yTranslation = -mTmpState.height;
                 }
                 mHeadsUpAppearChildren.add(changingView);
-                finalState.applyState(changingView, mTmpState);
+                finalState.applyState(context, changingView, mTmpState);
             } else if (event.animationType == NotificationStackScrollLayout
                             .AnimationEvent.ANIMATION_TYPE_HEADS_UP_DISAPPEAR ||
                     event.animationType == NotificationStackScrollLayout
@@ -1045,5 +1050,9 @@ public class StackStateAnimator {
 
     public void setShadeExpanded(boolean shadeExpanded) {
         mShadeExpanded = shadeExpanded;
+    }
+
+    private boolean isDefaultNotificationTheme(Context context) {
+        return ThemeHelper.getNotificationTheme(context) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

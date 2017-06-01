@@ -56,6 +56,7 @@ public class NotificationData {
         public boolean legacy; // whether the notification has a legacy, dark background
         public int targetSdk;
         private long lastFullScreenIntentLaunchTime = NOT_LAUNCHED_YET;
+        public boolean isDefaultNotificationTheme = true;
         public RemoteViews cachedContentView;
         public RemoteViews cachedBigContentView;
         public RemoteViews cachedHeadsUpContentView;

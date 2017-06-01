@@ -668,6 +668,9 @@ public class ExpandableNotificationRow extends ActivatableNotificationView {
             addView(mSettingsIconRow, settingsIndex);
 
         }
+        if (isDefaultNotificationTheme()) {
+            setDefaultColor();
+        }
         mPrivateLayout.reInflateViews();
         mPublicLayout.reInflateViews();
     }
@@ -1356,7 +1359,9 @@ public class ExpandableNotificationRow extends ActivatableNotificationView {
         NotificationContentView showingLayout = getShowingLayout();
         showingLayout.updateBackgroundColor(animated);
         mPrivateLayout.updateExpandButtons(isExpandable());
-        showingLayout.setDark(isDark(), false /* animate */, 0 /* delay */);
+        if (isDefaultNotificationTheme()) {
+            showingLayout.setDark(isDark(), false /* animate */, 0 /* delay */);
+        }
         mShowingPublicInitialized = true;
     }
 

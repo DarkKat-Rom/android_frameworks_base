@@ -454,6 +454,13 @@ public class NotificationStackScrollLayout extends ViewGroup
         mBackgroundPaint.setColor(mBgColor);
         invalidate();
     }
+
+    public void setBgColor(int color) {
+        mBgColor = color;
+        mBackgroundPaint.setColor(mBgColor);
+        invalidate();
+    }
+
     private void initView(Context context) {
         mScroller = new OverScroller(getContext());
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
@@ -2666,7 +2673,7 @@ public class NotificationStackScrollLayout extends ViewGroup
         }
         if (!mAnimationEvents.isEmpty() || isCurrentlyAnimating()) {
             setAnimationRunning(true);
-            mStateAnimator.startAnimationForEvents(mAnimationEvents, mCurrentStackScrollState,
+            mStateAnimator.startAnimationForEvents(mContext, mAnimationEvents, mCurrentStackScrollState,
                     mGoToFullShadeDelay);
             mAnimationEvents.clear();
             updateBackground();
@@ -3301,7 +3308,7 @@ public class NotificationStackScrollLayout extends ViewGroup
     }
 
     private void applyCurrentState() {
-        mCurrentStackScrollState.apply();
+        mCurrentStackScrollState.apply(mContext);
         if (mListener != null) {
             mListener.onChildLocationsChanged(this);
         }

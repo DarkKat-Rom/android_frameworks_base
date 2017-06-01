@@ -24,6 +24,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,9 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
+
+import com.android.internal.util.darkkat.ColorHelper;
+import com.android.internal.util.darkkat.ThemeHelper;
 
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -182,11 +186,14 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         setClipChildren(false);
         setClipToPadding(false);
         mLegacyColor = context.getColor(R.color.notification_legacy_background_color);
-        mNormalColor = context.getColor(R.color.notification_material_background_color);
-        mLowPriorityColor = context.getColor(
-                R.color.notification_material_background_low_priority_color);
-        mNormalColor = NotifColorHelper.getPrimaryBackgroundColor(context);
-        mLowPriorityColor = NotifColorHelper.getLowBackgroundColor(context);
+        if (isDefaultNotificationTheme()) {
+            mNormalColor = context.getColor(R.color.notification_material_background_color);
+            mLowPriorityColor = context.getColor(
+                    R.color.notification_material_background_low_priority_color);
+        } else {
+            mNormalColor = NotifColorHelper.getPrimaryBackgroundColor(context);
+            mLowPriorityColor = NotifColorHelper.getLowBackgroundColor(context);
+        }
         mTintedRippleColor = context.getColor(
                 R.color.notification_ripple_tinted_color);
         mLowPriorityRippleColor = context.getColor(
@@ -202,9 +209,16 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mBackgroundNormal = (NotificationBackgroundView) findViewById(R.id.backgroundNormal);
         mFakeShadow = (FakeShadowView) findViewById(R.id.fake_shadow);
         mBackgroundDimmed = (NotificationBackgroundView) findViewById(R.id.backgroundDimmed);
-        mBackgroundNormal.setCustomBackground(R.drawable.notification_material_bg);
-        mBackgroundDimmed.setCustomBackground(R.drawable.notification_material_bg_dim);
-        setNormalColor();
+        Drawable bg = mContext.getDrawable(R.drawable.notification_material_bg).mutate();
+        Drawable bgDimmed = mContext.getDrawable(
+                R.drawable.notification_material_bg_dim).mutate();
+        mBackgroundNormal.setCustomBackground(bg);
+        mBackgroundDimmed.setCustomBackground(bgDimmed);
+        if (isDefaultNotificationTheme()) {
+            setDefaultColor();
+        } else {
+            setNormalColor();
+        }
         updateBackground();
         updateBackgroundTint();
         updateOutlineAlpha();
@@ -887,15 +901,37 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
     }
 
     protected int getRippleColor() {
-        if (mBgTint != 0) {
-            return mTintedRippleColor;
-        } else if (mShowingLegacyBackground) {
-            return mTintedRippleColor;
-        } else if (mIsBelowSpeedBump) {
-            return mLowPriorityRippleColor;
+        int rippleColor = 0;
+        if (isDefaultNotificationTheme()) {
+            if (mBgTint != 0) {
+                rippleColor = mTintedRippleColor;
+            } else if (mShowingLegacyBackground) {
+                rippleColor = mTintedRippleColor;
+            } else if (mIsBelowSpeedBump) {
+                rippleColor = mLowPriorityRippleColor;
+            } else {
+                rippleColor = mNormalRippleColor;
+            }
         } else {
-            return mNormalRippleColor;
+            int bgColor = calculateBgColor(true);
+            rippleColor = mTintedRippleColor;
+            if (ColorHelper.isColorGrayscale(bgColor) && !ColorHelper.isColorDark(bgColor)) {
+                rippleColor = mNormalRippleColor;
+            }
         }
+        return rippleColor;
+    }
+
+    protected void setDefaultColor() {
+        mNormalColor = mContext.getColor(R.color.notification_material_background_color);
+        mLowPriorityColor = mContext.getColor(
+                R.color.notification_material_background_low_priority_color);
+        int rippleColor = getRippleColor();
+        mBackgroundNormal.setNormalOrDimmedBackground(mNormalColor);
+        mBackgroundDimmed.setNormalOrDimmedBackground(
+                mContext.getColor(R.color.notification_material_background_dimmed_color));
+        mBackgroundDimmed.setRippleColor(rippleColor);
+        mBackgroundNormal.setRippleColor(rippleColor);
     }
 
     public void setNormalColor() {
@@ -909,9 +945,12 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
             mNormalColor = NotifColorHelper.getPrimaryBackgroundColor(mContext);
         }
         mLowPriorityColor = NotifColorHelper.getLowBackgroundColor(mContext);
+        int rippleColor = getRippleColor();
         mBackgroundNormal.setNormalOrDimmedBackground(mNormalColor);
         mBackgroundDimmed.setNormalOrDimmedBackground(
                 NotifColorHelper.getDimmedBackgroundColor(mNormalColor));
+        mBackgroundDimmed.setRippleColor(rippleColor);
+        mBackgroundNormal.setRippleColor(rippleColor);
     }
 
     /**
@@ -988,5 +1027,9 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
     public interface OnActivatedListener {
         void onActivated(ActivatableNotificationView view);
         void onActivationReset(ActivatableNotificationView view);
+    }
+
+    protected boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

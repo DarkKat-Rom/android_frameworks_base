@@ -41,7 +41,6 @@ import android.app.IActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.StatusBarManager;
-import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
@@ -680,6 +679,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.USE_SLIM_RECENTS),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.EXPERIMENTAL_ENABLE_NOTIFICATIONS_THEME_COLORS),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -718,9 +720,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR))) {
                 updateStatusBarExpandedRippleColor();
             } else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.NOTIFICATION_USE_THEME_COLORS))) {
-                updateNotificationUseThemeColors();
-            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_USE_THEME_COLORS))
+                || uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_PRIMARY_BACKGROUND_COLOR))
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_SECONDARY_BACKGROUND_COLOR))
@@ -729,7 +730,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_TEXT_COLOR))
                 || uri.equals(Settings.System.getUriFor(
-                    Settings.System.NOTIFICATION_ICON_COLOR))) {
+                    Settings.System.NOTIFICATION_ICON_COLOR))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.EXPERIMENTAL_ENABLE_NOTIFICATIONS_THEME_COLORS))) {
                 updateNotificationColors();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_DISMISS_ALL_COLOR))) {
@@ -1484,8 +1487,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateClearAll();
         inflateEmptyShadeView();
         updateEmptyShadeView();
-        mEmptyShadeView.setTextColor();
-        mDismissView.setTextColor();
+        updateNotificationDismissAllColor();
         inflateOverflowContainer();
         mStatusBarKeyguardViewManager.onDensityOrFontScaleChanged();
         mUserInfoController.onDensityOrFontScaleChanged();
@@ -2969,20 +2971,27 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
-    private void updateNotificationUseThemeColors() {
-        updateNotificationColors();
-    }
-
     @Override
     protected void updateNotificationColors() {
         super.updateNotificationColors();
-        mStackScroller.setBgColor();
+        if (isDefaultNotificationTheme()) {
+            mStackScroller.setBgColor(mContext.getColor(R.color.notification_shade_background_color));
+        } else {
+            mStackScroller.setBgColor();
+        }
         updateNotificationDismissAllColor();
     }
 
     private void updateNotificationDismissAllColor() {
-        mEmptyShadeView.setTextColor();
-        mDismissView.setTextColor();
+        if (isDefaultNotificationTheme()) {
+            mEmptyShadeView.setTextColor(mContext.getColor(
+                    R.color.empty_shade_view_default_text_color));
+            mDismissView.setTextColor(mContext.getColor(
+                    R.color.notification_dismiss_all_default_text_color));
+        } else {
+            mEmptyShadeView.setTextColor();
+            mDismissView.setTextColor();
+        }
     }
 
     private void updateWeatherVisibility() {
@@ -5321,7 +5330,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         Trace.beginSection("PhoneStatusBar#updateDozingState");
         boolean animate = !mDozing && mDozeScrimController.isPulsing();
         mNotificationPanel.setDozing(mDozing, animate);
-//        mStackScroller.setDark(mDozing && isThemeLight(), animate, mWakeUpTouchLocation);
+        mStackScroller.setDark(mDozing && isDefaultNotificationTheme(), animate, mWakeUpTouchLocation);
         mScrimController.setDozing(mDozing);
 
         // Immediately abort the dozing from the doze scrim controller in case of wake-and-unlock
@@ -5331,12 +5340,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         != FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING, animate);
         Trace.endSection();
         mVisualizerView.setDozing(mDozing);
-    }
-
-    private boolean isThemeLight() {
-        final UiModeManager uiManager = (UiModeManager) mContext.getSystemService(
-                Context.UI_MODE_SERVICE);
-        return uiManager.getNightMode() == 1;
     }
 
     public void updateStackScrollerState(boolean goingToFullShade, boolean fromShadeLocked) {

@@ -45,6 +45,7 @@ import android.widget.TextView;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.settingslib.Utils;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -147,19 +148,21 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mBackground = getColoredBackground();
-        mImportanceSummary = (TextView) findViewById(R.id.summary);
-        mImportanceTitle = (TextView) findViewById(R.id.title);
-        mSeekBar = (SeekBar) findViewById(R.id.seekbar);
-        mBlock = (RadioButton) findViewById(R.id.block_importance);
-        mSilent = (RadioButton) findViewById(R.id.silent_importance);
-        mReset = (RadioButton)findViewById(R.id.reset_importance);
-        mAutoButton = (ImageView) findViewById(R.id.auto_importance);
+        mBackground = mContext.getDrawable(R.drawable.notification_guts_bg).mutate();
+        if (!isDefaultNotificationTheme()) {
+            mImportanceSummary = (TextView) findViewById(R.id.summary);
+            mImportanceTitle = (TextView) findViewById(R.id.title);
+            mSeekBar = (SeekBar) findViewById(R.id.seekbar);
+            mBlock = (RadioButton) findViewById(R.id.block_importance);
+            mSilent = (RadioButton) findViewById(R.id.silent_importance);
+            mReset = (RadioButton)findViewById(R.id.reset_importance);
+            mAutoButton = (ImageView) findViewById(R.id.auto_importance);
+            setColor();
+        }
 
         if (mBackground != null) {
             mBackground.setCallback(this);
         }
-        setColor();
     }
 
     @Override
@@ -272,6 +275,11 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
                         resetFalsingCheck();
                     }
                 });
+        if (isDefaultNotificationTheme()) {
+            mBlock = (RadioButton) importanceButtons.findViewById(R.id.block_importance);
+            mSilent = (RadioButton) importanceButtons.findViewById(R.id.silent_importance);
+            mReset = (RadioButton) importanceButtons.findViewById(R.id.reset_importance);
+        }
         if (nonBlockable) {
             mBlock.setVisibility(View.GONE);
             mReset.setText(mContext.getString(R.string.do_not_silence));
@@ -288,6 +296,15 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
     }
 
     private void bindSlider(final View importanceSlider, final boolean nonBlockable) {
+        if (isDefaultNotificationTheme()) {
+            mActiveSliderTint = ColorStateList.valueOf(Utils.getColorAccent(mContext));
+            mInactiveSliderTint = loadColorStateList(R.color.notification_guts_disabled_slider_color);
+
+            mImportanceSummary = ((TextView) importanceSlider.findViewById(R.id.summary));
+            mImportanceTitle = ((TextView) importanceSlider.findViewById(R.id.title));
+            mSeekBar = (SeekBar) importanceSlider.findViewById(R.id.seekbar);
+        }
+
         final int minProgress = nonBlockable ?
                 NotificationListenerService.Ranking.IMPORTANCE_MIN
                 : NotificationListenerService.Ranking.IMPORTANCE_NONE;
@@ -319,6 +336,9 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
 
         });
         mSeekBar.setProgress(mNotificationImportance);
+        if (isDefaultNotificationTheme()) {
+            mAutoButton = (ImageView) importanceSlider.findViewById(R.id.auto_importance);
+        }
         mAutoButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -333,9 +353,19 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
     private void applyAuto() {
         final float alpha = mAuto ? mInactiveSliderAlpha : mActiveSliderAlpha;
 
-        mSeekBar.setEnabled(!mAuto);
-        mSeekBar.setAlpha(alpha);
-        setAutoButtonColor();
+        if (isDefaultNotificationTheme()) {
+            mSeekBar.setEnabled(!mAuto);
+
+            final ColorStateList starTint = mAuto ?  mActiveSliderTint : mInactiveSliderTint;
+            Drawable icon = mAutoButton.getDrawable().mutate();
+            icon.setTintList(starTint);
+            mAutoButton.setImageDrawable(icon);
+            mSeekBar.setAlpha(alpha);
+        } else {
+            mSeekBar.setEnabled(!mAuto);
+            mSeekBar.setAlpha(alpha);
+            setAutoButtonColor();
+        }
         if (mAuto) {
             mSeekBar.setProgress(mNotificationImportance);
             mImportanceSummary.setText(mContext.getString(
@@ -477,7 +507,7 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
         ((TextView) findViewById(R.id.more_settings)).setTextColor(accentColor);
         ((TextView) findViewById(R.id.done)).setTextColor(accentColor);
 
-        mBackground = getColoredBackground();
+        colorizeBackground();
 
         if (mImportanceTitle != null) {
             mImportanceTitle.setTextColor(textColorPrimary);
@@ -522,13 +552,16 @@ public class NotificationGuts extends LinearLayout implements TunerService.Tunab
         }
     }
 
-    private Drawable getColoredBackground() {
+    private void colorizeBackground() {
         if (mBackground == null) {
             mBackground = mContext.getDrawable(R.drawable.notification_guts_bg).mutate();
         }
         if (mBackground instanceof GradientDrawable) {
             ((GradientDrawable) mBackground).setColor(NotifColorHelper.getSecondaryBackgroundColor(mContext));
         }
-        return mBackground;
+    }
+
+    private boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

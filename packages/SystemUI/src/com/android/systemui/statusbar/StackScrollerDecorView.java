@@ -135,6 +135,12 @@ public abstract class StackScrollerDecorView extends ExpandableView {
         mContent.animate().cancel();
     }
 
+    public void setTextColor(int color) {
+        if (mContent instanceof TextView) {
+            ((TextView) mContent).setTextColor(color);
+        }
+    }
+
     public void setTextColor() {
         if (mContent instanceof TextView) {
             ((TextView) mContent).setTextColor(

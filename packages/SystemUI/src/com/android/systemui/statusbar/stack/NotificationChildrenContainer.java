@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.ThemeHelper;
+
 import com.android.systemui.R;
 import com.android.systemui.ViewInvertHelper;
 import com.android.systemui.darkkat.util.NotifColorHelper;
@@ -202,13 +204,15 @@ public class NotificationChildrenContainer extends ViewGroup {
      */
     public void addNotification(ExpandableNotificationRow row, int childIndex) {
         int newIndex = childIndex < 0 ? mChildren.size() : childIndex;
-        ColorStateList tint = ColorStateList.valueOf(NotifColorHelper.getIconColor(mContext, true));
         mChildren.add(newIndex, row);
         addView(row);
         row.setUserLocked(mUserLocked);
 
         View divider = inflateDivider();
-        divider.setBackgroundTintList(tint);
+        if (!isDefaultNotificationTheme()) {
+            ColorStateList tint = ColorStateList.valueOf(NotifColorHelper.getIconColor(mContext, true));
+            divider.setBackgroundTintList(tint);
+        }
         addView(divider);
         mDividers.add(newIndex, divider);
 
@@ -263,8 +267,10 @@ public class NotificationChildrenContainer extends ViewGroup {
             header.reapply(getContext(), mNotificationHeader);
             mNotificationHeaderWrapper.notifyContentUpdated(notification);
         }
-        setHeaderTextColor();
-        setIconColor();
+        if (!isDefaultNotificationTheme()) {
+            setHeaderTextColor();
+            setIconColor();
+        }
         updateChildrenHeaderAppearance();
     }
 
@@ -583,13 +589,10 @@ public class NotificationChildrenContainer extends ViewGroup {
         if (mUserLocked) {
             expandFraction = getGroupExpandFraction();
         }
-        final boolean dividersVisible = mUserLocked
-                || mNotificationParent.isGroupExpansionChanging()
-                || mNotificationParent.isGroupExpanded();
         for (int i = 0; i < childCount; i++) {
             ExpandableNotificationRow child = mChildren.get(i);
             StackViewState viewState = state.getViewStateForView(child);
-            state.applyState(child, viewState);
+            state.applyState(mContext, child, viewState);
 
             // layout the divider
             View divider = mDividers.get(i);
@@ -600,7 +603,7 @@ public class NotificationChildrenContainer extends ViewGroup {
                 alpha = NotificationUtils.interpolate(0, 0.5f,
                         Math.min(viewState.alpha, expandFraction));
             }
-            tmpState.hidden = !dividersVisible;
+            tmpState.hidden = !dividersVisible();
             tmpState.alpha = alpha;
             state.applyViewState(divider, tmpState);
             // There is no fake shadow to be drawn on the children
@@ -631,13 +634,10 @@ public class NotificationChildrenContainer extends ViewGroup {
         int childCount = mChildren.size();
         ViewState tmpState = new ViewState();
         float expandFraction = getGroupExpandFraction();
-        final boolean dividersVisible = mUserLocked
-                || mNotificationParent.isGroupExpansionChanging()
-                || mNotificationParent.isGroupExpanded();
         for (int i = childCount - 1; i >= 0; i--) {
             ExpandableNotificationRow child = mChildren.get(i);
             StackViewState viewState = state.getViewStateForView(child);
-            stateAnimator.startStackAnimations(child, viewState, state, -1, baseDelay);
+            stateAnimator.startStackAnimations(mContext, child, viewState, state, -1, baseDelay);
 
             // layout the divider
             View divider = mDividers.get(i);
@@ -648,7 +648,7 @@ public class NotificationChildrenContainer extends ViewGroup {
                 alpha = NotificationUtils.interpolate(0, 0.5f,
                         Math.min(viewState.alpha, expandFraction));
             }
-            tmpState.hidden = !dividersVisible;
+            tmpState.hidden = !dividersVisible();
             tmpState.alpha = alpha;
             stateAnimator.startViewAnimations(divider, tmpState, baseDelay, duration);
             // There is no fake shadow to be drawn on the children
@@ -856,7 +856,9 @@ public class NotificationChildrenContainer extends ViewGroup {
             addView(divider, index);
             mDividers.set(i, divider);
         }
-        setDividerColor();
+        if (!isDefaultNotificationTheme()) {
+            setDividerColor();
+        }
         removeView(mOverflowNumber);
         mOverflowNumber = null;
         mOverflowInvertHelper = null;
@@ -874,8 +876,10 @@ public class NotificationChildrenContainer extends ViewGroup {
     }
 
     public void onNotificationUpdated() {
-        mHybridGroupManager.setOverflowNumberColor(mOverflowNumber,
-                NotifColorHelper.getTextColor(mContext, true));
+        final int textColor = isDefaultNotificationTheme()
+                ? mNotificationParent.getNotificationColor()
+                : NotifColorHelper.getTextColor(mContext, true);
+        mHybridGroupManager.setOverflowNumberColor(mOverflowNumber, textColor);
     }
 
     public int getPositionInLinearLayout(View childInGroup) {
@@ -897,6 +901,12 @@ public class NotificationChildrenContainer extends ViewGroup {
         return 0;
     }
 
+    private boolean dividersVisible() {
+        return mUserLocked
+                || mNotificationParent.isGroupExpansionChanging()
+                || (mNotificationParent.isGroupExpanded() && !isDefaultNotificationTheme());
+    }
+
     public void setTextColor() {
         mHybridGroupManager.setOverflowNumberColor(mOverflowNumber,
                 NotifColorHelper.getTextColor(mContext, true));
@@ -914,8 +924,8 @@ public class NotificationChildrenContainer extends ViewGroup {
 
     public void setIconColor() {
         if (mNotificationHeader != null) {
-            ((ImageView) findViewById(com.android.internal.R.id.icon)).setColorFilter(
-                    NotifColorHelper.getIconColor(mContext, true));
+            ((ImageView) mNotificationHeader.findViewById(com.android.internal.R.id.icon))
+                    .setColorFilter(NotifColorHelper.getIconColor(mContext, true));
             mNotificationHeader.getExpandButton().setColorFilter(
                     NotifColorHelper.getIconColor(mContext, false));
             setDividerColor();
@@ -928,5 +938,9 @@ public class NotificationChildrenContainer extends ViewGroup {
         for (int i = 0; i < childCount; i++) {
             mDividers.get(i).setBackgroundTintList(tint);
         }
+    }
+
+    private boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

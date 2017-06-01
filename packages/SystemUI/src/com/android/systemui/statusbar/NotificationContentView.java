@@ -33,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.util.NotificationColorUtil;
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.NotifColorHelper;
 import com.android.systemui.statusbar.notification.HybridNotificationView;
@@ -353,7 +354,9 @@ public class NotificationContentView extends FrameLayout {
         mContractedChild = child;
         mContractedWrapper = NotificationViewWrapper.wrap(getContext(), child,
                 mContainingNotification);
-        mContractedWrapper.setDark(mDark, false /* animate */, 0 /* delay */);
+        if (isDefaultNotificationTheme()) {
+            mContractedWrapper.setDark(mDark, false /* animate */, 0 /* delay */);
+        }
     }
 
     public void setExpandedChild(View child) {
@@ -679,9 +682,11 @@ public class NotificationContentView extends FrameLayout {
     }
 
     public void updateBackgroundColor(boolean animate) {
-        int customBackgroundColor = getBackgroundColor(mVisibleType);
-        mContainingNotification.resetBackgroundAlpha();
-        mContainingNotification.setContentBackground(customBackgroundColor, animate, this);
+        if (isDefaultNotificationTheme()) {
+            int customBackgroundColor = getBackgroundColor(mVisibleType);
+            mContainingNotification.resetBackgroundAlpha();
+            mContainingNotification.setContentBackground(customBackgroundColor, animate, this);
+        }
     }
 
     public int getVisibleType() {
@@ -936,7 +941,9 @@ public class NotificationContentView extends FrameLayout {
         }
         updateShowingLegacyBackground();
         mForceSelectNextLayout = true;
-        setDark(mDark, false /* animate */, 0 /* delay */);
+        if (isDefaultNotificationTheme()) {
+            setDark(mDark, false /* animate */, 0 /* delay */);
+        }
         mPreviousExpandedRemoteInputIntent = null;
         mPreviousHeadsUpRemoteInputIntent = null;
     }
@@ -945,7 +952,9 @@ public class NotificationContentView extends FrameLayout {
         if (mIsChildInGroup) {
             mSingleLineView = mHybridGroupManager.bindFromNotification(
                     mSingleLineView, mStatusBarNotification.getNotification());
-            mSingleLineView.setTextColor();
+            if (!isDefaultNotificationTheme()) {
+                mSingleLineView.setTextColor();
+            }
         } else if (mSingleLineView != null) {
             removeView(mSingleLineView);
             mSingleLineView = null;
@@ -1028,9 +1037,11 @@ public class NotificationContentView extends FrameLayout {
                     riv.setVisibility(View.INVISIBLE);
                     TextView tv = (TextView) riv.findViewById(R.id.remote_input_text);
                     ImageView iv = (ImageView) riv.findViewById(R.id.remote_input_send);
-                    tv.setTextColor(NotifColorHelper.getRemoteInputTextColorList(color));
-                    tv.setHintTextColor(NotifColorHelper.getRemoteInputHintTextColor(color));
-                    iv.setImageTintList(NotifColorHelper.getRemoteInputIconColorList(color));
+                    if (!isDefaultNotificationTheme()) {
+                        tv.setTextColor(NotifColorHelper.getRemoteInputTextColorList(color));
+                        tv.setHintTextColor(NotifColorHelper.getRemoteInputHintTextColor(color));
+                        iv.setImageTintList(NotifColorHelper.getRemoteInputIconColorList(color));
+                    }
                     actionContainer.addView(riv, new LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT)
@@ -1048,11 +1059,13 @@ public class NotificationContentView extends FrameLayout {
                 if (color == Notification.COLOR_DEFAULT) {
                     color = mContext.getColor(R.color.default_remote_input_background);
                 }
-                existing.setBackgroundColor(color);
-//                existing.setBackgroundColor(NotificationColorUtil.ensureTextBackgroundColor(color,
-//                        mContext.getColor(R.color.remote_input_text_enabled),
-//                        mContext.getColor(R.color.remote_input_hint)));
-
+                if (!isDefaultNotificationTheme()) {
+                    existing.setBackgroundColor(color);
+                } else {
+                    existing.setBackgroundColor(NotificationColorUtil.ensureTextBackgroundColor(color,
+                            mContext.getColor(R.color.remote_input_text_enabled),
+                            mContext.getColor(R.color.remote_input_hint)));
+                }
                 if (existingPendingIntent != null || existing.isActive()) {
                     // The current action could be gone, or the pending intent no longer valid.
                     // If we find a matching action in the new notification, focus, otherwise close.
@@ -1211,5 +1224,9 @@ public class NotificationContentView extends FrameLayout {
         if (mSingleLineView != null) {
             mSingleLineView.setTextColor();
         }
+    }
+
+    private boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

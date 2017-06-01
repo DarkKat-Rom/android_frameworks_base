@@ -25,6 +25,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.android.internal.util.darkkat.ThemeHelper;
+
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.NotifColorHelper;
@@ -84,7 +86,9 @@ public class NotificationSettingsIconRow extends FrameLayout implements View.OnC
         super.onFinishInflate();
         mGearIcon = (AlphaOptimizedImageView) findViewById(R.id.gear_icon);
         mGearIcon.setOnClickListener(this);
-        setGearIconColor();
+        if (!isDefaultNotificationTheme()) {
+            setGearIconColor();
+        }
         setOnClickListener(this);
         mHorizSpaceForGear =
                 getResources().getDimensionPixelOffset(R.dimen.notification_gear_width);
@@ -300,5 +304,9 @@ public class NotificationSettingsIconRow extends FrameLayout implements View.OnC
 
     public void setGearIconColor() {
         mGearIcon.setImageTintList(NotifColorHelper.getIconTint(mContext, false));
+    }
+
+    private boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 }

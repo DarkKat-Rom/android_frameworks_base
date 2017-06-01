@@ -22,9 +22,13 @@ import android.provider.Settings;
 public class ThemeHelper {
 
     // Themes
+
+    // Day/night themes
     public static final int THEME_DARKKAT        = 2;
     public static final int THEME_MATERIAL_LIGHT = 1;
     public static final int THEME_BLACKOUT       = 3;
+    // Unthemed notifications
+    public static final int NOTIFICATION_THEME_DEFAULT = -1;
 
     public static int getTheme(Context context) {
         return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.UI_NIGHT_MODE, 2);
@@ -38,6 +42,19 @@ public class ThemeHelper {
     public static boolean statusBarExpandedUseThemeColors(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.STATUS_BAR_EXPANDED_USE_THEME_COLORS, 1) == 1;
+    }
+
+    private static boolean notificationEnabledThemeColors(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.EXPERIMENTAL_ENABLE_NOTIFICATIONS_THEME_COLORS, 0) == 1;
+    }
+
+    public static int getNotificationTheme(Context context) {
+        if (!notificationEnabledThemeColors(context)) {
+            return NOTIFICATION_THEME_DEFAULT;
+        } else {
+            return getTheme(context);
+        }
     }
 
     public static boolean notificationUseThemeColors(Context context) {

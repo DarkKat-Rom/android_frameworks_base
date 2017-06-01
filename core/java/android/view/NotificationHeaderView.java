@@ -28,6 +28,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
+import com.android.internal.util.darkkat.ThemeHelper;
+
 import java.util.ArrayList;
 
 /**
@@ -297,7 +299,9 @@ public class NotificationHeaderView extends ViewGroup {
             drawableId = com.android.internal.R.drawable.ic_expand_notification;
         }
         mExpandButton.setImageDrawable(getContext().getDrawable(drawableId));
-//        mExpandButton.setColorFilter(mOriginalNotificationColor);
+        if (isDefaultNotificationTheme()) {
+            mExpandButton.setColorFilter(mOriginalNotificationColor);
+        }
     }
 
     public void setShowWorkBadgeAtEnd(boolean showWorkBadgeAtEnd) {
@@ -309,6 +313,10 @@ public class NotificationHeaderView extends ViewGroup {
 
     public View getWorkProfileIcon() {
         return mProfileBadge;
+    }
+
+    private boolean isDefaultNotificationTheme() {
+        return ThemeHelper.getNotificationTheme(mContext) == ThemeHelper.NOTIFICATION_THEME_DEFAULT;
     }
 
     public class HeaderTouchListener implements View.OnTouchListener {
