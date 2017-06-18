@@ -16,6 +16,8 @@
 
 <resources>
 
+    <java-symbol type="attr" name="colorSwitchThumbNormal"/>
+
     <!-- Shut down dialog -->
 
     <!-- Reboot to restart dialog -->
