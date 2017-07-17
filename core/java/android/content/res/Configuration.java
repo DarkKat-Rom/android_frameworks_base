@@ -569,10 +569,14 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      * resource qualifier. */
     public static final int UI_MODE_NIGHT_YES = 0x20;
     /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
-     * value that corresponds to the
-     * <a href="{@docRoot}guide/topics/resources/providing-resources.html#NightQualifier">night</a>
-     * resource qualifier. */
-    public static final int UI_MODE_NIGHT_BLACKOUT = 0x30;
+     * value that corresponds to the NightQualifier "darkkat". */
+    public static final int UI_MODE_NIGHT_YES_DARKKAT = 0x30;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "whiteout". */
+    public static final int UI_MODE_NIGHT_NO_WHITEOUT = 0x40;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "whiteout". */
+    public static final int UI_MODE_NIGHT_YES_BLACKOUT = 0x50;
 
     /**
      * Bit mask of the ui mode.  Currently there are two fields:
@@ -584,7 +588,8 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      *
      * <p>The {@link #UI_MODE_NIGHT_MASK} defines whether the screen
      * is in a special mode. They may be one of {@link #UI_MODE_NIGHT_UNDEFINED},
-     * {@link #UI_MODE_NIGHT_NO}, {@link #UI_MODE_NIGHT_YES} or {@link #UI_MODE_NIGHT_BLACKOUT}.
+     * {@link #UI_MODE_NIGHT_NO}, {@link #UI_MODE_NIGHT_YES}, {@link #UI_MODE_NIGHT_YES_DARKKAT},
+     * {@link #UI_MODE_NIGHT_NO_WHITEOUT} or {@link #UI_MODE_NIGHT_YES_BLACKOUT}.
      */
     public int uiMode;
 
@@ -868,7 +873,9 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             case UI_MODE_NIGHT_UNDEFINED: sb.append(" ?night"); break;
             case UI_MODE_NIGHT_NO: /* not-night is not interesting to print */ break;
             case UI_MODE_NIGHT_YES: sb.append(" night"); break;
-            case UI_MODE_NIGHT_BLACKOUT: sb.append(" blackout"); break;
+            case UI_MODE_NIGHT_YES_DARKKAT: sb.append(" darkkat"); break;
+            case UI_MODE_NIGHT_NO_WHITEOUT: sb.append(" whiteout"); break;
+            case UI_MODE_NIGHT_YES_BLACKOUT: sb.append(" blackout"); break;
             default: sb.append(" night="); sb.append(uiMode&UI_MODE_NIGHT_MASK); break;
         }
         switch (touchscreen) {
@@ -1711,11 +1718,17 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             case Configuration.UI_MODE_NIGHT_YES:
                 parts.add("night");
                 break;
+            case Configuration.UI_MODE_NIGHT_YES_DARKKAT:
+                parts.add("darkkat");
+                break;
+            case Configuration.UI_MODE_NIGHT_NO_WHITEOUT:
+                parts.add("whiteout");
+                break;
+            case Configuration.UI_MODE_NIGHT_YES_BLACKOUT:
+                parts.add("blackout");
+                break;
             case Configuration.UI_MODE_NIGHT_NO:
                 parts.add("notnight");
-                break;
-            case Configuration.UI_MODE_NIGHT_BLACKOUT:
-                parts.add("blackout");
                 break;
             default:
                 break;
