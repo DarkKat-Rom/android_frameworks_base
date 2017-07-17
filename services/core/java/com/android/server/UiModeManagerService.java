@@ -305,7 +305,9 @@ final class UiModeManagerService extends SystemService {
             switch (mode) {
                 case UiModeManager.MODE_NIGHT_NO:
                 case UiModeManager.MODE_NIGHT_YES:
-                case UiModeManager.MODE_NIGHT_BLACKOUT:
+                case UiModeManager.MODE_NIGHT_YES_DARKKAT:
+                case UiModeManager.MODE_NIGHT_NO_WHITEOUT:
+                case UiModeManager.MODE_NIGHT_YES_BLACKOUT:
                 case UiModeManager.MODE_NIGHT_AUTO:
                     break;
                 default:
