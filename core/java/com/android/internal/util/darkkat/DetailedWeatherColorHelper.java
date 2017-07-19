@@ -109,12 +109,18 @@ public class DetailedWeatherColorHelper {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_CARD_ICON_COLOR,
                 DetailedWeatherThemeHelper.getIconColor(context));
-        int alpha;
+        int alpha = 0;
 
-        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-            alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
-        } else {
-            alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_BLACKOUT:
+                alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+                break;
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_WHITEOUT:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+                break;
         }
 
         return (alpha << 24) | (color & 0x00ffffff);
@@ -140,37 +146,60 @@ public class DetailedWeatherColorHelper {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_CARD_RIPPLE_COLOR,
                 DetailedWeatherThemeHelper.getRippleColor(context));
-        int alpha;
+        int alpha = 0;
 
-        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-            alpha = ColorConstants.RIPPLE_ALPHA_NIGHT;
-        } else {
-            alpha = ColorConstants.RIPPLE_ALPHA_DAY;
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_BLACKOUT:
+                alpha = ColorConstants.RIPPLE_ALPHA_NIGHT;
+                break;
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_WHITEOUT:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                alpha = ColorConstants.RIPPLE_ALPHA_DAY;
+                break;
         }
 
         return (alpha << 24) | (color & 0x00ffffff);
     }
 
     public static int getDividerAlpha(Context context) {
-        int alpha;
-        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-            alpha = ColorConstants.DIVIDER_ALPHA_NIGHT;
-        } else {
-            alpha = ColorConstants.DIVIDER_ALPHA_DAY;
+        int alpha = 0;
+
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_BLACKOUT:
+                alpha = ColorConstants.DIVIDER_ALPHA_NIGHT;
+                break;
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_WHITEOUT:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                alpha = ColorConstants.DIVIDER_ALPHA_DAY;
+                break;
         }
 
         return alpha;
     }
 
     private static int getTextColorAlpha(Context context, boolean isPrimary) {
-        if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-            return isPrimary
+        int alpha = 0;
+
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_BLACKOUT:
+                alpha = isPrimary
                     ? ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT
                     : ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT;
-        } else {
-            return isPrimary
-                    ? ColorConstants.TEXT_PRIMARY_ALPHA_DAY
-                    : ColorConstants.TEXT_SECONDARY_ALPHA_DAY;
+                break;
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_WHITEOUT:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                alpha = isPrimary
+                        ? ColorConstants.TEXT_PRIMARY_ALPHA_DAY
+                        : ColorConstants.TEXT_SECONDARY_ALPHA_DAY;
+                break;
         }
+
+        return alpha;
     }
 }
