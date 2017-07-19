@@ -38,7 +38,7 @@ public class SlimRecentsColorHelper {
 
     public static int getPanelEmptyIconColor(Context context) {
         int color;
-        int alpha;
+        int alpha = 0;
 
         if (ThemeHelper.slimRecentsUseThemeColors(context)) {
             color = ThemeHelper.getSlimRecentsPanelEmptyIconColor(context);
@@ -47,10 +47,16 @@ public class SlimRecentsColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_PANEL_EMPTY_ICON_COLOR,
                     ThemeHelper.getSlimRecentsPanelEmptyIconColor(context));
-            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-                alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
-            } else {
-                alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+            switch (ThemeHelper.getTheme(context)) {
+                case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_BLACKOUT:
+                    alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+                    break;
+                case ThemeHelper.THEME_MATERIAL:
+                case ThemeHelper.THEME_WHITEOUT:
+                case ThemeHelper.THEME_MATERIAL_LIGHT:
+                    alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+                    break;
             }
         }
 
@@ -73,7 +79,7 @@ public class SlimRecentsColorHelper {
 
     public static int getCardRippleColor(Context context) {
         int color;
-        int alpha;
+        int alpha = 0;
 
         if (ThemeHelper.slimRecentsUseThemeColors(context)) {
             color = ThemeHelper.getRippleColor(context);
@@ -82,10 +88,16 @@ public class SlimRecentsColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_CARD_RIPPLE_COLOR,
                     ThemeHelper.getRippleColor(context));
-            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-                alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
-            } else {
-                alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
+            switch (ThemeHelper.getTheme(context)) {
+                case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_BLACKOUT:
+                    alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
+                    break;
+                case ThemeHelper.THEME_MATERIAL:
+                case ThemeHelper.THEME_WHITEOUT:
+                case ThemeHelper.THEME_MATERIAL_LIGHT:
+                    alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
+                    break;
             }
         }
 
@@ -94,7 +106,7 @@ public class SlimRecentsColorHelper {
 
     public static int getCardHeaderTextColor(Context context) {
         int color;
-        int alpha;
+        int alpha = 0;
 
         if (ThemeHelper.slimRecentsUseThemeColors(context)) {
             color = ThemeHelper.getPrimaryTextColor(context);
@@ -103,10 +115,16 @@ public class SlimRecentsColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_CARD_HEADER_TEXT_COLOR,
                     ThemeHelper.getPrimaryTextColor(context));
-            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-                alpha = ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT;
-            } else {
-                alpha = ColorConstants.TEXT_PRIMARY_ALPHA_DAY;
+            switch (ThemeHelper.getTheme(context)) {
+                case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_BLACKOUT:
+                    alpha = ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT;
+                    break;
+                case ThemeHelper.THEME_MATERIAL:
+                case ThemeHelper.THEME_WHITEOUT:
+                case ThemeHelper.THEME_MATERIAL_LIGHT:
+                    alpha = ColorConstants.TEXT_PRIMARY_ALPHA_DAY;
+                    break;
             }
         }
 
@@ -115,7 +133,7 @@ public class SlimRecentsColorHelper {
 
     public static int getCardActionIconColor(Context context) {
         int color;
-        int alpha;
+        int alpha = 0;
 
         if (ThemeHelper.slimRecentsUseThemeColors(context)) {
             color = ThemeHelper.getIconColor(context);
@@ -124,10 +142,16 @@ public class SlimRecentsColorHelper {
             color = Settings.System.getInt(context.getContentResolver(),
                     Settings.System.SLIM_RECENTS_CARD_ACTION_ICON_COLOR,
                     ThemeHelper.getIconColor(context));
-            if (ThemeHelper.getTheme(context) != ThemeHelper.THEME_MATERIAL_LIGHT) {
-                alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
-            } else {
-                alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+            switch (ThemeHelper.getTheme(context)) {
+                case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_BLACKOUT:
+                    alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+                    break;
+                case ThemeHelper.THEME_MATERIAL:
+                case ThemeHelper.THEME_WHITEOUT:
+                case ThemeHelper.THEME_MATERIAL_LIGHT:
+                    alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+                    break;
             }
         }
 

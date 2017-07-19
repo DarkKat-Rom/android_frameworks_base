@@ -22,12 +22,14 @@ import android.provider.Settings;
 public class ThemeHelper {
 
     // Themes
-    public static final int THEME_DARKKAT        = 2;
+    public static final int THEME_DARKKAT        = 3;
+    public static final int THEME_MATERIAL       = 2;
+    public static final int THEME_WHITEOUT       = 4;
     public static final int THEME_MATERIAL_LIGHT = 1;
-    public static final int THEME_BLACKOUT       = 3;
+    public static final int THEME_BLACKOUT       = 5;
 
     public static int getTheme(Context context) {
-        return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.UI_NIGHT_MODE, 2);
+        return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.UI_NIGHT_MODE, THEME_DARKKAT);
     }
 
     public static boolean detailedWeatherUseThemeColors(Context context) {
@@ -47,111 +49,221 @@ public class ThemeHelper {
 
     // General
     public static int getColorBackground(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.DARKKAT_BLUE_GREY;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.MATERIAL_GREY_50;
-        } else {
-            return ColorConstants.BLACK;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.DARKKAT_BLUE_GREY;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.MATERIAL_GREY_50;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACK;
+                break;
         }
+
+        return color;
     }
 
     public static int getColorBackgroundFloating(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.DARKKAT_BLUE_BLUE_GREY;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.WHITE;
-        } else {
-            return ColorConstants.BLACK;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.DARKKAT_BLUE_BLUE_GREY;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.WHITE;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACK;
+                break;
         }
+
+        return color;
     }
 
     public static int getAccentColor(Context context) {
-        if (getTheme(context) != THEME_BLACKOUT) {
-            return ColorConstants.MATERIAL_DEEP_TEAL_500;
-        } else {
-            return ColorConstants.MATERIAL_BLUE_700;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.MATERIAL_DEEP_TEAL_500;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.MATERIAL_BLUE_700;
+                break;
         }
+
+        return color;
     }
 
     public static int getPrimaryTextColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return ColorConstants.WHITE;
-        } else {
-            return (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
-                    | (ColorConstants.BLACK & 0x00ffffff);
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = ColorConstants.WHITE;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
+                        | (ColorConstants.BLACK & 0x00ffffff);
+                break;
         }
+
+        return color;
     }
 
     public static int getSecondaryTextColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT << 24)
-                    | (ColorConstants.WHITE & 0x00ffffff);
-        } else {
-            return (ColorConstants.TEXT_SECONDARY_ALPHA_DAY << 24)
-                    | (ColorConstants.BLACK & 0x00ffffff);
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = (ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT << 24)
+                        | (ColorConstants.WHITE & 0x00ffffff);
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = (ColorConstants.TEXT_SECONDARY_ALPHA_DAY << 24)
+                        | (ColorConstants.BLACK & 0x00ffffff);
+                break;
         }
+
+        return color;
     }
 
     public static int getIconColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24)
-                    | (ColorConstants.WHITE & 0x00ffffff);
-        } else {
-            return (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24)
-                    | (ColorConstants.BLACK & 0x00ffffff);
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24)
+                        | (ColorConstants.WHITE & 0x00ffffff);
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24)
+                        | (ColorConstants.BLACK & 0x00ffffff);
+                break;
         }
+
+        return color;
     }
 
     public static int getRippleColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.RIPPLE_ALPHA_NIGHT << 24)
-                    | (ColorConstants.WHITE & 0x00ffffff);
-        } else {
-            return (ColorConstants.RIPPLE_ALPHA_DAY << 24)
-                    | (ColorConstants.BLACK & 0x00ffffff);
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = (ColorConstants.RIPPLE_ALPHA_NIGHT << 24)
+                        | (ColorConstants.WHITE & 0x00ffffff);
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = (ColorConstants.RIPPLE_ALPHA_DAY << 24)
+                        | (ColorConstants.BLACK & 0x00ffffff);
+                break;
         }
+
+        return color;
     }
 
     public static int getDividerColor(Context context) {
-        if (getTheme(context) != THEME_MATERIAL_LIGHT) {
-            return (ColorConstants.DIVIDER_ALPHA_NIGHT << 24)
-                    | (ColorConstants.WHITE & 0x00ffffff);
-        } else {
-            return (ColorConstants.DIVIDER_ALPHA_DAY << 24)
-                    | (ColorConstants.BLACK & 0x00ffffff);
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = (ColorConstants.DIVIDER_ALPHA_NIGHT << 24)
+                        | (ColorConstants.WHITE & 0x00ffffff);
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = (ColorConstants.DIVIDER_ALPHA_DAY << 24)
+                        | (ColorConstants.BLACK & 0x00ffffff);
+                break;
         }
+
+        return color;
     }
 
     // SystemUI
     public static int getSystemUIPrimaryColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.SYSTEMUI_PRIMARY_DAY;
-        } else {
-            return ColorConstants.SYSTEMUI_PRIMARY_BLACKOUT;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.SYSTEMUI_PRIMARY_DAY;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.SYSTEMUI_PRIMARY_BLACKOUT;
+                break;
         }
+
+        return color;
     }
 
     public static int getSystemUISecondaryColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.SYSTEMUI_SECONDARY_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.SYSTEMUI_SECONDARY_DAY;
-        } else {
-            return ColorConstants.SYSTEMUI_SECONDARY_BLACKOUT;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.SYSTEMUI_SECONDARY_DARKKAT;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.SYSTEMUI_SECONDARY_DAY;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.SYSTEMUI_SECONDARY_BLACKOUT;
+                break;
         }
+
+        return color;
     }
 
     public static int getSystemUIAccentColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.SYSTEMUI_ACCENT_DARKKAT;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.SYSTEMUI_ACCENT_DAY;
-        } else {
-            return ColorConstants.SYSTEMUI_ACCENT_BLACKOUT;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.SYSTEMUI_ACCENT_DARKKAT;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.SYSTEMUI_ACCENT_DAY;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.SYSTEMUI_ACCENT_BLACKOUT;
+                break;
         }
+
+        return color;
     }
 
     public static int getSystemUIRippleColor(Context context) {
@@ -165,25 +277,41 @@ public class ThemeHelper {
 
     // Slim recents
     public static int getSlimRecentsPanelBgColor(Context context) {
-        if (getTheme(context) == THEME_DARKKAT) {
-            return ColorConstants.DARKKAT_BLUE_GREY;
-        } else if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            return ColorConstants.WHITE;
-        } else {
-            return ColorConstants.BLACK;
+        int color = 0;
+
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+                color = ColorConstants.DARKKAT_BLUE_GREY;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.WHITE;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACK;
+                break;
         }
+
+        return color;
     }
 
     public static int getSlimRecentsPanelEmptyIconColor(Context context) {
-        int color;
-        int alpha;
+        int color = 0;
+        int alpha = 0;
 
-        if (getTheme(context) == THEME_MATERIAL_LIGHT) {
-            color = ColorConstants.BLACK;
-            alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
-        } else {
-            color = ColorConstants.WHITE;
-            alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_BLACKOUT:
+                color = ColorConstants.WHITE;
+                alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
+                break;
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.BLACK;
+                alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
+                break;
         }
 
         return (alpha << 24) | (color & 0x00ffffff);

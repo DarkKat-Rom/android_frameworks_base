@@ -65,8 +65,8 @@ final class UiModeManagerService extends SystemService {
     private int mDockState = Intent.EXTRA_DOCK_STATE_UNDOCKED;
 
     private int mLastBroadcastState = Intent.EXTRA_DOCK_STATE_UNDOCKED;
-    private int mNightMode = UiModeManager.MODE_NIGHT_YES;
-    private int mNightAutoMode = UiModeManager.MODE_NIGHT_YES;
+    private int mNightMode = UiModeManager.MODE_NIGHT_YES_DARKKAT;
+    private int mNightAutoMode = UiModeManager.MODE_NIGHT_YES_DARKKAT;
 
     private boolean mCarModeEnabled = false;
     private boolean mCharging = false;
@@ -188,7 +188,7 @@ final class UiModeManagerService extends SystemService {
         @Override
         public void onChange(boolean selfChange) {
             mNightAutoMode = Settings.Secure.getInt(getContext().getContentResolver(),
-                    Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES);
+                    Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES_DARKKAT);
             synchronized (mLock) {
                 updateLocked(0, 0);
             }
@@ -232,7 +232,7 @@ final class UiModeManagerService extends SystemService {
         mNightMode = Settings.Secure.getInt(context.getContentResolver(),
                 Settings.Secure.UI_NIGHT_MODE, defaultNightMode);
         mNightAutoMode = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES);
+                Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES_DARKKAT);
         // Update the initial, static configurations.
         synchronized (this) {
             updateConfigurationLocked();
