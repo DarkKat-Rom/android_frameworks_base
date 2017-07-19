@@ -21,19 +21,35 @@ import android.content.Context;
 public class DetailedWeatherThemeHelper extends ThemeHelper {
 
     public static int getStatusBarBgColor(Context context) {
-        if (getTheme(context) == THEME_BLACKOUT) {
-            return ColorConstants.BLACK;
-        } else {
-            return ColorConstants.MATERIAL_BLUE_700;
+        int color = 0;
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.MATERIAL_BLUE_700;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACK;
+                break;
         }
+        return color;
     }
 
     public static int getActionBarBgColor(Context context) {
-        if (getTheme(context) == THEME_BLACKOUT) {
-            return ColorConstants.BLACKOUT_PRIMARY_COLOR;
-        } else {
-            return ColorConstants.MATERIAL_BLUE_500;
+        int color = 0;
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.MATERIAL_BLUE_500;
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACKOUT_PRIMARY_COLOR;
+                break;
         }
+        return color;
     }
 
     public static int getContentBgColor(Context context) {
@@ -41,11 +57,19 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
     }
 
     public static int getCardBgColor(Context context) {
-        if (getTheme(context) == THEME_BLACKOUT) {
-            return ColorConstants.BLACKOUT_PRIMARY_COLOR;
-        } else {
-            return getColorBackgroundFloating(context);
+        int color = 0;
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_MATERIAL:
+            case THEME_WHITEOUT:
+            case THEME_MATERIAL_LIGHT:
+                color = getColorBackgroundFloating(context);
+                break;
+            case THEME_BLACKOUT:
+                color = ColorConstants.BLACKOUT_PRIMARY_COLOR;
+                break;
         }
+        return color;
     }
 
     public static int getActionBarTextColor() {

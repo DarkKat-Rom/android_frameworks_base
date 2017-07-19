@@ -773,7 +773,7 @@
              4 - MODE_NIGHT_NO_WHITEOUT
              5 - MODE_NIGHT_YES_BLACKOUT
     -->
-    <integer name="config_defaultNightMode">2</integer>
+    <integer name="config_defaultNightMode">3</integer>
 
     <!-- Control whether Night display is available. This should only be enabled on devices
          with HWC 2.0 or higher. -->
