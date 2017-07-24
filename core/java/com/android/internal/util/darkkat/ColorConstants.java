@@ -31,8 +31,11 @@ public class ColorConstants {
     public static final int MATERIAL_BLUE_GREY_900 = 0xff263238;
     public static final int MATERIAL_BLUE_GREY_800 = 0xff37474F;
     public static final int MATERIAL_DEEP_TEAL_500 = 0xff009688;
+    public static final int MATERIAL_DEEP_TEAL_200 = 0xff80cbc4;
     public static final int MATERIAL_BLUE_700      = 0xff1976d2;
     public static final int MATERIAL_BLUE_500      = 0xff2196f3;
+    public static final int MATERIAL_GREY_800      = 0xff424242;
+    public static final int MATERIAL_GREY_850      = 0xff303030;
     public static final int MATERIAL_GREY_50       = 0xfffafafa;
 
     // Theme DarkKat
@@ -55,6 +58,11 @@ public class ColorConstants {
     public static final int SYSTEMUI_PRIMARY_DAY   = MATERIAL_BLUE_GREY_900;
     public static final int SYSTEMUI_SECONDARY_DAY = MATERIAL_BLUE_GREY_800;
     public static final int SYSTEMUI_ACCENT_DAY    = MATERIAL_DEEP_TEAL_500;
+
+    // Status bar expanded (Night theme)
+    public static final int SYSTEMUI_PRIMARY_NIGHT   = MATERIAL_BLUE_GREY_900;
+    public static final int SYSTEMUI_SECONDARY_NIGHT = MATERIAL_BLUE_GREY_800;
+    public static final int SYSTEMUI_ACCENT_NIGHT    = MATERIAL_DEEP_TEAL_200;
 
     // Status bar expanded (DarkKat theme)
     public static final int SYSTEMUI_PRIMARY_DARKKAT   = DARKKAT_BLUE_GREY;
