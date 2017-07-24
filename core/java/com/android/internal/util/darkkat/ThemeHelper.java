@@ -56,6 +56,8 @@ public class ThemeHelper {
                 color = ColorConstants.DARKKAT_BLUE_GREY;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.MATERIAL_GREY_850;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_GREY_50;
@@ -76,6 +78,8 @@ public class ThemeHelper {
                 color = ColorConstants.DARKKAT_BLUE_BLUE_GREY;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.MATERIAL_GREY_800;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.WHITE;
@@ -93,10 +97,12 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_DEEP_TEAL_500;
+                break;
+            case THEME_MATERIAL:
+                color = ColorConstants.MATERIAL_DEEP_TEAL_200;
                 break;
             case THEME_BLACKOUT:
                 color = ColorConstants.MATERIAL_BLUE_700;
@@ -111,10 +117,10 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = ColorConstants.WHITE;
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
@@ -130,11 +136,11 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = (ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.TEXT_SECONDARY_ALPHA_DAY << 24)
@@ -150,11 +156,11 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24)
@@ -170,11 +176,11 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = (ColorConstants.RIPPLE_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.RIPPLE_ALPHA_DAY << 24)
@@ -190,11 +196,11 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = (ColorConstants.DIVIDER_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.DIVIDER_ALPHA_DAY << 24)
@@ -214,6 +220,8 @@ public class ThemeHelper {
                 color = ColorConstants.SYSTEMUI_PRIMARY_DARKKAT;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.SYSTEMUI_PRIMARY_NIGHT;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_PRIMARY_DAY;
@@ -234,6 +242,8 @@ public class ThemeHelper {
                 color = ColorConstants.SYSTEMUI_SECONDARY_DARKKAT;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.SYSTEMUI_SECONDARY_NIGHT;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_SECONDARY_DAY;
@@ -254,6 +264,8 @@ public class ThemeHelper {
                 color = ColorConstants.SYSTEMUI_ACCENT_DARKKAT;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.SYSTEMUI_ACCENT_NIGHT;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_ACCENT_DAY;
@@ -284,6 +296,8 @@ public class ThemeHelper {
                 color = ColorConstants.DARKKAT_BLUE_GREY;
                 break;
             case THEME_MATERIAL:
+                color = ColorConstants.MATERIAL_GREY_850;
+                break;
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.WHITE;
@@ -302,11 +316,11 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
+            case THEME_MATERIAL:
             case THEME_BLACKOUT:
                 color = ColorConstants.WHITE;
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
                 break;
-            case THEME_MATERIAL:
             case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.BLACK;
