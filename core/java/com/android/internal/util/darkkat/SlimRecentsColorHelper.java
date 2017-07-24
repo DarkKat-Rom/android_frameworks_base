@@ -49,10 +49,10 @@ public class SlimRecentsColorHelper {
                     ThemeHelper.getSlimRecentsPanelEmptyIconColor(context));
             switch (ThemeHelper.getTheme(context)) {
                 case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_BLACKOUT:
                     alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
                     break;
-                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_WHITEOUT:
                 case ThemeHelper.THEME_MATERIAL_LIGHT:
                     alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
@@ -90,10 +90,10 @@ public class SlimRecentsColorHelper {
                     ThemeHelper.getRippleColor(context));
             switch (ThemeHelper.getTheme(context)) {
                 case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_BLACKOUT:
                     alpha = ColorConstants.HIGHTLIGHT_ALPHA_NIGHT;
                     break;
-                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_WHITEOUT:
                 case ThemeHelper.THEME_MATERIAL_LIGHT:
                     alpha = ColorConstants.HIGHTLIGHT_ALPHA_DAY;
@@ -117,10 +117,10 @@ public class SlimRecentsColorHelper {
                     ThemeHelper.getPrimaryTextColor(context));
             switch (ThemeHelper.getTheme(context)) {
                 case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_BLACKOUT:
                     alpha = ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT;
                     break;
-                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_WHITEOUT:
                 case ThemeHelper.THEME_MATERIAL_LIGHT:
                     alpha = ColorConstants.TEXT_PRIMARY_ALPHA_DAY;
@@ -144,10 +144,10 @@ public class SlimRecentsColorHelper {
                     ThemeHelper.getIconColor(context));
             switch (ThemeHelper.getTheme(context)) {
                 case ThemeHelper.THEME_DARKKAT:
+                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_BLACKOUT:
                     alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
                     break;
-                case ThemeHelper.THEME_MATERIAL:
                 case ThemeHelper.THEME_WHITEOUT:
                 case ThemeHelper.THEME_MATERIAL_LIGHT:
                     alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
