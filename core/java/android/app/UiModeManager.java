@@ -293,6 +293,33 @@ public class UiModeManager {
     }
 
     /**
+     * Returns the currently applied night mode.
+     * <p>
+     * May be one of:
+     * <ul>
+     *   <li>{@link #MODE_NIGHT_NO}</li>
+     *   <li>{@link #MODE_NIGHT_YES}</li>
+     *   <li>{@link #MODE_NIGHT_YES_DARKKAT}</li>
+     *   <li>{@link #MODE_NIGHT_NO_WHITEOUT}</li>
+     *   <li>{@link #MODE_NIGHT_YES_BLACKOUT}</li>
+     *   <li>{@code -1} on error</li>
+     * </ul>
+     *
+     * @return the currently applied night mode, or {@code -1} on error
+     * @see #setNightMode(int)
+     */
+    public @NightMode int getCurrentNightMode() {
+        if (mService != null) {
+            try {
+                return mService.getCurrentNightMode();
+            } catch (RemoteException e) {
+                throw e.rethrowFromSystemServer();
+            }
+        }
+        return -1;
+    }
+
+    /**
      * @return If UI mode is locked or not. When UI mode is locked, calls to change UI mode
      *         like {@link #enableCarMode(int)} will silently fail.
      * @hide
