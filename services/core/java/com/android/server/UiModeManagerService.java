@@ -66,6 +66,7 @@ final class UiModeManagerService extends SystemService {
 
     private int mLastBroadcastState = Intent.EXTRA_DOCK_STATE_UNDOCKED;
     private int mNightMode = UiModeManager.MODE_NIGHT_YES_DARKKAT;
+    private int mCurrentNightMode = mNightMode;
     private int mNightAutoMode = UiModeManager.MODE_NIGHT_YES_DARKKAT;
 
     private boolean mCarModeEnabled = false;
@@ -231,6 +232,7 @@ final class UiModeManagerService extends SystemService {
                 com.android.internal.R.integer.config_defaultNightMode);
         mNightMode = Settings.Secure.getInt(context.getContentResolver(),
                 Settings.Secure.UI_NIGHT_MODE, defaultNightMode);
+        mCurrentNightMode = mNightMode;
         mNightAutoMode = Settings.Secure.getInt(context.getContentResolver(),
                 Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES_DARKKAT);
         // Update the initial, static configurations.
@@ -333,6 +335,14 @@ final class UiModeManagerService extends SystemService {
                 return mNightMode;
             }
         }
+
+        @Override
+        public int getCurrentNightMode() {
+            synchronized (mLock) {
+                return mCurrentNightMode;
+            }
+        }
+
         @Override
         public boolean isUiModeLocked() {
             synchronized (mLock) {
@@ -453,6 +463,7 @@ final class UiModeManagerService extends SystemService {
             updateComputedNightModeLocked();
             int dayNightMode = mComputedNightMode ? mNightAutoMode : UiModeManager.MODE_NIGHT_NO;
             uiMode |=  dayNightMode << 4;
+            mCurrentNightMode = dayNightMode;
         } else {
             if (mTwilightManager != null) {
                 mTwilightManager.unregisterListener(mTwilightListener);
@@ -462,6 +473,7 @@ final class UiModeManagerService extends SystemService {
                 }
             }
             uiMode |= mNightMode << 4;
+            mCurrentNightMode = mNightMode;
         }
 
         if (LOG) {

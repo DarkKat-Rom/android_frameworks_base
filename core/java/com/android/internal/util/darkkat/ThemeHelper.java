@@ -16,6 +16,7 @@
 
 package com.android.internal.util.darkkat;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.provider.Settings;
 
@@ -29,7 +30,9 @@ public class ThemeHelper {
     public static final int THEME_BLACKOUT       = 5;
 
     public static int getTheme(Context context) {
-        return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.UI_NIGHT_MODE, THEME_DARKKAT);
+        UiModeManager uiManager = (UiModeManager) context.getSystemService(
+                Context.UI_MODE_SERVICE);
+        return uiManager.getCurrentNightMode();
     }
 
     public static boolean detailedWeatherUseThemeColors(Context context) {
