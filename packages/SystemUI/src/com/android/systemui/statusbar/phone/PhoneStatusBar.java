@@ -662,10 +662,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            if (uri.equals(Settings.Secure.getUriFor(
-                    Settings.Secure.UI_NIGHT_MODE))) {
-                updateUiNightMode();
-            } else if (uri.equals(Settings.System.getUriFor(
+            if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TEXT_COLOR))) {
                 updateStatusBarTextColor(true);
             } else if (uri.equals(Settings.System.getUriFor(
@@ -2820,12 +2817,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void updateUiNightMode() {
-        // TO-DO:
-        // Update the QS and header colors here as well,
-        // so the QS and header colors will get updated when no custom colors are defined
-        if (ThemeHelper.statusBarExpandedUseThemeColors(mContext)) {
-            updateStatusBarExpandedColors();
-        }
+        updateStatusBarExpandedColors();
         updateRecentsScreenColors();
     }
 
@@ -4546,6 +4538,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mScreenPinningRequest.onConfigurationChanged();
         mNetworkController.onConfigurationChanged();
         rebuildRecentsScreen();
+        updateUiNightMode();
     }
 
     @Override
