@@ -47,10 +47,18 @@ interface IUiModeManager {
     void setNightMode(int mode);
 
     /**
-     * Gets the currently configured night mode.  Return 1 for notnight,
-     * 2 for night, and 3 for automatic mode switching.
+     * Gets the currently configured night mode.
+     * Return 0 for automatic mode switching,
+     * 1 for notnight, 2 for night, 3 for darkkat, 4 for whiteout, and 5 blackout.
      */
     int getNightMode();
+
+    /**
+     * Gets the currently applied night mode.
+     * Return 1 for notnight,
+     * 2 for night, 3 for darkkat, 4 for whiteout, and 5 blackout.
+     */
+    int getCurrentNightMode();
 
     /**
      * Tells if UI mode is locked or not.

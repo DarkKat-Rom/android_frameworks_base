@@ -6048,6 +6048,25 @@ public final class Settings {
         public static final String UI_NIGHT_MODE = "ui_night_mode";
 
         /**
+         * The theme used for the night auto mode when the user selected ui night mode auto
+         * 2 - Theme Material
+         * 3 - Theme DarkKat
+         * 5 - Theme Blackout
+         * default: 2
+         * @hide
+         */
+        public static final String UI_NIGHT_AUTO_MODE = "ui_night_auto_mode";
+
+        /**
+         * The theme used for the day auto mode when the user selected ui night mode auto
+         * 1 - Theme Material light
+         * 4 - Theme Whiteout
+         * default: 1
+         * @hide
+         */
+        public static final String UI_DAY_AUTO_MODE = "ui_day_auto_mode";
+
+        /**
          * Whether screensavers are enabled.
          * @hide
          */

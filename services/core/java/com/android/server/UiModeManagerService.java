@@ -33,6 +33,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Handler;
@@ -65,6 +66,9 @@ final class UiModeManagerService extends SystemService {
 
     private int mLastBroadcastState = Intent.EXTRA_DOCK_STATE_UNDOCKED;
     private int mNightMode = UiModeManager.MODE_NIGHT_NO;
+    private int mCurrentNightMode = mNightMode;
+    private int mNightAutoMode = UiModeManager.MODE_NIGHT_YES;
+    private int mDayAutoMode = UiModeManager.MODE_NIGHT_NO;
 
     private boolean mCarModeEnabled = false;
     private boolean mCharging = false;
@@ -97,6 +101,9 @@ final class UiModeManagerService extends SystemService {
     private StatusBarManager mStatusBarManager;
 
     private PowerManager.WakeLock mWakeLock;
+
+    private SettingsObserver mSettingsObserver;
+    private boolean mIsObserving = false;
 
     public UiModeManagerService(Context context) {
         super(context);
@@ -166,6 +173,45 @@ final class UiModeManagerService extends SystemService {
         }
     };
 
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            getContext().getContentResolver().registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_AUTO_MODE), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_DAY_AUTO_MODE), false, this);
+        }
+
+        void unobserve() {
+            getContext().getContentResolver().unregisterContentObserver(this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            int nightAutoMode = Settings.Secure.getInt(getContext().getContentResolver(),
+                    Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES);
+            int dayAutoMode = Settings.Secure.getInt(getContext().getContentResolver(),
+                    Settings.Secure.UI_DAY_AUTO_MODE, UiModeManager.MODE_NIGHT_NO);
+            boolean changed = false;
+            if (mNightAutoMode != nightAutoMode) {
+                mNightAutoMode = nightAutoMode;
+                changed = true;
+            }
+            if (mDayAutoMode != dayAutoMode) {
+                mDayAutoMode = dayAutoMode;
+                changed = true;
+            }
+            if (changed && mNightMode == UiModeManager.MODE_NIGHT_AUTO) {
+                synchronized (mLock) {
+                    updateLocked(0, 0);
+                }
+            }
+        }
+    };
+
     @Override
     public void onStart() {
         final Context context = getContext();
@@ -178,6 +224,7 @@ final class UiModeManagerService extends SystemService {
                 new IntentFilter(Intent.ACTION_DOCK_EVENT));
         context.registerReceiver(mBatteryReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        mSettingsObserver = new SettingsObserver(mHandler);
 
         mConfiguration.setToDefaults();
 
@@ -202,6 +249,11 @@ final class UiModeManagerService extends SystemService {
                 com.android.internal.R.integer.config_defaultNightMode);
         mNightMode = Settings.Secure.getInt(context.getContentResolver(),
                 Settings.Secure.UI_NIGHT_MODE, defaultNightMode);
+        mCurrentNightMode = mNightMode;
+        mNightAutoMode = Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.UI_NIGHT_AUTO_MODE, UiModeManager.MODE_NIGHT_YES);
+        mDayAutoMode = Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.UI_DAY_AUTO_MODE, UiModeManager.MODE_NIGHT_NO);
 
         // Update the initial, static configurations.
         synchronized (this) {
@@ -303,6 +355,13 @@ final class UiModeManagerService extends SystemService {
         public int getNightMode() {
             synchronized (mLock) {
                 return mNightMode;
+            }
+        }
+
+        @Override
+        public int getCurrentNightMode() {
+            synchronized (mLock) {
+                return mCurrentNightMode;
             }
         }
 
@@ -419,15 +478,25 @@ final class UiModeManagerService extends SystemService {
         if (mNightMode == UiModeManager.MODE_NIGHT_AUTO) {
             if (mTwilightManager != null) {
                 mTwilightManager.registerListener(mTwilightListener, mHandler);
+                if (!mIsObserving) {
+                    mSettingsObserver.observe();
+                    mIsObserving = !mIsObserving;
+                }
             }
             updateComputedNightModeLocked();
-            uiMode |= mComputedNightMode ? Configuration.UI_MODE_NIGHT_YES
-                    : Configuration.UI_MODE_NIGHT_NO;
+            int dayNightAutoMode = mComputedNightMode ? mNightAutoMode : mDayAutoMode;
+            uiMode |= dayNightAutoMode << 4;
+            mCurrentNightMode = dayNightAutoMode;
         } else {
             if (mTwilightManager != null) {
                 mTwilightManager.unregisterListener(mTwilightListener);
+                if (mIsObserving) {
+                    mSettingsObserver.unobserve();
+                    mIsObserving = !mIsObserving;
+                }
             }
             uiMode |= mNightMode << 4;
+            mCurrentNightMode = mNightMode;
         }
 
         if (LOG) {
