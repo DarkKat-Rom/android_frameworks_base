@@ -130,6 +130,7 @@ import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.internal.util.darkkat.WeatherServiceControllerImpl;
 import com.android.internal.util.darkkat.WeatherHelper;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
+import com.android.keyguard.KeyguardStatusView;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
 import com.android.keyguard.ViewMediatorCallback;
@@ -1277,8 +1278,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             createUserSwitcher();
         }
 
+        WeatherServiceControllerImpl weatherController = new WeatherServiceControllerImpl(mContext);
+        ((KeyguardStatusView) mKeyguardStatusView).setWeatherController(weatherController);
         ((StatusBarWeather) mStatusBarView.findViewById(R.id.status_bar_weather_layout))
-                .setWeatherController(new WeatherServiceControllerImpl(mContext));
+                .setWeatherController(weatherController);
 
         mNetworkTrafficController = new NetworkTrafficControllerImpl(mContext);
         ((NetworkTraffic) mStatusBarView.findViewById(R.id.network_traffic))

@@ -35,11 +35,17 @@ import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.android.internal.util.darkkat.LockScreenColorHelper;
+import com.android.internal.util.darkkat.LockscreenHelper;
+import com.android.internal.util.darkkat.WeatherServiceController;
 import com.android.internal.widget.LockPatternUtils;
+
+import com.android.keyguard.darkkat.KeyguardWeatherWidget;
+import com.android.keyguard.darkkat.KeyguardWidgetScroller;
 
 import java.util.Locale;
 
-public class KeyguardStatusView extends GridLayout {
+public class KeyguardStatusView extends GridLayout implements
+        KeyguardWidgetScroller.OnActiveWidgetChangeListener {
     private static final boolean DEBUG = KeyguardConstants.DEBUG;
     private static final String TAG = "KeyguardStatusView";
 
@@ -49,7 +55,11 @@ public class KeyguardStatusView extends GridLayout {
     private TextView mAlarmStatusView;
     private TextClock mDateView;
     private TextClock mClockView;
+    private KeyguardWidgetScroller mKeyguardWidgetScroller;
+    private KeyguardWeatherWidget mKeyguardWeatherWidget;
     private TextView mOwnerInfo;
+
+    private int mActiveWidget = KeyguardWidgetScroller.TIME_WIDGET;
 
     private KeyguardUpdateMonitorCallback mInfoCallback = new KeyguardUpdateMonitorCallback() {
 
@@ -62,6 +72,16 @@ public class KeyguardStatusView extends GridLayout {
         public void onKeyguardVisibilityChanged(boolean showing) {
             if (showing) {
                 if (DEBUG) Slog.v(TAG, "refresh statusview showing:" + showing);
+                boolean showWeatherWidget = LockscreenHelper.showWeatherWidget(mContext);
+                if (!showWeatherWidget) {
+                    mActiveWidget = KeyguardWidgetScroller.TIME_WIDGET;
+                }
+                mKeyguardWeatherWidget.setKeyguardVisibility(showing);
+                if (showWeatherWidget && showing) {
+                    mKeyguardWidgetScroller.setOnActiveWidgetChangeListener(KeyguardStatusView.this);
+                } else {
+                    mKeyguardWidgetScroller.removeOnActiveWidgetChangeListener(KeyguardStatusView.this);
+                }
                 refresh();
                 updateOwnerInfo();
             }
@@ -110,6 +130,8 @@ public class KeyguardStatusView extends GridLayout {
         mAlarmStatusView = (TextView) findViewById(R.id.alarm_status);
         mDateView = (TextClock) findViewById(R.id.date_view);
         mClockView = (TextClock) findViewById(R.id.clock_view);
+        mKeyguardWidgetScroller = (KeyguardWidgetScroller) findViewById(R.id.widget_scroller);
+        mKeyguardWeatherWidget = (KeyguardWeatherWidget) findViewById(R.id.weather_widget);
         mDateView.setShowCurrentUserTime(true);
         mClockView.setShowCurrentUserTime(true);
         mOwnerInfo = (TextView) findViewById(R.id.owner_info);
@@ -140,9 +162,24 @@ public class KeyguardStatusView extends GridLayout {
                 getResources().getDimensionPixelSize(R.dimen.widget_label_font_size));
     }
 
+    public void setWeatherController(WeatherServiceController controller) {
+        mKeyguardWeatherWidget.setWeatherController(controller);
+    }
+
+    @Override
+    public void onActiveWidgetChanged(int newActiveWidget) {
+        if (mActiveWidget != newActiveWidget) {
+            mActiveWidget = newActiveWidget;
+            refreshTime();
+        }
+    }
+
     public void refreshTime() {
-        mDateView.setFormat24Hour(Patterns.dateView);
-        mDateView.setFormat12Hour(Patterns.dateView);
+        boolean useTimeDateForDateView = mActiveWidget != KeyguardWidgetScroller.TIME_WIDGET;
+        mDateView.setFormat24Hour(useTimeDateForDateView
+                ?  Patterns.clockDateView24 : Patterns.dateView);
+        mDateView.setFormat12Hour(useTimeDateForDateView
+                ? Patterns.clockDateView12 : Patterns.dateView);
 
         mClockView.setFormat12Hour(Patterns.clockView12);
         mClockView.setFormat24Hour(Patterns.clockView24);
@@ -232,6 +269,7 @@ public class KeyguardStatusView extends GridLayout {
                 ColorStateList.valueOf(LockScreenColorHelper.getSecondaryTextColor(mContext)));
         mDateView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
         mClockView.setTextColor(LockScreenColorHelper.getPrimaryTextColor(mContext));
+        mKeyguardWeatherWidget.setColors();
         mOwnerInfo.setTextColor(LockScreenColorHelper.getSecondaryTextColor(mContext));
     }
 
@@ -241,6 +279,8 @@ public class KeyguardStatusView extends GridLayout {
         static String dateView;
         static String clockView12;
         static String clockView24;
+        static String clockDateView12;
+        static String clockDateView24;
         static String cacheKey;
 
         static void update(Context context, boolean hasAlarm) {
@@ -251,23 +291,31 @@ public class KeyguardStatusView extends GridLayout {
                     : R.string.abbrev_wday_month_day_no_year);
             final String clockView12Skel = res.getString(R.string.clock_12hr_format);
             final String clockView24Skel = res.getString(R.string.clock_24hr_format);
+            final String clockDateView12Skel = clockView12Skel + dateViewSkel;
+            final String clockDateView24Skel = clockView24Skel + dateViewSkel;
             final String key = locale.toString() + dateViewSkel + clockView12Skel + clockView24Skel;
             if (key.equals(cacheKey)) return;
 
             dateView = DateFormat.getBestDateTimePattern(locale, dateViewSkel);
 
             clockView12 = DateFormat.getBestDateTimePattern(locale, clockView12Skel);
+            clockDateView12 = DateFormat.getBestDateTimePattern(locale, clockDateView12Skel);
             // CLDR insists on adding an AM/PM indicator even though it wasn't in the skeleton
             // format.  The following code removes the AM/PM indicator if we didn't want it.
             if (!clockView12Skel.contains("a")) {
                 clockView12 = clockView12.replaceAll("a", "").trim();
             }
+            if (!clockDateView12Skel.contains("a")) {
+                clockDateView12 = clockDateView12.replaceAll("a", "").trim();
+            }
 
             clockView24 = DateFormat.getBestDateTimePattern(locale, clockView24Skel);
-
+            clockDateView24 = DateFormat.getBestDateTimePattern(locale, clockDateView24Skel);
             // Use fancy colon.
             clockView24 = clockView24.replace(':', '\uee01');
             clockView12 = clockView12.replace(':', '\uee01');
+            clockDateView24 = clockDateView24.replace(':', '\uee01');
+            clockDateView12 = clockDateView12.replace(':', '\uee01');
 
             cacheKey = key;
         }
