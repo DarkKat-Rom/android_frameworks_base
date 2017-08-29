@@ -25,6 +25,11 @@ import android.provider.Settings;
 
 public class LockscreenHelper {
 
+    public static boolean showWeatherWidget(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_SHOW_WEATHER_WIDGET, 0) == 1;
+    }
+
     private static boolean showBatteryInfoOnAmbientDisplayEnabled(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.AMBIENT_DISPLAY_SHOW_BATTERY_INFO, 0) == 1;

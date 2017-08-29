@@ -3876,6 +3876,12 @@ public final class Settings {
         public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
 
         /**
+         *  Whether to show the weather widget on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_WEATHER_WIDGET = "lock_screen_show_weather_widget";
+
+        /**
          *  Whether to show battery info on the lock screen
          * @hide
          */
