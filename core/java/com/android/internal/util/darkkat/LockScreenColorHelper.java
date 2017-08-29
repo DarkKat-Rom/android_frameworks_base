@@ -47,8 +47,13 @@ public class LockScreenColorHelper {
     }
 
     public static ColorStateList getIconTint(Context context) {
-
         return ColorStateList.valueOf(getIconColor(context));
+    }
+
+    public static ColorStateList getNormalIconTint(Context context) {
+        int baseColor = getIconColor(context);
+        return ColorStateList.valueOf(
+                (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24) | (baseColor & 0x00ffffff));
     }
 
     public static int getAmbientDisplayBatteryTextColor(Context context) {
