@@ -485,6 +485,7 @@ public interface WindowManagerPolicy {
 
         public void shutdown(boolean confirm);
         public void reboot(boolean confirm);
+        public void advancedReboot(String reason, boolean confirm);
         public void rebootSafeMode(boolean confirm);
 
         /**

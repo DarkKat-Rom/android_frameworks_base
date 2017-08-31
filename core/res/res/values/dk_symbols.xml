@@ -18,9 +18,36 @@
 
     <java-symbol type="attr" name="colorSwitchThumbNormal"/>
 
-    <!-- Shut down dialog -->
+    <!-- Global actions -->
 
-    <!-- Reboot to restart dialog -->
-    <java-symbol type="string" name="shutdown_restart" />
-    <java-symbol type="string" name="shutdown_progress_restart" />
+    <java-symbol type="array" name="config_advancedRestartActionsList" />
+    <java-symbol type="string" name="advanced_restart_menu_title" />
+    <java-symbol type="color" name="global_action_silent_mode_icon_color" />
+    <java-symbol type="drawable" name="ic_advanced_restart_menu" />
+    <java-symbol type="drawable" name="ic_restart_to_system" />
+    <java-symbol type="drawable" name="ic_restart_to_quick_reboot" />
+    <java-symbol type="drawable" name="ic_restart_to_recovery" />
+    <java-symbol type="drawable" name="ic_restart_to_bootloader" />
+    <java-symbol type="drawable" name="ic_global_action_silent_mode_mute" />
+    <java-symbol type="drawable" name="ic_global_action_silent_mode_vibrate" />
+    <java-symbol type="drawable" name="ic_global_action_silent_mode_vol" />
+    <java-symbol type="string" name="global_action_reboot" />
+    <java-symbol type="string" name="global_action_advanced_restart_menu" />
+    <java-symbol type="string" name="global_action_restart_to_system" />
+    <java-symbol type="string" name="global_action_restart_to_quick_reboot" />
+    <java-symbol type="string" name="global_action_restart_to_recovery" />
+    <java-symbol type="string" name="global_action_restart_to_bootloader" />
+
+    <!-- Shut down dialogs -->
+
+    <java-symbol type="string" name="reboot_general_title" />
+    <java-symbol type="string" name="reboot_confirm" />
+    <java-symbol type="string" name="reboot_to_system_confirm" />
+    <java-symbol type="string" name="reboot_to_quick_reboot_confirm" />
+    <java-symbol type="string" name="reboot_to_recovery_confirm" />
+    <java-symbol type="string" name="reboot_to_bootloader_confirm" />
+    <java-symbol type="string" name="reboot_message" />
+    <java-symbol type="string" name="reboot_to_system_message" />
+    <java-symbol type="string" name="reboot_to_recovery_message" />
+    <java-symbol type="string" name="reboot_to_bootloader_message" />
 </resources>

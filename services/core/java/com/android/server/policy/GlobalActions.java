@@ -29,6 +29,7 @@ import com.android.internal.widget.LockPatternUtils;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.Dialog;
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,6 +44,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
@@ -60,6 +62,7 @@ import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -104,6 +107,18 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private static final String GLOBAL_ACTION_KEY_VOICEASSIST = "voiceassist";
     private static final String GLOBAL_ACTION_KEY_ASSIST = "assist";
     private static final String GLOBAL_ACTION_KEY_RESTART = "restart";
+    private static final String GLOBAL_ACTION_KEY_ADVANCED_RESTART_MENU = "advanced_restart";
+
+    private static final String GLOBAL_ACTION_KEY_RESTART_TO_SYSTEM       = "restart_to_system";
+    private static final String GLOBAL_ACTION_KEY_RESTART_TO_QUICK_REBOOT = "restart_to_quick_reboot";
+    private static final String GLOBAL_ACTION_KEY_RESTART_TO_RECOVERY     = "restart_to_recovery";
+    private static final String GLOBAL_ACTION_KEY_RESTART_TO_BOOTLOADER   = "restart_to_bootloader";
+
+    private static final String REASON_QUICK_REBOOT = "quick_reboot";
+
+    private static final int ADVANCED_REBOOT_MODE_ALWAYS                     = 0;
+    private static final int ADVANCED_REBOOT_MODE_NEVER                      = 1;
+    private static final int ADVANCED_REBOOT_MODE_HIDE_ON_SECURE_LOCK_SCREEN = 2;
 
     private final Context mContext;
     private final WindowManagerFuncs mWindowManagerFuncs;
@@ -126,6 +141,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private boolean mHasVibrator;
     private final boolean mShowSilentToggle;
     private final EmergencyAffordanceManager mEmergencyAffordanceManager;
+
+    private String[] mMenuActions;
 
     /**
      * @param context everything needs a context :(
@@ -164,11 +181,20 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         mEmergencyAffordanceManager = new EmergencyAffordanceManager(context);
     }
 
+    // as day/night theming isn't fully implemented, we need to use a day/night themed context
+    private ContextThemeWrapper getThemedContext(Context context) {
+        ContextThemeWrapper themedContext =
+                new ContextThemeWrapper(context, com.android.internal.R.style.Theme_Material_DayNight);
+        return themedContext;
+    }
+
     /**
      * Show the global actions dialog (creating if necessary)
      * @param keyguardShowing True if keyguard is showing
      */
     public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned) {
+        mMenuActions = mContext.getResources().getStringArray(
+                com.android.internal.R.array.config_globalActionsList);
         mKeyguardShowing = keyguardShowing;
         mDeviceProvisioned = isDeviceProvisioned;
         if (mDialog != null) {
@@ -221,7 +247,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         if (!mHasVibrator) {
             mSilentModeAction = new SilentModeToggleAction();
         } else {
-            mSilentModeAction = new SilentModeTriStateAction(mContext, mAudioManager, mHandler);
+            mSilentModeAction =
+                    new SilentModeTriStateAction(getThemedContext(mContext), mAudioManager, mHandler);
         }
         mAirplaneModeOn = new ToggleAction(
                 R.drawable.ic_lock_airplane_mode,
@@ -266,13 +293,48 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         };
         onAirplaneModeChanged();
 
-        mItems = new ArrayList<Action>();
-        String[] defaultActions = mContext.getResources().getStringArray(
-                com.android.internal.R.array.config_globalActionsList);
+        buildMenuList();
 
+        if (mEmergencyAffordanceManager.needsEmergencyAffordance()) {
+            mItems.add(getEmergencyAction());
+        }
+
+        mAdapter = new MyAdapter();
+
+        AlertParams params = new AlertParams(getThemedContext(mContext));
+        params.mAdapter = mAdapter;
+        params.mOnClickListener = this;
+//        params.mForceInverseBackground = true;
+
+        GlobalActionsDialog dialog = new GlobalActionsDialog(getThemedContext(mContext), params);
+        dialog.setCanceledOnTouchOutside(false); // Handled by the custom class.
+
+        dialog.getListView().setItemsCanFocus(true);
+        dialog.getListView().setLongClickable(true);
+        dialog.getListView().setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
+                            long id) {
+                        final Action action = mAdapter.getItem(position);
+                        if (action instanceof LongPressAction) {
+                            return ((LongPressAction) action).onLongPress();
+                        }
+                        return false;
+                    }
+        });
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        dialog.setOnDismissListener(this);
+
+        return dialog;
+    }
+
+    private void buildMenuList() {
+//        mItems.clear();
+        mItems = new ArrayList<Action>();
         ArraySet<String> addedKeys = new ArraySet<String>();
-        for (int i = 0; i < defaultActions.length; i++) {
-            String actionKey = defaultActions[i];
+        for (int i = 0; i < mMenuActions.length; i++) {
+            String actionKey = mMenuActions[i];
             if (addedKeys.contains(actionKey)) {
                 // If we already have added this, don't add it again.
                 continue;
@@ -302,48 +364,55 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 mItems.add(getVoiceAssistAction());
             } else if (GLOBAL_ACTION_KEY_ASSIST.equals(actionKey)) {
                 mItems.add(getAssistAction());
-            } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)) {
+            } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)
+                        && !advancedRebootEnabled()) {
                 mItems.add(new RestartAction());
+            } else if (GLOBAL_ACTION_KEY_ADVANCED_RESTART_MENU.equals(actionKey)
+                        && advancedRebootEnabled()) {
+                mItems.add(new AdvancedRestartMenuAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_TO_SYSTEM.equals(actionKey)) {
+                mItems.add(new RestartToSystemAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_TO_QUICK_REBOOT.equals(actionKey)) {
+                mItems.add(new RestartToQuickRebootAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_TO_RECOVERY.equals(actionKey)) {
+                mItems.add(new RestartToRecoveryAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_TO_BOOTLOADER.equals(actionKey)) {
+                mItems.add(new RestartToBootloaderAction());
             } else {
                 Log.e(TAG, "Invalid global action key " + actionKey);
             }
             // Add here so we don't add more than one.
             addedKeys.add(actionKey);
         }
+    }
 
-        if (mEmergencyAffordanceManager.needsEmergencyAffordance()) {
-            mItems.add(getEmergencyAction());
+    private boolean advancedRebootEnabled() {
+        int mode = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWER_MENU_ADVANCED_REBOOT_MODE,
+                ADVANCED_REBOOT_MODE_HIDE_ON_SECURE_LOCK_SCREEN);
+        boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
+
+        if (mode == ADVANCED_REBOOT_MODE_HIDE_ON_SECURE_LOCK_SCREEN) {
+            if (isPrimary) {
+                KeyguardManager km = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
+                boolean locked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
+                return !locked;
+            } else {
+                return false;
+            }
         }
 
-        mAdapter = new MyAdapter();
+        return mode == ADVANCED_REBOOT_MODE_ALWAYS && isPrimary;
+    }
 
-        AlertParams params = new AlertParams(mContext);
-        params.mAdapter = mAdapter;
-        params.mOnClickListener = this;
-        params.mForceInverseBackground = true;
+    private boolean confirmReboot() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWER_MENU_CONFIRM_REBOOT, 0) == 1;
+    }
 
-        GlobalActionsDialog dialog = new GlobalActionsDialog(mContext, params);
-        dialog.setCanceledOnTouchOutside(false); // Handled by the custom class.
-
-        dialog.getListView().setItemsCanFocus(true);
-        dialog.getListView().setLongClickable(true);
-        dialog.getListView().setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
-                            long id) {
-                        final Action action = mAdapter.getItem(position);
-                        if (action instanceof LongPressAction) {
-                            return ((LongPressAction) action).onLongPress();
-                        }
-                        return false;
-                    }
-        });
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-
-        dialog.setOnDismissListener(this);
-
-        return dialog;
+    private boolean confirmPowerOff() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWER_MENU_CONFIRM_POWER_OFF, 0) == 1;
     }
 
     private final class PowerAction extends SinglePressAction implements LongPressAction {
@@ -375,13 +444,13 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         @Override
         public void onPress() {
             // shutdown by making sure radio and power are handled accordingly.
-            mWindowManagerFuncs.shutdown(false /* confirm */);
+            mWindowManagerFuncs.shutdown(confirmPowerOff());
         }
     }
 
-    private final class RestartAction extends SinglePressAction implements LongPressAction {
+    private class RestartAction extends SinglePressAction implements LongPressAction {
         private RestartAction() {
-            super(R.drawable.ic_restart, R.string.global_action_restart);
+            super(R.drawable.ic_restart, R.string.global_action_reboot);
         }
 
         @Override
@@ -406,7 +475,133 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         @Override
         public void onPress() {
-            mWindowManagerFuncs.reboot(false /* confirm */);
+            mWindowManagerFuncs.reboot(confirmReboot());
+        }
+    }
+
+    private class AdvancedRestartMenuAction extends SinglePressAction {
+        private AdvancedRestartMenuAction() {
+            super(R.drawable.ic_advanced_restart_menu, R.string.global_action_advanced_restart_menu);
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return true;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+
+        @Override
+        public View create(Context context, View convertView, ViewGroup parent, LayoutInflater inflater) {
+            View v = super.create(context, convertView, parent, inflater);
+            v.setOnClickListener(this);
+            return v;
+        }
+
+        @Override
+        public void onClick(View v) {
+            mMenuActions = mContext.getResources().getStringArray(
+                com.android.internal.R.array.config_advancedRestartActionsList);
+            buildMenuList();
+            mAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    private class RestartToSystemAction extends SinglePressAction implements LongPressAction {
+        private RestartToSystemAction() {
+            super(R.drawable.ic_restart_to_system, R.string.global_action_restart_to_system);
+        }
+
+        @Override
+        public boolean onLongPress() {
+            UserManager um = (UserManager) mContext.getSystemService(Context.USER_SERVICE);
+            if (!um.hasUserRestriction(UserManager.DISALLOW_SAFE_BOOT)) {
+                mWindowManagerFuncs.rebootSafeMode(true);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return true;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+
+        @Override
+        public void onPress() {
+            mWindowManagerFuncs.advancedReboot(null, confirmReboot());
+        }
+    }
+
+    private class RestartToQuickRebootAction extends SinglePressAction {
+        private RestartToQuickRebootAction() {
+            super(R.drawable.ic_restart_to_quick_reboot, R.string.global_action_restart_to_quick_reboot);
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return true;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+
+        @Override
+        public void onPress() {
+            mWindowManagerFuncs.advancedReboot(REASON_QUICK_REBOOT, confirmReboot());
+        }
+    }
+
+    private class RestartToRecoveryAction extends SinglePressAction {
+        private RestartToRecoveryAction() {
+            super(R.drawable.ic_restart_to_recovery, R.string.global_action_restart_to_recovery);
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return true;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+
+        @Override
+        public void onPress() {
+            mWindowManagerFuncs.advancedReboot(PowerManager.REBOOT_RECOVERY, confirmReboot());
+        }
+    }
+
+    private class RestartToBootloaderAction extends SinglePressAction {
+        private RestartToBootloaderAction() {
+            super(R.drawable.ic_restart_to_bootloader, R.string.global_action_restart_to_bootloader);
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return true;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+
+        @Override
+        public void onPress() {
+            mWindowManagerFuncs.advancedReboot(PowerManager.REBOOT_BOOTLOADER, confirmReboot());
         }
     }
 
@@ -746,7 +941,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         public View getView(int position, View convertView, ViewGroup parent) {
             Action action = getItem(position);
-            return action.create(mContext, convertView, parent, LayoutInflater.from(mContext));
+            return action.create(getThemedContext(mContext), convertView, parent,
+                    LayoutInflater.from(getThemedContext(mContext)));
         }
     }
 
@@ -796,7 +992,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
      * A single press action maintains no state, just responds to a press
      * and takes an action.
      */
-    private static abstract class SinglePressAction implements Action {
+    private static abstract class SinglePressAction implements Action, View.OnClickListener {
         private final int mIconResId;
         private final Drawable mIcon;
         private final int mMessageResId;
@@ -824,7 +1020,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             return null;
         }
 
-        abstract public void onPress();
+        public void onPress() {
+        }
 
         public CharSequence getLabelForAccessibility(Context context) {
             if (mMessage != null) {
@@ -861,6 +1058,10 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             }
 
             return v;
+        }
+
+        @Override
+        public void onClick(View v) {
         }
     }
 
@@ -1205,7 +1406,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         private boolean mCancelOnUp;
 
         public GlobalActionsDialog(Context context, AlertParams params) {
-            super(context, getDialogTheme(context));
+            super(context, com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert);
             mContext = getContext();
             mAlert = AlertController.create(mContext, this, getWindow());
             mAdapter = (MyAdapter) params.mAdapter;
