@@ -17,12 +17,10 @@
 
 package com.android.server.power;
 
-import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.IActivityManager;
-import android.app.KeyguardManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.IBluetoothManager;
@@ -56,7 +54,6 @@ import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.WindowManager;
 
 import java.io.BufferedReader;
@@ -88,16 +85,14 @@ public final class ShutdownThread extends Thread {
     private static boolean sIsStarted = false;
 
     private static boolean mReboot;
+    private static boolean mAdvancedReboot;
+    private static boolean mQuickReboot;
     private static boolean mRebootSafeMode;
     private static boolean mRebootHasProgressBar;
     private static String mReason;
+    private static boolean mReasonFactoryReset;
 
-    private static int mRebootAction = -1;
-
-    private static final int ACTION_REBOOT       = 0;
-    private static final int ACTION_QUICK_REBOOT = 1;
-    private static final int ACTION_RECOVERY     = 2;
-    private static final int ACTION_BOOTLOADER   = 3;
+    private static final String REASON_QUICK_REBOOT = "quick_reboot";
 
     // Provides shutdown assurance in case the system_server is killed
     public static final String SHUTDOWN_ACTION_PROPERTY = "sys.shutdown.requested";
@@ -142,8 +137,11 @@ public final class ShutdownThread extends Thread {
      */
     public static void shutdown(final Context context, String reason, boolean confirm) {
         mReboot = false;
+        mAdvancedReboot = false;
+        mQuickReboot = false;
         mRebootSafeMode = false;
         mReason = reason;
+        mReasonFactoryReset = false;
         shutdownInner(context, confirm);
     }
 
@@ -157,8 +155,8 @@ public final class ShutdownThread extends Thread {
             }
         }
 
-        final int titleResourceId;
-        final int resourceId;
+        int titleResourceId;
+        int resourceId;
 
         Log.d(TAG, "Notifying thread to start shutdown");
 
@@ -166,20 +164,28 @@ public final class ShutdownThread extends Thread {
             titleResourceId = com.android.internal.R.string.reboot_safemode_title;
             resourceId = com.android.internal.R.string.reboot_safemode_confirm;
         } else if (mReboot) {
-            titleResourceId = com.android.internal.R.string.shutdown_reboot_dlg_title;
-            resourceId = com.android.internal.R.string.shutdown_reboot_dlg_confirm_title;
+            titleResourceId = com.android.internal.R.string.restart_general_title;
+            if (!mAdvancedReboot) {
+                resourceId = com.android.internal.R.string.restart_confirm;
+            } else {
+                if (mQuickReboot) {
+                    resourceId = com.android.internal.R.string.advanced_restart_restart_to_quick_restart_confirm;
+                } else if (PowerManager.REBOOT_RECOVERY.equals(mReason)) {
+                    resourceId = com.android.internal.R.string.advanced_restart_reboot_to_recovery_confirm;
+                } else if (PowerManager.REBOOT_BOOTLOADER.equals(mReason)) {
+                    resourceId = com.android.internal.R.string.advanced_restart_reboot_to_bootloader_confirm;
+                } else {
+                    resourceId = com.android.internal.R.string.advanced_restart_restart_to_system_confirm;
+                }
+            }
         } else {
-
             final int longPressBehavior = context.getResources().getInteger(
                             com.android.internal.R.integer.config_longPressOnPowerBehavior);
-
             titleResourceId = com.android.internal.R.string.power_off;
-            if (longPressBehavior == 2) {
-                resourceId = com.android.internal.R.string.shutdown_confirm_question;
-            } else {
-                resourceId = com.android.internal.R.string.shutdown_confirm;
-            }
 
+            resourceId = longPressBehavior == 2
+                    ? com.android.internal.R.string.shutdown_confirm_question
+                    : com.android.internal.R.string.shutdown_confirm;
             Log.d(TAG, "longPressBehavior=" + longPressBehavior);
         }
 
@@ -187,96 +193,32 @@ public final class ShutdownThread extends Thread {
             final CloseDialogReceiver closer = new CloseDialogReceiver(context);
             if (sConfirmDialog != null) {
                 sConfirmDialog.dismiss();
-                sConfirmDialog = null;
             }
-            if (mReboot && !mRebootSafeMode) {
-                // Determine if primary user is logged in
-                boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
-
-                // See if the advanced reboot menu is enabled (only if primary user) and check the keyguard state
-                boolean advancedReboot = isPrimary ? advancedRebootEnabled(context) : false;
-                KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-                boolean locked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
-
-                if (advancedReboot && !locked) {
-                    mRebootAction = ACTION_REBOOT;
-                    // Include options in power menu for rebooting into recovery or bootloader
-                    sConfirmDialog = new AlertDialog.Builder(context)
-                            .setTitle(titleResourceId)
-                            .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (which < 0)
-                                        return;
-
-                                    String actions[] = context.getResources().getStringArray(com.android.internal.R.array.shutdown_reboot_actions);
-                                    mRebootAction = which;
-                                    if (actions != null && which < actions.length) {
-                                        mReason = actions[which];
-                                    }
-                                }
-                            })
-                            .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (mRebootAction == ACTION_QUICK_REBOOT) {
-                                        try {
-                                            final IActivityManager am =
-                                                    ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
-                                            if (am != null) {
-                                                am.restart();
-                                            }
-                                        } catch (RemoteException e) {
-                                            Log.e(TAG, "failure trying to perform quick reboot", e);
-                                        }
-                                    } else {
-                                        if (mRebootAction < 0) {
-                                            // no option was pressed, set reboot action to default (reboot)
-                                            mRebootAction = ACTION_REBOOT;
-                                        }
-                                        beginShutdownSequence(context);
-                                    }
-                                }
-                            })
-                            .setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            })
-                            .create();
-                            sConfirmDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                        dialog.cancel();
-                                    }
-                                    return true;
-                                }
-                            });
-                }
-            }
-
-            if (sConfirmDialog == null) {
-                sConfirmDialog = new AlertDialog.Builder(context, com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert)
-                        .setTitle(titleResourceId)
-                        .setMessage(resourceId)
-                        .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+            sConfirmDialog = new AlertDialog.Builder(context, com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert)
+                    .setTitle(titleResourceId)
+                    .setMessage(resourceId)
+                    .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (mQuickReboot) {
+                                doQuickReboot();
+                            } else {
                                 beginShutdownSequence(context);
                             }
-                        })
-                        .setNegativeButton(com.android.internal.R.string.no, null)
-                        .create();
-            }
+                        }
+                    })
+                    .setNegativeButton(com.android.internal.R.string.no, null)
+                    .create();
             closer.dialog = sConfirmDialog;
             sConfirmDialog.setOnDismissListener(closer);
             sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
             sConfirmDialog.show();
         } else {
-            beginShutdownSequence(context);
+            if (mQuickReboot) {
+                doQuickReboot();
+            } else {
+                beginShutdownSequence(context);
+            }
         }
-    }
-
-    private static boolean advancedRebootEnabled(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.POWER_MENU_SHOW_ADVANCED_REBOOT, 0) == 1;
     }
 
     private static class CloseDialogReceiver extends BroadcastReceiver
@@ -311,9 +253,43 @@ public final class ShutdownThread extends Thread {
      */
     public static void reboot(final Context context, String reason, boolean confirm) {
         mReboot = true;
+        mAdvancedReboot = false;
+        mQuickReboot = false;
         mRebootSafeMode = false;
         mRebootHasProgressBar = false;
         mReason = reason;
+
+        if (PowerManager.REBOOT_RECOVERY.equals(reason)) {
+            mReasonFactoryReset = true;
+        } else {
+            mReasonFactoryReset = false;
+        }
+
+        shutdownInner(context, confirm);
+    }
+
+    /**
+     * Request a clean shutdown, waiting for subsystems to clean up their
+     * state etc.  Must be called from a Looper thread in which its UI
+     * is shown.
+     *
+     * @param context Context used to display the shutdown progress dialog.
+     * @param reason code to pass to the kernel (e.g. "recovery"), or null.
+     * @param confirm true if user confirmation is needed before shutting down.
+     */
+    public static void advancedReboot(final Context context, String reason, boolean confirm) {
+        mReboot = true;
+        mAdvancedReboot = true;
+        mRebootSafeMode = false;
+        mRebootHasProgressBar = false;
+        if (REASON_QUICK_REBOOT.equals(reason)) {
+            mReason = null;
+            mQuickReboot = true;
+        } else {
+            mReason = reason;
+            mQuickReboot = false;
+        }
+        mReasonFactoryReset = false;
         shutdownInner(context, confirm);
     }
 
@@ -331,10 +307,25 @@ public final class ShutdownThread extends Thread {
         }
 
         mReboot = true;
+        mAdvancedReboot = false;
+        mQuickReboot = false;
         mRebootSafeMode = true;
         mRebootHasProgressBar = false;
         mReason = null;
+        mReasonFactoryReset = false;
         shutdownInner(context, confirm);
+    }
+
+    private static void doQuickReboot() {
+        try {
+            final IActivityManager am =
+                    ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
+            if (am != null) {
+                am.restart();
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "failure trying to perform quick reboot", e);
+        }
     }
 
     private static void beginShutdownSequence(Context context) {
@@ -347,72 +338,87 @@ public final class ShutdownThread extends Thread {
         }
 
         // Throw up a system dialog to indicate the device is rebooting / shutting down.
-        ProgressDialog pd = new ProgressDialog(context);
+        ProgressDialog pd = new ProgressDialog(context,
+                com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert);
 
-        // Path 1: Reboot to recovery and install the update
-        //   Condition: mReason == REBOOT_RECOVERY, mRebootUpdate == True
-        //   and mRebootAction is not defined
-        //   (mRebootUpdate is set by checking if /cache/recovery/uncrypt_file exists.)
-        //   UI: progress bar
+        // Path 1: Reboot to recovery for update
+        //   Condition: mReason == REBOOT_RECOVERY_UPDATE
+        //
+        //  Path 1a: uncrypt needed
+        //   Condition: if /cache/recovery/uncrypt_file exists but
+        //              /cache/recovery/block.map doesn't.
+        //   UI: determinate progress bar (mRebootHasProgressBar == True)
+        //
+        // * Path 1a is expected to be removed once the GmsCore shipped on
+        //   device always calls uncrypt prior to reboot.
+        //
+        //  Path 1b: uncrypt already done
+        //   UI: spinning circle only (no progress bar)
         //
         // Path 2: Reboot to recovery for factory reset
         //   Condition: mReason == REBOOT_RECOVERY
-        //   and mRebootAction is not defined
+        //              mReasonFactoryReset == true
         //   UI: spinning circle only (no progress bar)
         //
-        // Path 3: Regular/advanced reboot
-        //   Condition: mRebootAction == ACTION_REBOOT, ACTION_QUICK_REBOOT, ACTION_RECOVERY
-        //   or ACTION_BOOTLOADER
+        // Path 3: Regular reboot to recovery
+        //   Condition: mReason == REBOOT_RECOVERY
+        //              mReasonFactoryReset == false
         //   UI: spinning circle only (no progress bar)
         //
-        // Path 4: Regular shutdown
+        // Path 4: Reboot to bootloader
+        //   Condition: mReason == REBOOT_BOOTLOADER
+        //   UI: spinning circle only (no progress bar)
+        //
+        // Path 5: Regular reboot / shutdown
         //   Condition: Otherwise
         //   UI: spinning circle only (no progress bar)
+        int titleResId;
+        int messageResId;
+        boolean useIndeterminate = false;
         if (PowerManager.REBOOT_RECOVERY_UPDATE.equals(mReason)) {
             // We need the progress bar if uncrypt will be invoked during the
             // reboot, which might be time-consuming.
             mRebootHasProgressBar = RecoverySystem.UNCRYPT_PACKAGE_FILE.exists()
                     && !(RecoverySystem.BLOCK_MAP_FILE.exists());
-            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_update_title));
+            titleResId = com.android.internal.R.string.reboot_to_update_title;
             if (mRebootHasProgressBar) {
                 pd.setMax(100);
                 pd.setProgress(0);
-                pd.setIndeterminate(false);
                 pd.setProgressNumberFormat(null);
                 pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pd.setMessage(context.getText(
-                            com.android.internal.R.string.reboot_to_update_prepare));
+                messageResId = com.android.internal.R.string.reboot_to_update_prepare;
             } else {
-                pd.setIndeterminate(true);
-                pd.setMessage(context.getText(
-                            com.android.internal.R.string.reboot_to_update_reboot));
+                useIndeterminate = true;
+                messageResId = com.android.internal.R.string.reboot_to_update_reboot;
             }
-        } else if (PowerManager.REBOOT_RECOVERY.equals(mReason) && mRebootAction < 0) {
-            // Factory reset path. Set the dialog message accordingly.
-            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_reset_title));
-            pd.setMessage(context.getText(
-                        com.android.internal.R.string.reboot_to_reset_message));
-            pd.setIndeterminate(true);
+        } else if (PowerManager.REBOOT_RECOVERY.equals(mReason)) {
+            titleResId = mReasonFactoryReset
+                    ? com.android.internal.R.string.reboot_to_reset_title
+                    : com.android.internal.R.string.restart_general_title;
+            messageResId = mReasonFactoryReset
+                    ? com.android.internal.R.string.reboot_to_reset_message
+                    : com.android.internal.R.string.advanced_restart_reboot_to_recovery_message;
+            useIndeterminate = true;
+        } else if (PowerManager.REBOOT_BOOTLOADER.equals(mReason)) {
+            titleResId = com.android.internal.R.string.restart_general_title;
+            messageResId = com.android.internal.R.string.advanced_restart_reboot_to_bootloader_message;
+            useIndeterminate = true;
         } else {
-            int titleResourceId = mReboot
-                    ? com.android.internal.R.string.shutdown_reboot_dlg_title
-                    :  com.android.internal.R.string.power_off;
-            int messageResourceId = mReboot
-                    ? com.android.internal.R.string.shutdown_reboot_dlg_message_reboot
-                    : com.android.internal.R.string.shutdown_progress;
-            if (!(mRebootAction < 1)) {
-                if (mRebootAction == ACTION_QUICK_REBOOT) {
-                    messageResourceId = com.android.internal.R.string.shutdown_reboot_dlg_message_quick_reboot;
-                } else if (mRebootAction == ACTION_RECOVERY) {
-                    messageResourceId = com.android.internal.R.string.shutdown_reboot_dlg_message_recovery;
-                } else if (mRebootAction == ACTION_BOOTLOADER) {
-                    messageResourceId = com.android.internal.R.string.shutdown_reboot_dlg_message_bootloader;
-                }
+            titleResId = mReboot
+                    ? com.android.internal.R.string.restart_general_title
+                    : com.android.internal.R.string.power_off;
+            if (mAdvancedReboot) {
+                messageResId = com.android.internal.R.string.advanced_restart_restart_to_system_message;
+            } else {
+                messageResId = mReboot
+                        ? com.android.internal.R.string.restart_message
+                        : com.android.internal.R.string.shutdown_progress;
             }
-            pd.setTitle(context.getText(titleResourceId));
-            pd.setMessage(context.getText(messageResourceId));
-            pd.setIndeterminate(true);
+            useIndeterminate = true;
         }
+        pd.setTitle(context.getText(titleResId));
+        pd.setMessage(context.getText(messageResId));
+        pd.setIndeterminate(useIndeterminate);
         pd.setCancelable(false);
         pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 
