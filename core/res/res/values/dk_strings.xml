@@ -15,32 +15,51 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- Global action Buttons -->
+    <!-- Global actions start -->
 
-    <!-- Button to reboot the phone, within the Global actions dialog -->
-    <string name="global_action_reboot">Reboot</string>
+    <!-- Title for the advanced restart action -->
+    <string name="global_action_advanced_restart_menu">Advanced restart\u2026</string>
 
-    <!-- Shut down reboot dialogs -->
+    <!-- Advanced restart menu -->
 
-    <!-- Option to reboot the phone, within the Shut down reboot dialog -->
-    <string name="shutdown_reboot_option_reboot">Reboot</string>
-    <!-- Option to quick reboot the phone, within the Shut down reboot dialog -->
-    <string name="shutdown_reboot_option_quick_reboot">Quick reboot</string>
-    <!-- Option to reboot the phone into recovery, within the Shut down reboot dialog -->
-    <string name="shutdown_reboot_option_recovery">Recovery</string>
-    <!-- Option to reboot the phone into bootloader, within the Shut down reboot dialog -->
-    <string name="shutdown_reboot_option_bootloader">Bootloader</string>
+    <!-- Title of the advanced restart menu -->
+    <string name="advanced_restart_menu_dialog_title_text">Advanced restart</string>
+    <!-- Title for the advanced restart menu action (restart) -->
+    <string name="advanced_restart_restart_to_system">System</string>
+    <!-- Title for the advanced restart menu action (quick reboot) -->
+    <string name="advanced_restart_restart_to_quick_restart">Quick restart</string>
+    <!-- Title for the advanced restart menu action (recovery) -->
+    <string name="advanced_restart_reboot_to_recovery">Recovery</string>
+    <!-- Title for the advanced restart menu action (bootloader) -->
+    <string name="advanced_restart_reboot_to_bootloader">Bootloader</string>
+    <!-- Global actions end -->
 
-    <!-- Reboot Confirmation Dialog title -->
-    <string name="shutdown_reboot_dlg_confirm_title" product="tablet">Your tablet will reboot.</string>
-    <string name="shutdown_reboot_dlg_confirm_title" product="default">Your phone will reboot.</string>
-    <!-- Reboot Progress Dialog title -->
-    <string name="shutdown_reboot_dlg_title" product="tablet">Reboot tablet</string>
-    <string name="shutdown_reboot_dlg_title" product="default">Reboot phone</string>
-    <!-- Reboot Progress Dialog messages -->
-    <string name="shutdown_reboot_dlg_message_reboot">Rebooting\u2026</string>
-    <string name="shutdown_reboot_dlg_message_quick_reboot">Rebooting\u2026\n(Quick reboot)</string>
-    <string name="shutdown_reboot_dlg_message_recovery">Rebooting\u2026\n(Recovery)</string>
-    <string name="shutdown_reboot_dlg_message_bootloader">Rebooting\u2026\n(Bootloader)</string>
+    <!-- Shut down dialogs -->
+
+    <!-- General title used for shut down dialogs -->
+    <string name="restart_general_title" product="tablet">Restart tablet</string>
+    <string name="restart_general_title" product="default">Restart phone</string>
+    <!-- Message shown in the shut down confirm dialog (restart) -->
+    <string name="restart_confirm" product="tablet">Your tablet will restart.</string>
+    <string name="restart_confirm" product="default">Your phone will restart.</string>
+    <!-- Message shown in the shut down confirm dialog (restart to system) -->
+    <string name="advanced_restart_restart_to_system_confirm" product="tablet">Your tablet will restart\n(System).</string>
+    <string name="advanced_restart_restart_to_system_confirm" product="default">Your phone will restart\n(System).</string>
+    <!-- Message shown in the shut down confirm dialog (restart to quick restart) -->
+    <string name="advanced_restart_restart_to_quick_restart_confirm" product="tablet">Your tablet will restart\n(Quick reboot).</string>
+    <string name="advanced_restart_restart_to_quick_restart_confirm" product="default">Your phone will restart\n(Quick reboot).</string>
+    <!-- Message shown in the shut down confirm dialog (reboot to recovery) -->
+    <string name="advanced_restart_reboot_to_recovery_confirm" product="tablet">Your tablet will restart\n(Recovery).</string>
+    <string name="advanced_restart_reboot_to_recovery_confirm" product="default">Your phone will restart\n(Recovery).</string>
+    <!-- Message shown in the shut down confirm dialog (reboot to bootloader) -->
+    <string name="advanced_restart_reboot_to_bootloader_confirm" product="tablet">Your tablet will restart\n(Bootloader).</string>
+    <string name="advanced_restart_reboot_to_bootloader_confirm" product="default">Your phone will restart\n(Bootloader).</string>
+    <!-- Message shown in the shut down dialog (when restarting)  -->
+    <string name="restart_message">Restarting\u2026</string>
+    <!-- Message shown in the shut down dialog (when restarting into system)  -->
+    <string name="advanced_restart_restart_to_system_message">Restarting\u2026\n(System)</string>
+    <!-- Message shown in the shut down dialog (when rebooting into recovery) -->
+    <string name="advanced_restart_reboot_to_recovery_message">Restarting\u2026\n(Recovery)</string>
+    <!-- Message shown in the shut down dialog (when rebooting into bootloader) -->
+    <string name="advanced_restart_reboot_to_bootloader_message">Restarting\u2026\n(Bootloader)</string>
 </resources>
-

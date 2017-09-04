@@ -19,6 +19,14 @@
 
 <resources>
 
+    <!-- Actions shown in the advanced restart menu -->
+    <string-array translatable="false" name="config_advancedRestartActionsList">
+        <item>advanced_restart_restart_to_system</item>
+        <item>advanced_restart_restart_to_quick_restart</item>
+        <item>advanced_restart_reboot_to_recovery</item>
+        <item>advanced_restart_reboot_to_bootloader</item>
+    </string-array>
+
     <!-- SlimRoms additions -->
 
     <!-- Slim recent app screen -->

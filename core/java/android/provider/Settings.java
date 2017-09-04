@@ -4312,11 +4312,26 @@ public final class Settings {
         public static final String QS_COLUMNS_LANDSCAPE = "qs_columns_landscape";
 
         /**
-         * Whether to include advanced reboot options in power menu for 
-         * quick rebooting, rebooting into recovery and rebooting into bootloader
+         * Wether to confirm power off
          * @hide
          */
-        public static final String POWER_MENU_SHOW_ADVANCED_REBOOT = "power_menu_show_advanced_reboot";
+        public static final String POWER_MENU_CONFIRM_POWER_OFF = "power_menu_confirm_power_off";
+
+        /**
+         * Mode used to show advanced reboot options in the reboot menu
+         * 0 - Always
+         * 1 - Hever
+         * 2 - Hide on secure lock screen
+         * default: 2
+         * @hide
+         */
+        public static final String POWER_MENU_ADVANCED_RESTART_MODE = "power_menu_advanced_restart_mode";
+
+        /**
+         * Wether to confirm reboot
+         * @hide
+         */
+        public static final String POWER_MENU_CONFIRM_RESTART = "power_menu_confirm_restart";
 
         /**
          * Slim Rexents thumbnail aspect ratio
