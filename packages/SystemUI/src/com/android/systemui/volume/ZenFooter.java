@@ -27,6 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.VolumeDialogColorHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.statusbar.policy.ZenModeController;
 
 import java.util.Objects;
@@ -132,6 +134,26 @@ public class ZenFooter extends LinearLayout {
     public void onConfigurationChanged() {
         Util.setText(mEndNowButton, mContext.getString(R.string.volume_zen_end_now));
         mSpTexts.update();
+    }
+
+    public void updateAccentColor() {
+        mEndNowButton.setTextColor(VolumeDialogColorHelper.getAccentColor(mContext));
+    }
+
+    public void updateTextColor() {
+        mSummaryLine1.setTextColor(VolumeDialogColorHelper.getTextColor(mContext));
+        mSummaryLine2.setTextColor(VolumeDialogColorHelper.getAlternativeTextColor(mContext));
+    }
+
+    public void updateIconColor() {
+        mIcon.setImageTintList(VolumeDialogColorHelper.getIconTintList(mContext));
+        findViewById(R.id.zen_embedded_divider).setBackgroundTintList(
+                VolumeDialogColorHelper.getIconTintList(mContext));
+    }
+
+    public void updateRippleColor() {
+        mEndNowButton.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                mEndNowButton.getBackground()));
     }
 
     private final ZenModeController.Callback mZenCallback = new ZenModeController.Callback() {

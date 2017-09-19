@@ -41,7 +41,7 @@ import android.widget.Toolbar.OnMenuItemClickListener;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSContainer;
 import com.android.systemui.qs.QSDetailClipper;
@@ -248,11 +248,11 @@ public class QSCustomizer extends LinearLayout implements OnMenuItemClickListene
 
     public void setActionBarRippleColor() {
         if (mToolbar.getNavigationView() != null) {
-            mToolbar.getNavigationView().setBackground(QSRippleHelper.getColoredRippleDrawable(
+            mToolbar.getNavigationView().setBackground(RippleDrawableHelper.getColoredRippleDrawable(
                     mContext, mToolbar.getNavigationView().getBackground()));
         }
         if (mToolbar.getOverflowButton() != null) {
-            mToolbar.getOverflowButton().setBackground(QSRippleHelper.getColoredRippleDrawable(
+            mToolbar.getOverflowButton().setBackground(RippleDrawableHelper.getColoredRippleDrawable(
                     mContext, mToolbar.getOverflowButton().getBackground()));
         }
         mToolbar.setMenuItemRippleColor(QSColorHelper.getRippleTintList(mContext));

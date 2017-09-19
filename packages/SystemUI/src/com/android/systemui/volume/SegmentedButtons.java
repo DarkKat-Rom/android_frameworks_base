@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.systemui.R;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 
 import java.util.Objects;
 
@@ -132,7 +132,7 @@ public class SegmentedButtons extends LinearLayout {
     public void setRippleColor() {
         for (int i = 0; i < getChildCount(); i++) {
             final View v = getChildAt(i);
-            v.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext, v.getBackground()));
+            v.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext, v.getBackground()));
         }
     }
 

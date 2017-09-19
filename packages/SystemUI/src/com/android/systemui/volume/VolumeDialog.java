@@ -67,9 +67,12 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.ThemeHelper;
 import com.android.settingslib.Utils;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.VolumeDialogColorHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerZenModePanel;
@@ -118,8 +121,6 @@ public class VolumeDialog implements TunerService.Tunable {
     private ZenFooter mZenFooter;
     private final Object mSafetyWarningLock = new Object();
     private final Accessibility mAccessibility = new Accessibility();
-    private final ColorStateList mActiveSliderTint;
-    private final ColorStateList mInactiveSliderTint;
     private VolumeDialogMotion mMotion;
     private final int mWindowType;
     private final ZenModeController mZenModeController;
@@ -140,6 +141,7 @@ public class VolumeDialog implements TunerService.Tunable {
     private long mCollapseTime;
     private boolean mHovering = false;
     private int mDensity;
+    private int mDayNightTheme;
 
     private boolean mShowFullZen;
     private TunerZenModePanel mZenPanel;
@@ -155,8 +157,6 @@ public class VolumeDialog implements TunerService.Tunable {
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         mAccessibilityMgr =
                 (AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
-        mActiveSliderTint = ColorStateList.valueOf(Utils.getColorAccent(mContext));
-        mInactiveSliderTint = loadColorStateList(R.color.volume_slider_inactive);
 
         initDialog();
 
@@ -168,6 +168,7 @@ public class VolumeDialog implements TunerService.Tunable {
 
         final Configuration currentConfig = mContext.getResources().getConfiguration();
         mDensity = currentConfig.densityDpi;
+        mDayNightTheme = ThemeHelper.getTheme(mContext);
     }
 
     private void initDialog() {
@@ -257,6 +258,7 @@ public class VolumeDialog implements TunerService.Tunable {
         mZenPanel = (TunerZenModePanel) mDialog.findViewById(R.id.tuner_zen_mode_panel);
         mZenPanel.init(mZenModeController);
         mZenPanel.setCallback(mZenPanelCallback);
+        updateColors();
     }
 
     @Override
@@ -836,12 +838,22 @@ public class VolumeDialog implements TunerService.Tunable {
         if (isActive && mExpanded) {
             row.slider.requestFocus();
         }
-        final ColorStateList tint = isActive && row.slider.isEnabled() ? mActiveSliderTint
-                : mInactiveSliderTint;
-        if (tint == row.cachedSliderTint) return;
-        row.cachedSliderTint = tint;
-        row.slider.setProgressTintList(tint);
-        row.slider.setThumbTintList(tint);
+
+        final ColorStateList backgroundTint = getIconTint();
+        final ColorStateList tint = isActive && row.slider.isEnabled() ? getActiveSliderTint()
+                : getInactiveSliderTint();
+        final boolean colorizeProgressBackground = backgroundTint != row.cachedSliderBackgroundTint;
+        final boolean colorizeProgressAndThumb = tint != row.cachedSliderTint;
+
+        if (colorizeProgressBackground) {
+            row.cachedSliderBackgroundTint = backgroundTint;
+            row.slider.setProgressBackgroundTintList(backgroundTint);
+        }
+        if (colorizeProgressAndThumb) {
+            row.cachedSliderTint = tint;
+            row.slider.setProgressTintList(tint);
+            row.slider.setThumbTintList(tint);
+        }
     }
 
     private void updateVolumeRowSliderH(VolumeRow row, boolean enable, int vlevel) {
@@ -946,6 +958,88 @@ public class VolumeDialog implements TunerService.Tunable {
         return pm.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN);
     }
 
+    private void updateColors() {
+        updateBackgroundColor();
+        updateAccentColor();
+        updateTextColor();
+        updateIconColor();
+        updateRippleColor();
+    }
+
+    public void updateBackgroundColor() {
+        mDialogView.setBackgroundTintList(getPrimaryBgTintList());
+        mZenPanel.updateBackgroundColor();
+    }
+
+    public void updateAccentColor() {
+        for (final VolumeRow row : mRows) {
+            final boolean isActive = row == getActiveRow();
+            updateVolumeRowSliderTintH(row, isActive);
+        }
+        mZenPanel.updateAccentColor();
+        mZenFooter.updateAccentColor();
+    }
+
+    public void updateTextColor() {
+        for (final VolumeRow row : mRows) {
+            row.header.setTextColor(getAlternativeTextColor());
+        }
+        mZenPanel.updateTextColor();
+        mZenFooter.updateTextColor();
+    }
+
+    public void updateIconColor() {
+        mExpandButton.setImageTintList(getIconTint());
+        for (final VolumeRow row : mRows) {
+            final boolean isActive = row == getActiveRow();
+            updateVolumeRowSliderTintH(row, isActive);
+            row.icon.setImageTintList(getIconTint());
+        }
+        mZenPanel.updateIconColor();
+        mZenFooter.updateIconColor();
+    }
+
+    public void updateRippleColor() {
+        mExpandButton.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                mExpandButton.getBackground()));
+        for (final VolumeRow row : mRows) {
+            row.icon.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                    row.icon.getBackground()));
+            row.slider.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                    row.slider.getBackground()));
+        }
+        mZenPanel.updateRippleColor();
+        mZenFooter.updateRippleColor();
+    }
+
+    private ColorStateList getPrimaryBgTintList() {
+        return VolumeDialogColorHelper.getPrimaryBgTintList(mContext);
+    }
+
+    private int getAccentColor() {
+        return VolumeDialogColorHelper.getAccentColor(mContext);
+    }
+
+    private int getAlternativeTextColor() {
+        return VolumeDialogColorHelper.getAlternativeTextColor(mContext);
+    }
+
+    private ColorStateList getIconTint() {
+        return VolumeDialogColorHelper.getIconTintList(mContext);
+    }
+
+    private ColorStateList getRippleTint() {
+        return VolumeDialogColorHelper.getRippleTintList(mContext);
+    }
+
+    private ColorStateList getActiveSliderTint() {
+        return VolumeDialogColorHelper.getAccentTintList(mContext);
+    }
+
+    private ColorStateList getInactiveSliderTint() {
+        return VolumeDialogColorHelper.getInactiveSliderTintList(mContext);
+    }
+
     private final VolumeDialogController.Callbacks mControllerCallbackH
             = new VolumeDialogController.Callbacks() {
         @Override
@@ -977,7 +1071,9 @@ public class VolumeDialog implements TunerService.Tunable {
         public void onConfigurationChanged() {
             Configuration newConfig = mContext.getResources().getConfiguration();
             final int density = newConfig.densityDpi;
-            if (density != mDensity) {
+            final int dayNightTheme = ThemeHelper.getTheme(mContext);
+            if (density != mDensity || mDayNightTheme != dayNightTheme) {
+                mDayNightTheme = dayNightTheme;
                 mDialog.dismiss();
                 mZenFooter.cleanup();
                 initDialog();
@@ -1240,6 +1336,7 @@ public class VolumeDialog implements TunerService.Tunable {
         private int iconMuteRes;
         private boolean important;
         private int cachedIconRes;
+        private ColorStateList cachedSliderBackgroundTint;
         private ColorStateList cachedSliderTint;
         private int iconState;  // from Events
         private boolean cachedShowHeaders = VolumePrefs.DEFAULT_SHOW_HEADERS;

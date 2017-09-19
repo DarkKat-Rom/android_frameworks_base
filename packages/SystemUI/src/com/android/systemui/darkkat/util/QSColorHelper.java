@@ -18,6 +18,7 @@ package com.android.systemui.darkkat.util;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.provider.Settings;
 
 import com.android.internal.util.darkkat.ColorConstants;
@@ -227,5 +228,53 @@ public class QSColorHelper extends StatusBarExpandedColorHelper {
         };
 
         return new ColorStateList(states, colors);
+    }
+
+    public static int getVolumeDialogHeaderTextColor(Context context) {
+        int themeColor = 0;
+
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                themeColor = ColorConstants.VOLUME_DIALOG_INACTIVE_DARK;
+                break;
+            case ThemeHelper.THEME_BLACKOUT:
+                themeColor = ColorConstants.VOLUME_DIALOG_INACTIVE_BLACKOUT;
+                break;
+        }
+
+        int color = themeColor;
+
+        if (!ThemeHelper.statusBarExpandedUseThemeColors(context)) {
+            color = getTextColor(context);
+        }
+
+        return color;
+    }
+
+    public static ColorStateList getVolumeDialogInactiveSliderTintList(Context context) {
+        int themeColor = 0;
+
+        switch (ThemeHelper.getTheme(context)) {
+            case ThemeHelper.THEME_DARKKAT:
+            case ThemeHelper.THEME_MATERIAL:
+            case ThemeHelper.THEME_MATERIAL_LIGHT:
+                themeColor = ColorConstants.VOLUME_DIALOG_INACTIVE_DARK;
+                break;
+            case ThemeHelper.THEME_BLACKOUT:
+                themeColor = ColorConstants.VOLUME_DIALOG_INACTIVE_BLACKOUT;
+                break;
+        }
+
+        int color = themeColor;
+
+        if (!ThemeHelper.statusBarExpandedUseThemeColors(context)) {
+            int foreground = (ColorConstants.VOLUME_DIALOG_INACTIVE_ALPHA << 24)
+                    | (getIconColor(context) & 0x00ffffff);
+            color = ColorHelper.compositeColors(foreground, getPrimaryBackgroundColor(context));
+        }
+
+        return ColorStateList.valueOf(color);
     }
 }

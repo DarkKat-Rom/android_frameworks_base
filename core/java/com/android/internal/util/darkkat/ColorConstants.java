@@ -30,6 +30,7 @@ public class ColorConstants {
     // Theme Material
     public static final int MATERIAL_BLUE_GREY_900 = 0xff263238;
     public static final int MATERIAL_BLUE_GREY_800 = 0xff37474F;
+    public static final int MATERIAL_BLUE_GREY_200 = 0xffb0bec5;
     public static final int MATERIAL_DEEP_TEAL_500 = 0xff009688;
     public static final int MATERIAL_DEEP_TEAL_200 = 0xff80cbc4;
     public static final int MATERIAL_BLUE_700      = 0xff1976d2;
@@ -74,6 +75,14 @@ public class ColorConstants {
     public static final int SYSTEMUI_SECONDARY_BLACKOUT = BLACK;
     public static final int SYSTEMUI_ACCENT_BLACKOUT    = MATERIAL_BLUE_700;
 
+    // Volume dialog
+
+    // Volume dialog (Material-, Material light and DarkKat theme)
+    public static final int VOLUME_DIALOG_INACTIVE_DARK = MATERIAL_BLUE_GREY_200;
+
+    // Volume dialog (Blackout theme)
+    public static final int VOLUME_DIALOG_INACTIVE_BLACKOUT = 0xff808080;
+
     // Alpha values
 
     // General
@@ -116,6 +125,11 @@ public class ColorConstants {
     public static final int QS_TILE_DISABLED_ALPHA    = 97;
     public static final int QS_TILE_INACTIVE_ALPHA    = 74;
     public static final int QS_TILE_UNAVAILABLE_ALPHA = 64;
+
+    // Volume dialog
+
+    // Volume dialog (all theme)
+    public static final int VOLUME_DIALOG_INACTIVE_ALPHA = 128;
 
     // Slim recents
     public static final int SLIM_RECENTS_PANEL_BG_ALPHA = 128;

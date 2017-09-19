@@ -44,7 +44,7 @@ import com.android.systemui.BatteryMeterCircleDrawable;
 import com.android.systemui.BatteryMeterArcsDrawable;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.statusbar.policy.BatteryController;
 
@@ -285,7 +285,7 @@ public class BatteryTile extends QSTile<QSTile.State> implements
             checkbox.setChecked(mPowerSave);
             checkbox.setThumbTintList(QSColorHelper.getSwitchThumbTintList(mContext));
             checkbox.setTrackTintList(QSColorHelper.getSwitchTrackTintList(mContext));
-            checkbox.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+            checkbox.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                     checkbox.getBackground()));
             BatteryInfo.getBatteryInfo(mContext, new BatteryInfo.Callback() {
                 @Override
@@ -302,7 +302,7 @@ public class BatteryTile extends QSTile<QSTile.State> implements
             batterySaverTitle.setTextColor(QSColorHelper.getTextColorSecondary(mContext));
             batterySaverSummary.setTextColor(QSColorHelper.getAccentColor(mContext));
             mCurrentView.findViewById(R.id.switch_container).setBackground(
-                    QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                    RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                     mCurrentView.findViewById(R.id.switch_container).getBackground()));
             if (mCharging) {
                 mCurrentView.findViewById(R.id.switch_container).setAlpha(.7f);

@@ -42,7 +42,7 @@ import com.android.systemui.darkkat.util.QSColorHelper;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.qs.QSContainer;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSPanel.Callback;
@@ -505,14 +505,14 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
 
     @Override
     public void setRippleColor() {
-        mExpandIndicator.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mExpandIndicator.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mExpandIndicator.getBackground()));
         mDateTimeAlarmGroup.findViewById(R.id.alarm_status).setBackground(
-                QSRippleHelper.getColoredRippleDrawable(mContext,
+                RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mDateTimeAlarmGroup.findViewById(R.id.alarm_status).getBackground()));
-        mMultiUserSwitch.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mMultiUserSwitch.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mMultiUserSwitch.getBackground()));
-        mSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mSettingsButton.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mSettingsButton.getBackground()));
         mBrightnessController.updateRippleColor();
     }

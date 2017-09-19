@@ -21,7 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.graphics.drawable.RippleDrawable;
 
-public class QSRippleHelper {
+public class RippleDrawableHelper {
 
     public static Drawable getColoredRippleDrawable(Context context, Drawable d) {
         if (d instanceof RippleDrawable) {

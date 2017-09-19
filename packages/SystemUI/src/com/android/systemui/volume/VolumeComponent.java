@@ -30,4 +30,9 @@ public interface VolumeComponent extends DemoMode {
     void onConfigurationChanged(Configuration newConfig);
     void dump(FileDescriptor fd, PrintWriter pw, String[] args);
     void register();
+    void updateBackgroundColor();
+    public void updateAccentColor();
+    public void updateTextColor();
+    public void updateIconColor();
+    public void updateRippleColor();
 }

@@ -678,21 +678,26 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_PRIMARY_BACKGROUND_COLOR))) {
                 updateStatusBarExpandedPrimaryBgColor();
+                updateVolumeDialogBgColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_SECONDARY_BACKGROUND_COLOR))) {
                 updateStatusBarExpandedSecondaryBgColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_ACCENT_COLOR))) {
                 updateStatusBarExpandedAccentColor();
+                updateVolumeDialogAccentColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_TEXT_COLOR))) {
                 updateStatusBarExpandedTextColor();
+                updateVolumeDialogTextColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_ICON_COLOR))) {
                 updateStatusBarExpandedIconColor();
+                updateVolumeDialogIconColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_RIPPLE_COLOR))) {
                 updateStatusBarExpandedRippleColor();
+                updateVolumeDialogRippleColor();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_EXPANDED_BATTERY_TEXT_COLOR))) {
                 updateStatusBarExpandedBatteryTextColor();
@@ -2826,10 +2831,19 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private void updateStatusBarExpandedUseThemeColors() {
         updateStatusBarExpandedColors();
+        updateVolumeDialogColors();
     }
 
     private void updateStatusBarExpandedColors() {
         updateQSAndHeaderColors();
+    }
+
+    private void updateVolumeDialogColors() {
+        updateVolumeDialogBgColor();
+        updateVolumeDialogAccentColor();
+        updateVolumeDialogTextColor();
+        updateVolumeDialogIconColor();
+        updateVolumeDialogRippleColor();
     }
 
     private void updateStatusBarExpandedPrimaryBgColor() {
@@ -2917,6 +2931,33 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void updateQSAndHeaderBatteryTextColor() {
         if (mQSContainer != null) {
             mQSContainer.updateBatteryTextColor();
+        }
+    }
+
+    private void updateVolumeDialogBgColor() {
+        if (mVolumeComponent != null) {
+            mVolumeComponent.updateBackgroundColor();
+        }
+    }
+
+    private void updateVolumeDialogAccentColor() {
+        if (mVolumeComponent != null) {
+            mVolumeComponent.updateAccentColor();
+        }
+    }
+    private void updateVolumeDialogTextColor() {
+        if (mVolumeComponent != null) {
+            mVolumeComponent.updateTextColor();
+        }
+    }
+    private void updateVolumeDialogIconColor() {
+        if (mVolumeComponent != null) {
+            mVolumeComponent.updateIconColor();
+        }
+    }
+    private void updateVolumeDialogRippleColor() {
+        if (mVolumeComponent != null) {
+            mVolumeComponent.updateRippleColor();
         }
     }
 
