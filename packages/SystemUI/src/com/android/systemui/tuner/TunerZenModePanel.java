@@ -24,9 +24,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
+import com.android.systemui.darkkat.util.VolumeDialogColorHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.volume.ZenModePanel;
 import com.android.systemui.volume.ZenModePanel.Callback;
@@ -36,12 +39,14 @@ public class TunerZenModePanel extends LinearLayout implements OnClickListener {
 
     private Callback mCallback;
     private ZenModePanel mZenModePanel;
-    private View mHeaderSwitch;
+    private View mHeader;
+    private TextView mHeaderTitle;
+    private Switch mHeaderSwitch;
     private int mZenMode;
     private ZenModeController mController;
     private View mButtons;
-    private View mMoreSettings;
-    private View mDone;
+    private TextView mMoreSettings;
+    private TextView mDone;
     private OnClickListener mDoneListener;
     private boolean mEditing;
 
@@ -51,20 +56,21 @@ public class TunerZenModePanel extends LinearLayout implements OnClickListener {
 
     public void init(ZenModeController zenModeController) {
         mController = zenModeController;
-        mHeaderSwitch = findViewById(R.id.tuner_zen_switch);
-        mHeaderSwitch.setVisibility(View.VISIBLE);
-        mHeaderSwitch.setOnClickListener(this);
-        ((TextView) mHeaderSwitch.findViewById(android.R.id.title)).setText(
-                R.string.quick_settings_dnd_label);
+        mHeader = findViewById(R.id.tuner_zen_switch);
+        mHeader.setVisibility(View.VISIBLE);
+        mHeader.setOnClickListener(this);
+        mHeaderTitle = (TextView) mHeader.findViewById(android.R.id.title);
+        mHeaderTitle.setText(R.string.quick_settings_dnd_label);
+        mHeaderSwitch = (Switch) mHeader.findViewById(android.R.id.toggle);
         mZenModePanel = (ZenModePanel) findViewById(R.id.zen_mode_panel);
         mZenModePanel.init(zenModeController);
         mButtons = findViewById(R.id.tuner_zen_buttons);
-        mMoreSettings = mButtons.findViewById(android.R.id.button2);
+        mMoreSettings = (TextView) mButtons.findViewById(android.R.id.button2);
         mMoreSettings.setOnClickListener(this);
-        ((TextView) mMoreSettings).setText(R.string.quick_settings_more_settings);
-        mDone = mButtons.findViewById(android.R.id.button1);
+        mMoreSettings.setText(R.string.quick_settings_more_settings);
+        mDone = (TextView) mButtons.findViewById(android.R.id.button1);
         mDone.setOnClickListener(this);
-        ((TextView) mDone).setText(R.string.quick_settings_done);
+        mDone.setText(R.string.quick_settings_done);
     }
 
     @Override
@@ -80,7 +86,7 @@ public class TunerZenModePanel extends LinearLayout implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v == mHeaderSwitch) {
+        if (v == mHeader) {
             mEditing = true;
             if (mZenMode == Global.ZEN_MODE_OFF) {
                 mZenMode = Prefs.getInt(mContext, Prefs.Key.DND_FAVORITE_ZEN,
@@ -126,7 +132,7 @@ public class TunerZenModePanel extends LinearLayout implements OnClickListener {
 
     private void updatePanel() {
         boolean zenOn = mZenMode != Global.ZEN_MODE_OFF;
-        ((Checkable) mHeaderSwitch.findViewById(android.R.id.toggle)).setChecked(zenOn);
+        mHeaderSwitch.setChecked(zenOn);
         mZenModePanel.setVisibility(zenOn ? View.VISIBLE : View.GONE);
         mButtons.setVisibility(zenOn ? View.VISIBLE : View.GONE);
     }
@@ -137,4 +143,43 @@ public class TunerZenModePanel extends LinearLayout implements OnClickListener {
             updatePanel();
         }
     };
+
+    public void updateBackgroundColor() {
+        mZenModePanel.setZenModePanelBgColor();
+    }
+
+    public void updateAccentColor() {
+        mHeaderSwitch.setThumbTintList(VolumeDialogColorHelper.getSwitchThumbTintList(mContext));
+        mHeaderSwitch.setTrackTintList(VolumeDialogColorHelper.getSwitchTrackTintList(mContext));
+        mHeaderSwitch.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
+                mHeaderSwitch.getBackground()));
+        mZenModePanel.setZenModePanelAccentColor();
+    }
+
+    public void updateTextColor() {
+        mHeaderTitle.setTextColor(VolumeDialogColorHelper.getTextColor(mContext));
+        mMoreSettings.setTextColor(VolumeDialogColorHelper.getAlternativeTextColor(mContext));
+        mDone.setTextColor(VolumeDialogColorHelper.getAlternativeTextColor(mContext));
+        mZenModePanel.setZenModePanelTextColor();
+    }
+
+    public void updateIconColor() {
+        mHeaderSwitch.setThumbTintList(VolumeDialogColorHelper.getSwitchThumbTintList(mContext));
+        mHeaderSwitch.setTrackTintList(VolumeDialogColorHelper.getSwitchTrackTintList(mContext));
+        findViewById(R.id.zen_embedded_divider).setBackgroundTintList(
+                VolumeDialogColorHelper.getIconTintList(mContext));
+        mZenModePanel.setZenModePanelIconColor();
+    }
+
+    public void updateRippleColor() {
+        mMoreSettings.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                mMoreSettings.getBackground()));
+        mDone.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                mDone.getBackground()));
+        mHeader.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
+                mHeader.getBackground()));
+        mHeaderSwitch.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
+                mHeaderSwitch.getBackground()));
+        mZenModePanel.setZenModePanelRippleColor();
+    }
 }

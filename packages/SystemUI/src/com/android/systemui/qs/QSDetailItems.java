@@ -34,7 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
@@ -184,7 +184,7 @@ public class QSDetailItems extends FrameLayout {
                         false);
             }
             view.setVisibility(mItemsVisible ? VISIBLE : INVISIBLE);
-            view.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+            view.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                     view.getBackground()));
             final ImageView iv = (ImageView) view.findViewById(android.R.id.icon);
             iv.setImageResource(item.icon);
@@ -216,7 +216,7 @@ public class QSDetailItems extends FrameLayout {
             final ImageView disconnect = (ImageView) view.findViewById(android.R.id.icon2);
             disconnect.setImageTintList(QSColorHelper.getIconTintList(mContext));
             disconnect.setVisibility(item.canDisconnect ? VISIBLE : GONE);
-            disconnect.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+            disconnect.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                     disconnect.getBackground()));
             disconnect.setOnClickListener(new OnClickListener() {
                 @Override

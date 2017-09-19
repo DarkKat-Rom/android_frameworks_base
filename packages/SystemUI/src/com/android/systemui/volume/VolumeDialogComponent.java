@@ -177,4 +177,28 @@ public class VolumeDialogComponent implements VolumeComponent, TunerService.Tuna
         }
     };
 
+    @Override
+    public void updateBackgroundColor() {
+        mDialog.updateBackgroundColor();
+    }
+
+    @Override
+    public void updateAccentColor() {
+        mDialog.updateAccentColor();
+    }
+
+    @Override
+    public void updateTextColor() {
+        mDialog.updateTextColor();
+    }
+
+    @Override
+    public void updateIconColor() {
+        mDialog.updateIconColor();
+    }
+
+    @Override
+    public void updateRippleColor() {
+        mDialog.updateRippleColor();
+    }
 }

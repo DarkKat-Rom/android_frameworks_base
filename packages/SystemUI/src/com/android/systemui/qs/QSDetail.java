@@ -36,7 +36,7 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.qs.QSTile.DetailAdapter;
 import com.android.systemui.statusbar.phone.BaseStatusBarHeader;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -276,7 +276,7 @@ public class QSDetail extends LinearLayout {
     public void setAccentColor() {
         mQsDetailHeaderSwitch.setThumbTintList(QSColorHelper.getSwitchThumbTintList(mContext));
         mQsDetailHeaderSwitch.setTrackTintList(QSColorHelper.getSwitchTrackTintList(mContext));
-        mQsDetailHeaderSwitch.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+        mQsDetailHeaderSwitch.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                 mQsDetailHeaderSwitch.getBackground()));
     }
 
@@ -293,15 +293,15 @@ public class QSDetail extends LinearLayout {
     }
 
     public void setRippleColor() {
-        mQsDetailHeader.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mQsDetailHeader.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mQsDetailHeader.getBackground()));
-//        mQsDetailHeaderBack.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+//        mQsDetailHeaderBack.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
 //                mQsDetailHeaderBack.getBackground()));
-        mQsDetailHeaderSwitch.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+        mQsDetailHeaderSwitch.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                 mQsDetailHeaderSwitch.getBackground()));
-        mDetailSettingsButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mDetailSettingsButton.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mDetailSettingsButton.getBackground()));
-        mDetailDoneButton.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mDetailDoneButton.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mDetailDoneButton.getBackground()));
     }
 

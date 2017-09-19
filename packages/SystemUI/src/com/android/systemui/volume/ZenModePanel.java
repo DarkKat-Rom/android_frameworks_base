@@ -57,7 +57,7 @@ import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.QSRippleHelper;
+import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.statusbar.policy.ZenModeController;
 
 import java.io.FileDescriptor;
@@ -829,7 +829,7 @@ public class ZenModePanel extends LinearLayout {
             CompoundButton cb = (CompoundButton) mZenRadioGroup.getChildAt(irg);
             if (cb != null) {
                 cb.setButtonTintList(QSColorHelper.getZenModeConditionsIconColors(mContext));
-                cb.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                cb.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                         cb.getBackground()));
             }
         }
@@ -883,14 +883,14 @@ public class ZenModePanel extends LinearLayout {
 
     public void setZenModePanelRippleColor() {
         mZenButtons.setRippleColor();
-        mZenIntroductionConfirm.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mZenIntroductionConfirm.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mZenIntroductionConfirm.getBackground()));
-        mZenIntroductionCustomize.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+        mZenIntroductionCustomize.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                 mZenIntroductionCustomize.getBackground()));
         for (int irg = 0; irg < mZenRadioGroup.getChildCount(); irg++) {
             View v = mZenRadioGroup.getChildAt(irg);
             if (v != null) {
-                v.setBackground(QSRippleHelper.getCheckableViewRippleDrawable(mContext,
+                v.setBackground(RippleDrawableHelper.getCheckableViewRippleDrawable(mContext,
                         v.getBackground()));
             }
         }
@@ -900,11 +900,11 @@ public class ZenModePanel extends LinearLayout {
                 View v1 = row.findViewById(android.R.id.button1);
                 View v2 = row.findViewById(android.R.id.button2);
                 if (v1 != null) {
-                    v1.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    v1.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                             v1.getBackground()));
                 }
                 if (v2 != null) {
-                    v2.setBackground(QSRippleHelper.getColoredRippleDrawable(mContext,
+                    v2.setBackground(RippleDrawableHelper.getColoredRippleDrawable(mContext,
                             v2.getBackground()));
                 }
             }
