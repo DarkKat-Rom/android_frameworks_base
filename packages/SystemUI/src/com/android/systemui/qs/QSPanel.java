@@ -32,7 +32,6 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.MetricsProto.MetricsEvent;
 import com.android.systemui.R;
 import com.android.systemui.darkkat.util.QSColorHelper;
-import com.android.systemui.darkkat.util.RippleDrawableHelper;
 import com.android.systemui.qs.QSTile.DetailAdapter;
 import com.android.systemui.qs.QSTile.Host.Callback;
 import com.android.systemui.qs.customize.QSCustomizer;
