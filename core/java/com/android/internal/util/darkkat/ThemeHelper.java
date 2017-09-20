@@ -25,7 +25,6 @@ public class ThemeHelper {
     // Themes
     public static final int THEME_DARKKAT        = 3;
     public static final int THEME_MATERIAL       = 2;
-    public static final int THEME_WHITEOUT       = 4;
     public static final int THEME_MATERIAL_LIGHT = 1;
     public static final int THEME_BLACKOUT       = 5;
 
@@ -61,7 +60,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.MATERIAL_GREY_850;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_GREY_50;
                 break;
@@ -83,7 +81,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.MATERIAL_GREY_800;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.WHITE;
                 break;
@@ -100,7 +97,6 @@ public class ThemeHelper {
 
         switch (getTheme(context)) {
             case THEME_DARKKAT:
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_DEEP_TEAL_500;
                 break;
@@ -124,7 +120,6 @@ public class ThemeHelper {
             case THEME_BLACKOUT:
                 color = ColorConstants.WHITE;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.TEXT_PRIMARY_ALPHA_DAY << 24)
                         | (ColorConstants.BLACK & 0x00ffffff);
@@ -144,7 +139,6 @@ public class ThemeHelper {
                 color = (ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.TEXT_SECONDARY_ALPHA_DAY << 24)
                         | (ColorConstants.BLACK & 0x00ffffff);
@@ -164,7 +158,6 @@ public class ThemeHelper {
                 color = (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24)
                         | (ColorConstants.BLACK & 0x00ffffff);
@@ -184,7 +177,6 @@ public class ThemeHelper {
                 color = (ColorConstants.RIPPLE_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.RIPPLE_ALPHA_DAY << 24)
                         | (ColorConstants.BLACK & 0x00ffffff);
@@ -204,7 +196,6 @@ public class ThemeHelper {
                 color = (ColorConstants.DIVIDER_ALPHA_NIGHT << 24)
                         | (ColorConstants.WHITE & 0x00ffffff);
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = (ColorConstants.DIVIDER_ALPHA_DAY << 24)
                         | (ColorConstants.BLACK & 0x00ffffff);
@@ -225,7 +216,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.SYSTEMUI_PRIMARY_NIGHT;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_PRIMARY_DAY;
                 break;
@@ -247,7 +237,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.SYSTEMUI_SECONDARY_NIGHT;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_SECONDARY_DAY;
                 break;
@@ -269,7 +258,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.SYSTEMUI_ACCENT_NIGHT;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.SYSTEMUI_ACCENT_DAY;
                 break;
@@ -301,7 +289,6 @@ public class ThemeHelper {
             case THEME_MATERIAL:
                 color = ColorConstants.MATERIAL_GREY_850;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.WHITE;
                 break;
@@ -324,7 +311,6 @@ public class ThemeHelper {
                 color = ColorConstants.WHITE;
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
                 break;
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.BLACK;
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;

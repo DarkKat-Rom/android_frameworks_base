@@ -117,7 +117,6 @@ public class DetailedWeatherColorHelper {
             case ThemeHelper.THEME_BLACKOUT:
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_NIGHT;
                 break;
-            case ThemeHelper.THEME_WHITEOUT:
             case ThemeHelper.THEME_MATERIAL_LIGHT:
                 alpha = ColorConstants.ICON_NORMAL_ALPHA_DAY;
                 break;
@@ -154,7 +153,6 @@ public class DetailedWeatherColorHelper {
             case ThemeHelper.THEME_BLACKOUT:
                 alpha = ColorConstants.RIPPLE_ALPHA_NIGHT;
                 break;
-            case ThemeHelper.THEME_WHITEOUT:
             case ThemeHelper.THEME_MATERIAL_LIGHT:
                 alpha = ColorConstants.RIPPLE_ALPHA_DAY;
                 break;
@@ -172,7 +170,6 @@ public class DetailedWeatherColorHelper {
             case ThemeHelper.THEME_BLACKOUT:
                 alpha = ColorConstants.DIVIDER_ALPHA_NIGHT;
                 break;
-            case ThemeHelper.THEME_WHITEOUT:
             case ThemeHelper.THEME_MATERIAL_LIGHT:
                 alpha = ColorConstants.DIVIDER_ALPHA_DAY;
                 break;
@@ -192,7 +189,6 @@ public class DetailedWeatherColorHelper {
                     ? ColorConstants.TEXT_PRIMARY_ALPHA_NIGHT
                     : ColorConstants.TEXT_SECONDARY_ALPHA_NIGHT;
                 break;
-            case ThemeHelper.THEME_WHITEOUT:
             case ThemeHelper.THEME_MATERIAL_LIGHT:
                 alpha = isPrimary
                         ? ColorConstants.TEXT_PRIMARY_ALPHA_DAY

@@ -498,11 +498,6 @@ bool parseUiModeNight(const char* name, ResTable_config* out) {
                 (out->uiMode&~ResTable_config::MASK_UI_MODE_NIGHT)
                 | ResTable_config::UI_MODE_NIGHT_YES_DARKKAT;
         return true;
-    } else if (strcmp(name, "whiteout") == 0) {
-        if (out) out->uiMode =
-                (out->uiMode&~ResTable_config::MASK_UI_MODE_NIGHT)
-                | ResTable_config::UI_MODE_NIGHT_NO_WHITEOUT;
-        return true;
     } else if (strcmp(name, "blackout") == 0) {
         if (out) out->uiMode =
                 (out->uiMode&~ResTable_config::MASK_UI_MODE_NIGHT)
