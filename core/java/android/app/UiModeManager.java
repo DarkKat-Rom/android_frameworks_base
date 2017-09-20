@@ -100,7 +100,7 @@ public class UiModeManager {
 
     /** @hide */
     @IntDef({MODE_NIGHT_AUTO, MODE_NIGHT_NO, MODE_NIGHT_YES, MODE_NIGHT_YES_DARKKAT,
-            MODE_NIGHT_NO_WHITEOUT, MODE_NIGHT_YES_BLACKOUT})
+            MODE_NIGHT_YES_BLACKOUT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NightMode {}
 
@@ -127,12 +127,6 @@ public class UiModeManager {
      * always run in night mode (DarkKat theme).
      */
     public static final int MODE_NIGHT_YES_DARKKAT = Configuration.UI_MODE_NIGHT_YES_DARKKAT >> 4;
-
-    /**
-     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
-     * never run in day mode (Whiteout theme).
-     */
-    public static final int MODE_NIGHT_NO_WHITEOUT = Configuration.UI_MODE_NIGHT_NO_WHITEOUT >> 4;
 
     /**
      * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
@@ -237,8 +231,6 @@ public class UiModeManager {
      *       {@code night} mode</li>
      *   <li><em>{@link #MODE_NIGHT_YES_DARKKAT}</em> sets the device into
      *       {@code darkkat } mode</li>
-     *   <li><em>{@link #MODE_NIGHT_NO_WHITEOUT}</em> sets the device into
-     *       {@code whiteout } mode</li>
      *   <li><em>{@link #MODE_NIGHT_YES_BLACKOUT}</em> sets the device into
      *       {@code blackout } mode</li>
      *   <li><em>{@link #MODE_NIGHT_AUTO}</em> automatically switches between
@@ -272,7 +264,6 @@ public class UiModeManager {
      *   <li>{@link #MODE_NIGHT_NO}</li>
      *   <li>{@link #MODE_NIGHT_YES}</li>
      *   <li>{@link #MODE_NIGHT_YES_DARKKAT}</li>
-     *   <li>{@link #MODE_NIGHT_NO_WHITEOUT}</li>
      *   <li>{@link #MODE_NIGHT_YES_BLACKOUT}</li>
      *   <li>{@link #MODE_NIGHT_AUTO}</li>
      *   <li>{@code -1} on error</li>
@@ -300,7 +291,6 @@ public class UiModeManager {
      *   <li>{@link #MODE_NIGHT_NO}</li>
      *   <li>{@link #MODE_NIGHT_YES}</li>
      *   <li>{@link #MODE_NIGHT_YES_DARKKAT}</li>
-     *   <li>{@link #MODE_NIGHT_NO_WHITEOUT}</li>
      *   <li>{@link #MODE_NIGHT_YES_BLACKOUT}</li>
      *   <li>{@code -1} on error</li>
      * </ul>

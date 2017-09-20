@@ -25,7 +25,6 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
         switch (getTheme(context)) {
             case THEME_DARKKAT:
             case THEME_MATERIAL:
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_BLUE_700;
                 break;
@@ -41,7 +40,6 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
         switch (getTheme(context)) {
             case THEME_DARKKAT:
             case THEME_MATERIAL:
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = ColorConstants.MATERIAL_BLUE_500;
                 break;
@@ -61,7 +59,6 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
         switch (getTheme(context)) {
             case THEME_DARKKAT:
             case THEME_MATERIAL:
-            case THEME_WHITEOUT:
             case THEME_MATERIAL_LIGHT:
                 color = getColorBackgroundFloating(context);
                 break;
