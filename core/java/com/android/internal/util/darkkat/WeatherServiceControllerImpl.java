@@ -44,7 +44,7 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
     public static final String PACKAGE_NAME = "net.darkkatroms.weather";
 
     public static final ComponentName COMPONENT_DETAILED_WEATHER = new ComponentName(
-            "net.darkkatroms.weather", "net.darkkatroms.weather.DetailedWeatherActivity");
+            "net.darkkatroms.weather", "net.darkkatroms.weather.activities.DetailedWeatherActivity");
 
     private static final Uri WEATHER_URI
             = Uri.parse("content://net.darkkatroms.weather.provider/weather");
