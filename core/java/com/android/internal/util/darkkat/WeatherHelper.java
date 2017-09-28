@@ -73,7 +73,7 @@ public class WeatherHelper {
     public static Intent getWeatherServiceSettingsIntent() {
         Intent settings = new Intent(Intent.ACTION_MAIN)
                 .setClassName(WeatherServiceControllerImpl.PACKAGE_NAME,
-                WeatherServiceControllerImpl.PACKAGE_NAME + ".SettingsActivity");
+                WeatherServiceControllerImpl.PACKAGE_NAME + ".activities.AppSettingsActivity");
         return settings;
     }
 
