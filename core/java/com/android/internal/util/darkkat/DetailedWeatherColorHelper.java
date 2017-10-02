@@ -22,10 +22,10 @@ import android.provider.Settings;
 
 public class DetailedWeatherColorHelper {
 
-    public static int getAccentColor(Context context) {
+    public static int getWeatherAccentColor(Context context) {
         final int color = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.DETAILED_WEATHER_ACCENT_COLOR,
-                DetailedWeatherThemeHelper.getAccentColor(context));
+                DetailedWeatherThemeHelper.getWeatherAccentColor(context));
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
