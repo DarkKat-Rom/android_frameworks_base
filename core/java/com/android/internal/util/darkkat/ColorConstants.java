@@ -46,6 +46,11 @@ public class ColorConstants {
     // Theme Blackout
     public static final int BLACKOUT_PRIMARY_COLOR = 0xff101010;
 
+    // DarkKat app theme
+    public static final int DARKKAT_APP_PRIMARY      = MATERIAL_BLUE_500;
+    public static final int DARKKAT_APP_PRIMARY_DARK = MATERIAL_BLUE_700;
+    public static final int DARKKAT_APP_ACCENT       = 0xff5a8596;
+
     // SystemUI
 
     // Status bar

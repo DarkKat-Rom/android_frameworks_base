@@ -20,13 +20,28 @@ import android.content.Context;
 
 public class DetailedWeatherThemeHelper extends ThemeHelper {
 
+    public static int getWeatherAccentColor(Context context) {
+        int color = 0;
+        switch (getTheme(context)) {
+            case THEME_DARKKAT:
+            case THEME_MATERIAL:
+            case THEME_MATERIAL_LIGHT:
+                color = ColorConstants.DARKKAT_APP_ACCENT;
+                break;
+            case THEME_BLACKOUT:
+                color = getAccentColor(context);
+                break;
+        }
+        return color;
+    }
+
     public static int getStatusBarBgColor(Context context) {
         int color = 0;
         switch (getTheme(context)) {
             case THEME_DARKKAT:
             case THEME_MATERIAL:
             case THEME_MATERIAL_LIGHT:
-                color = ColorConstants.MATERIAL_BLUE_700;
+                color = ColorConstants.DARKKAT_APP_PRIMARY_DARK;
                 break;
             case THEME_BLACKOUT:
                 color = ColorConstants.BLACK;
@@ -41,7 +56,7 @@ public class DetailedWeatherThemeHelper extends ThemeHelper {
             case THEME_DARKKAT:
             case THEME_MATERIAL:
             case THEME_MATERIAL_LIGHT:
-                color = ColorConstants.MATERIAL_BLUE_500;
+                color = ColorConstants.DARKKAT_APP_PRIMARY;
                 break;
             case THEME_BLACKOUT:
                 color = ColorConstants.BLACKOUT_PRIMARY_COLOR;
