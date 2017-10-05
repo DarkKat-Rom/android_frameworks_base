@@ -16,7 +16,7 @@
 
 <resources>
 
-    <!-- Material theme -->
+    <!-- Night (Material) theme colors -->
     <color name="window_background">@color/background_primary</color>
     <color name="drawer_background">@color/background_primary</color>
     <color name="directory_background">@color/background_primary</color>

@@ -15,6 +15,8 @@
 -->
 <resources>
 
+    <!-- Night (Material) theme, additional styles -->
+
     <!-- Slim recent app screen -->
     <style name="RecentCardViewButton.Borderless.Small"
             parent="@android:style/Widget.Material.Button.Borderless.Small" />

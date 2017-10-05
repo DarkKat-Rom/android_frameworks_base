@@ -16,7 +16,7 @@
 
 <resources>
 
-    <!-- DarkKat theme -->
+    <!-- Night (DarkKat) theme colors -->
     <color name="window_background">@color/background_primary</color>
     <color name="drawer_background">@color/darkkat_blue_grey</color>
     <color name="directory_background">@color/darkkat_blue_grey</color>

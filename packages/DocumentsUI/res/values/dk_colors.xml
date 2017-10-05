@@ -16,7 +16,6 @@
 
 <resources>
 
-    <!-- Day theme
-         (additional colors) -->
+    <!-- Day (Material.Light) theme, additional colors -->
     <color name="background_primary">@color/material_grey_50</color>
 </resources>
