@@ -16,8 +16,7 @@
 
 <resources>
 
-    <!-- DarkKat theme
-        (additional colors) -->
+    <!-- Night (DarkKat) theme, additional colors -->
     <color name="system_primary_color">#ff1b1f23</color><!-- darkkat blue grey -->
     <color name="system_secondary_color">#ff1f2429</color><!-- darkkat blue blue grey -->
     <color name="system_accent_color">#ff009688</color><!-- deep teal 500 -->

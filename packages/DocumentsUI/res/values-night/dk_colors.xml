@@ -16,8 +16,7 @@
 
 <resources>
 
-    <!-- Material theme
-         (additional colors)-->
+    <!-- Night (Material) theme, additional colors -->
     <color name="material_grey_850">#ff303030</color>
     <color name="material_grey_800">#ff424242</color>
 

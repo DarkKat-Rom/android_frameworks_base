@@ -16,8 +16,7 @@
 
 <resources>
 
-    <!-- DarkKat theme
-         (additional colors)-->
+    <!-- Night (DarkKat) theme, additional colors -->
     <color name="darkkat_blue_grey">#ff1b1f23</color>
     <color name="darkkat_blue_blue_grey">#ff1f2429</color>
 
