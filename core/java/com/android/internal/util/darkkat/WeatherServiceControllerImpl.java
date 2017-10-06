@@ -41,15 +41,15 @@ import java.util.List;
 
 public class WeatherServiceControllerImpl implements WeatherServiceController {
     private static final String TAG = "WeatherService:WeatherServiceController";
-    public static final String PACKAGE_NAME = "net.darkkatroms.weather";
+    public static final String PACKAGE_NAME = "net.darkkatrom.dkweather";
 
     public static final ComponentName COMPONENT_DK_WEATHER = new ComponentName(
             PACKAGE_NAME, PACKAGE_NAME + ".DetailedWeatherActivity");
 
     private static final Uri WEATHER_URI
-            = Uri.parse("content://net.darkkatroms.weather.provider/weather");
+            = Uri.parse("content://net.darkkatrom.dkweather.provider/weather");
     private static final Uri SETTINGS_URI
-            = Uri.parse("content://net.darkkatroms.weather.provider/settings");
+            = Uri.parse("content://net.darkkatrom.dkweather.provider/settings");
     private static final String[] WEATHER_PROJECTION = new String[] {
             "city",
             "condition",
@@ -101,7 +101,7 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
         mCallbacks = new ArrayList<Callback>();
         mCachedInfo = new WeatherInfo();
 
-        if (WeatherHelper.isWeatherServiceAvailable(mContext)) {
+        if (WeatherHelper.isWeatherAvailable(mContext)) {
             Intent updateIntent = new Intent(Intent.ACTION_MAIN)
                     .setClassName(PACKAGE_NAME, PACKAGE_NAME + ".WeatherService");
             updateIntent.setAction(PACKAGE_NAME + ".ACTION_UPDATE");
@@ -200,7 +200,7 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
     }
 
     public boolean isServiceEnabled() {
-        if (!WeatherHelper.isWeatherServiceAvailable(mContext)) {
+        if (!WeatherHelper.isWeatherAvailable(mContext)) {
             return false;
         }
         final Cursor c = mContext.getContentResolver().query(SETTINGS_URI, SETTINGS_PROJECTION,

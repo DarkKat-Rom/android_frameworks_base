@@ -166,7 +166,7 @@
     <uses-permission android:name="android.permission.RESET_SHORTCUT_MANAGER_THROTTLING" />
 
     <!-- Weather -->
-    <uses-permission android:name="net.darkkatroms.weather.READ_WEATHER" />
+    <uses-permission android:name="net.darkkatrom.dkweather.READ_WEATHER" />
 
     <!-- Visualizer -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
