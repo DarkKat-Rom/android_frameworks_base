@@ -33,7 +33,7 @@ public class WeatherHelper {
 
     public static final String DAY_INDEX = "day_index";
 
-    public static int getWeatherServiceAvailability(Context context) {
+    public static int getWeatherAvailability(Context context) {
         boolean isInstalled = false;
         int availability = PACKAGE_MISSING;
 
@@ -59,18 +59,18 @@ public class WeatherHelper {
         return availability;
     }
 
-    public static boolean isWeatherServiceAvailable(Context context) {
-        return getWeatherServiceAvailability(context)
+    public static boolean isWeatherAvailable(Context context) {
+        return getWeatherAvailability(context)
                 == PACKAGE_ENABLED;
     }
 
-    public static Intent getWeatherServiceAppDetailSettingsIntent() {
+    public static Intent getWeatherAppDetailSettingsIntent() {
         Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         i.setData(Uri.parse("package:" + WeatherServiceControllerImpl.PACKAGE_NAME));
         return i;
     }
 
-    public static Intent getWeatherServiceAppSettingsIntent() {
+    public static Intent getWeatherAppSettingsIntent() {
         Intent settings = new Intent(Intent.ACTION_MAIN)
                 .setClassName(WeatherServiceControllerImpl.PACKAGE_NAME,
                 WeatherServiceControllerImpl.PACKAGE_NAME + ".activities.AppSettingsActivity");

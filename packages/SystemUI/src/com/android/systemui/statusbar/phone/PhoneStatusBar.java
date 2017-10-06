@@ -710,7 +710,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_WEATHER_HIDE))
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_WEATHER_NUMBER_OF_NOTIFICATION_ICONS))) {
-                if (WeatherHelper.isWeatherServiceAvailable(mContext)) {
+                if (WeatherHelper.isWeatherAvailable(mContext)) {
                     updateWeatherVisibility();
                 }
             } else if (uri.equals(Settings.System.getUriFor(
@@ -2406,7 +2406,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         updateNotificationShade();
         mIconController.updateNotificationIcons(mNotificationData);
-        if (WeatherHelper.isWeatherServiceAvailable(mContext)) {
+        if (WeatherHelper.isWeatherAvailable(mContext)) {
             updateWeatherVisibility();
         }
     }
@@ -2972,7 +2972,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 Settings.System.STATUS_BAR_WEATHER_NUMBER_OF_NOTIFICATION_ICONS, 1);
 
         if (mIconController != null) {
-            mIconController.updateWeatherVisibility(WeatherHelper.isWeatherServiceAvailable(mContext)
+            mIconController.updateWeatherVisibility(WeatherHelper.isWeatherAvailable(mContext)
                     && show, forceHide, maxAllowedIcons);
         }
     }
