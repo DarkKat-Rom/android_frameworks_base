@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.android.internal.R;
 import com.android.internal.colorextraction.ColorExtractor.GradientColors;
 import com.android.internal.colorextraction.drawable.GradientDrawable;
+import com.android.internal.util.darkkat.PowerMenuHelper;
 import com.android.settingslib.Utils;
 import com.android.systemui.Dependency;
 import com.android.systemui.colorextraction.SysuiColorExtractor;
@@ -62,7 +63,7 @@ public class GlobalActionsImpl implements GlobalActions {
     }
 
     @Override
-    public void showShutdownUi(boolean isReboot, String reason) {
+    public void showShutdownUi(boolean isReboot, String reason, int rebootMode) {
         GradientDrawable background = new GradientDrawable(mContext);
         background.setAlpha((int) (SHUTDOWN_SCRIM_ALPHA * 255));
 
@@ -96,7 +97,17 @@ public class GlobalActionsImpl implements GlobalActions {
         bar.getIndeterminateDrawable().setTint(color);
         TextView message = d.findViewById(R.id.text1);
         message.setTextColor(color);
-        if (isReboot) message.setText(R.string.reboot_to_reset_message);
+        if (rebootMode == PowerMenuHelper.REBOOT_MODE_NOT_IN_USE) {
+            if (isReboot) {
+                message.setText(R.string.reboot_to_reset_message);
+            }
+        } else if (rebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_SYSTEM) {
+            message.setText(R.string.advanced_restart_restart_to_system_message);
+        } else if (rebootMode == PowerMenuHelper.REBOOT_MODE_REBOOT_TO_RECOVERY) {
+            message.setText(R.string.advanced_restart_reboot_to_recovery_message);
+        } else {
+            message.setText(R.string.advanced_restart_reboot_to_bootloader_message);
+        }
 
         Point displaySize = new Point();
         mContext.getDisplay().getRealSize(displaySize);

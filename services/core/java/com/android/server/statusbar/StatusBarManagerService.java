@@ -340,13 +340,13 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         }
 
         @Override
-        public boolean showShutdownUi(boolean isReboot, String reason) {
+        public boolean showShutdownUi(boolean isReboot, String reason, int rebootMode) {
             if (!mContext.getResources().getBoolean(R.bool.config_showSysuiShutdown)) {
                 return false;
             }
             if (mBar != null) {
                 try {
-                    mBar.showShutdownUi(isReboot, reason);
+                    mBar.showShutdownUi(isReboot, reason, rebootMode);
                     return true;
                 } catch (RemoteException ex) {}
             }
@@ -795,13 +795,21 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
      */
     @Override
     public void shutdown() {
+        shutdown2(false);
+    }
+
+    /**
+     * Allows the status bar to shutdown the device.
+     */
+    @Override
+    public void shutdown2(boolean confirm) {
         enforceStatusBarService();
         long identity = Binder.clearCallingIdentity();
         try {
             // ShutdownThread displays UI, so give it a UI context.
             mHandler.post(() ->
                     ShutdownThread.shutdown(getUiContext(),
-                        PowerManager.SHUTDOWN_USER_REQUESTED, false));
+                        PowerManager.SHUTDOWN_USER_REQUESTED, confirm));
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
@@ -824,6 +832,22 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
                             PowerManager.SHUTDOWN_USER_REQUESTED, false);
                 }
             });
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+    }
+
+    /**
+     * Allows the status bar to reboot the device.
+     */
+    @Override
+    public void customReboot(int rebootMode, boolean confirm) {
+        enforceStatusBarService();
+        long identity = Binder.clearCallingIdentity();
+        try {
+            mHandler.post(() ->
+                // ShutdownThread displays UI, so give it a UI context.
+                ShutdownThread.customReboot(getUiContext(), rebootMode, confirm));
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
