@@ -3884,6 +3884,31 @@ public final class Settings {
         /** @hide */
         private static final Validator SHOW_BATTERY_PERCENT_VALIDATOR = sBooleanValidator;
 
+        // DarkKat additions start
+
+        /**
+         * Wether to confirm power off
+         * @hide
+         */
+        public static final String POWER_MENU_CONFIRM_POWER_OFF = "power_menu_confirm_power_off";
+
+        /**
+         * Mode used to show advanced reboot options in the reboot menu
+         * 0 - Always
+         * 1 - Hever
+         * 2 - Hide on secure lock screen
+         * default: 2
+         * @hide
+         */
+        public static final String POWER_MENU_ADVANCED_RESTART_MODE = "power_menu_advanced_restart_mode";
+
+        /**
+         * Wether to confirm reboot
+         * @hide
+         */
+        public static final String POWER_MENU_CONFIRM_RESTART = "power_menu_confirm_restart";
+        // DarkKat additions end
+
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add

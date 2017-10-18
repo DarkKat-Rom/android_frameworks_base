@@ -17,6 +17,7 @@
 
 package com.android.server.power;
 
+import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.IActivityManager;
@@ -49,6 +50,7 @@ import android.system.ErrnoException;
 import android.system.Os;
 
 import com.android.internal.telephony.ITelephony;
+import com.android.internal.util.darkkat.PowerMenuHelper;
 import com.android.server.pm.PackageManagerService;
 
 import android.util.Log;
@@ -86,6 +88,7 @@ public final class ShutdownThread extends Thread {
     private static boolean mRebootSafeMode;
     private static boolean mRebootHasProgressBar;
     private static String mReason;
+    private static int mRebootMode;
 
     // Provides shutdown assurance in case the system_server is killed
     public static final String SHUTDOWN_ACTION_PROPERTY = "sys.shutdown.requested";
@@ -130,6 +133,7 @@ public final class ShutdownThread extends Thread {
         mReboot = false;
         mRebootSafeMode = false;
         mReason = reason;
+        mRebootMode = PowerMenuHelper.REBOOT_MODE_NOT_IN_USE;
         shutdownInner(context, confirm);
     }
 
@@ -147,15 +151,35 @@ public final class ShutdownThread extends Thread {
             }
         }
 
-        final int longPressBehavior = context.getResources().getInteger(
-                        com.android.internal.R.integer.config_longPressOnPowerBehavior);
-        final int resourceId = mRebootSafeMode
-                ? com.android.internal.R.string.reboot_safemode_confirm
-                : (longPressBehavior == 2
-                        ? com.android.internal.R.string.shutdown_confirm_question
-                        : com.android.internal.R.string.shutdown_confirm);
+        int titleResourceId;
+        int resourceId;
 
-        Log.d(TAG, "Notifying thread to start shutdown longPressBehavior=" + longPressBehavior);
+        if (mRebootSafeMode) {
+            titleResourceId = com.android.internal.R.string.reboot_safemode_title;
+            resourceId = com.android.internal.R.string.reboot_safemode_confirm;
+        } else if (mReboot) {
+            titleResourceId = com.android.internal.R.string.restart_general_title;
+            if (mRebootMode == PowerMenuHelper.REBOOT_MODE_NOT_IN_USE) {
+                resourceId = com.android.internal.R.string.restart_confirm;
+            } else if (mRebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_SYSTEM) {
+                resourceId = com.android.internal.R.string.advanced_restart_restart_to_system_confirm;
+            } else if (mRebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_QUICK_RESTART) {
+                resourceId = com.android.internal.R.string.advanced_restart_restart_to_quick_restart_confirm;
+            } else if (mRebootMode == PowerMenuHelper.REBOOT_MODE_REBOOT_TO_RECOVERY) {
+                resourceId = com.android.internal.R.string.advanced_restart_reboot_to_recovery_confirm;
+            } else {
+                resourceId = com.android.internal.R.string.advanced_restart_reboot_to_bootloader_confirm;
+            }
+        } else {
+            final int longPressBehavior = context.getResources().getInteger(
+                            com.android.internal.R.integer.config_longPressOnPowerBehavior);
+            titleResourceId = com.android.internal.R.string.power_off;
+
+            resourceId = longPressBehavior == 2
+                    ? com.android.internal.R.string.shutdown_confirm_question
+                    : com.android.internal.R.string.shutdown_confirm;
+            Log.d(TAG, "longPressBehavior=" + longPressBehavior);
+        }
 
         if (confirm) {
             final CloseDialogReceiver closer = new CloseDialogReceiver(context);
@@ -163,13 +187,15 @@ public final class ShutdownThread extends Thread {
                 sConfirmDialog.dismiss();
             }
             sConfirmDialog = new AlertDialog.Builder(context)
-                    .setTitle(mRebootSafeMode
-                            ? com.android.internal.R.string.reboot_safemode_title
-                            : com.android.internal.R.string.power_off)
+                    .setTitle(titleResourceId)
                     .setMessage(resourceId)
                     .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            beginShutdownSequence(context);
+                            if (mRebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_QUICK_RESTART) {
+                                doQuickReboot();
+                            } else {
+                                beginShutdownSequence(context);
+                            }
                         }
                     })
                     .setNegativeButton(com.android.internal.R.string.no, null)
@@ -179,7 +205,11 @@ public final class ShutdownThread extends Thread {
             sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
             sConfirmDialog.show();
         } else {
-            beginShutdownSequence(context);
+            if (mRebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_QUICK_RESTART) {
+                doQuickReboot();
+            } else {
+                beginShutdownSequence(context);
+            }
         }
     }
 
@@ -219,6 +249,7 @@ public final class ShutdownThread extends Thread {
         mRebootSafeMode = false;
         mRebootHasProgressBar = false;
         mReason = reason;
+        mRebootMode = PowerMenuHelper.REBOOT_MODE_NOT_IN_USE;
         shutdownInner(context, confirm);
     }
 
@@ -240,7 +271,38 @@ public final class ShutdownThread extends Thread {
         mRebootSafeMode = true;
         mRebootHasProgressBar = false;
         mReason = null;
+        mRebootMode = PowerMenuHelper.REBOOT_MODE_NOT_IN_USE;
         shutdownInner(context, confirm);
+    }
+
+    /**
+     * Request a clean shutdown, waiting for subsystems to clean up their
+     * state etc.  Must be called from a Looper thread in which its UI
+     * is shown.
+     *
+     * @param context Context used to display the shutdown progress dialog.
+     * @param rebootMode ćode for the custom reboot, MUST NOT pass to the kernel.
+     * @param confirm true if user confirmation is needed before shutting down.
+     */
+    public static void customReboot(final Context context, int rebootMode, boolean confirm) {
+        mReboot = true;
+        mRebootSafeMode = false;
+        mRebootHasProgressBar = false;
+        mReason = PowerMenuHelper.resolveReason(rebootMode);
+        mRebootMode = rebootMode;
+        shutdownInner(context, confirm);
+    }
+
+    private static void doQuickReboot() {
+        try {
+            final IActivityManager am =
+                    ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
+            if (am != null) {
+                am.restart();
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "failure trying to perform quick reboot", e);
+        }
     }
 
     private static void beginShutdownSequence(Context context) {
@@ -277,35 +339,49 @@ public final class ShutdownThread extends Thread {
         //   Condition: Otherwise
         //   UI: spinning circle only (no progress bar)
 
-        // mReason could be "recovery-update" or "recovery-update,quiescent".
-        if (mReason != null && mReason.startsWith(PowerManager.REBOOT_RECOVERY_UPDATE)) {
-            // We need the progress bar if uncrypt will be invoked during the
-            // reboot, which might be time-consuming.
-            mRebootHasProgressBar = RecoverySystem.UNCRYPT_PACKAGE_FILE.exists()
-                    && !(RecoverySystem.BLOCK_MAP_FILE.exists());
-            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_update_title));
-            if (mRebootHasProgressBar) {
-                pd.setMax(100);
-                pd.setProgress(0);
-                pd.setIndeterminate(false);
-                pd.setProgressNumberFormat(null);
-                pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        if (mRebootMode == PowerMenuHelper.REBOOT_MODE_NOT_IN_USE) {
+            // mReason could be "recovery-update" or "recovery-update,quiescent".
+            if (mReason != null && mReason.startsWith(PowerManager.REBOOT_RECOVERY_UPDATE)) {
+                // We need the progress bar if uncrypt will be invoked during the
+                // reboot, which might be time-consuming.
+                mRebootHasProgressBar = RecoverySystem.UNCRYPT_PACKAGE_FILE.exists()
+                        && !(RecoverySystem.BLOCK_MAP_FILE.exists());
+                pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_update_title));
+                if (mRebootHasProgressBar) {
+                    pd.setMax(100);
+                    pd.setProgress(0);
+                    pd.setIndeterminate(false);
+                    pd.setProgressNumberFormat(null);
+                    pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    pd.setMessage(context.getText(
+                                com.android.internal.R.string.reboot_to_update_prepare));
+                } else {
+                    pd.setIndeterminate(true);
+                    pd.setMessage(context.getText(
+                                com.android.internal.R.string.reboot_to_update_reboot));
+                }
+            } else if (mReason != null && mReason.equals(PowerManager.REBOOT_RECOVERY)) {
+                // Factory reset path. Set the dialog message accordingly.
+                pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_reset_title));
                 pd.setMessage(context.getText(
-                            com.android.internal.R.string.reboot_to_update_prepare));
-            } else {
+                            com.android.internal.R.string.reboot_to_reset_message));
                 pd.setIndeterminate(true);
-                pd.setMessage(context.getText(
-                            com.android.internal.R.string.reboot_to_update_reboot));
+            } else {
+                pd.setTitle(context.getText(com.android.internal.R.string.power_off));
+                pd.setMessage(context.getText(com.android.internal.R.string.shutdown_progress));
+                pd.setIndeterminate(true);
             }
-        } else if (mReason != null && mReason.equals(PowerManager.REBOOT_RECOVERY)) {
-            // Factory reset path. Set the dialog message accordingly.
-            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_reset_title));
-            pd.setMessage(context.getText(
-                        com.android.internal.R.string.reboot_to_reset_message));
-            pd.setIndeterminate(true);
         } else {
-            pd.setTitle(context.getText(com.android.internal.R.string.power_off));
-            pd.setMessage(context.getText(com.android.internal.R.string.shutdown_progress));
+            pd.setTitle(context.getText(com.android.internal.R.string.restart_general_title));
+            int messageResId;
+            if (mRebootMode == PowerMenuHelper.REBOOT_MODE_RESTART_TO_SYSTEM) {
+                messageResId = com.android.internal.R.string.advanced_restart_restart_to_system_message;
+            } else if (mRebootMode == PowerMenuHelper.REBOOT_MODE_REBOOT_TO_RECOVERY) {
+                messageResId = com.android.internal.R.string.advanced_restart_reboot_to_recovery_message;
+            } else {
+                messageResId = com.android.internal.R.string.advanced_restart_reboot_to_bootloader_message;
+            }
+            pd.setMessage(context.getText(messageResId));
             pd.setIndeterminate(true);
         }
         pd.setCancelable(false);

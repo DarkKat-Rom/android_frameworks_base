@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2017 DarkKat
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+
+    <!-- Global actions start -->
+    <java-symbol type="string" name="global_action_advanced_restart_menu" />
+
+    <!-- Advanced restart menu -->
+    <java-symbol type="array" name="config_advancedRestartActionsList" />
+    <java-symbol type="drawable" name="ic_advanced_restart_menu" />
+    <java-symbol type="drawable" name="ic_advanced_restart_restart_to_system" />
+    <java-symbol type="drawable" name="ic_advanced_restart_restart_to_quick_restart" />
+    <java-symbol type="drawable" name="ic_advanced_restart_reboot_to_recovery" />
+    <java-symbol type="drawable" name="ic_advanced_restart_reboot_to_bootloader" />
+    <java-symbol type="id" name="advanced_restart_menu_dialog_title_view" />
+    <java-symbol type="layout" name="advanced_restart_menu_dialog_title" />
+    <java-symbol type="string" name="advanced_restart_menu_dialog_title_text" />
+    <java-symbol type="string" name="advanced_restart_restart_to_system" />
+    <java-symbol type="string" name="advanced_restart_restart_to_quick_restart" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_recovery" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_bootloader" />
+    <!-- Global actions end -->
+
+    <!-- Shut down dialogs -->
+    <java-symbol type="string" name="restart_general_title" />
+    <java-symbol type="string" name="restart_confirm" />
+    <java-symbol type="string" name="advanced_restart_restart_to_system_confirm" />
+    <java-symbol type="string" name="advanced_restart_restart_to_quick_restart_confirm" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_recovery_confirm" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_bootloader_confirm" />
+    <java-symbol type="string" name="restart_message" />
+    <java-symbol type="string" name="advanced_restart_restart_to_system_message" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_recovery_message" />
+    <java-symbol type="string" name="advanced_restart_reboot_to_bootloader_message" />
+</resources>
