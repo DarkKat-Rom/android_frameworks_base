@@ -53,6 +53,19 @@ interface IUiModeManager {
     int getNightMode();
 
     /**
+     * Gets the currently configured day/night theme. Return:
+     *   1 - Theme.Material.Light
+     *   2 - Theme.Material
+     *   3 - Theme.Material (DarkKat version)
+     *   4 - Theme.Material.Light (Whiteout-DarkKat version)
+     *   5 - Theme.Material.Light (DarkKat version)
+     *   6 - Theme.Material.Light (Whiteout version)
+     *   7 - Theme.Material (Blackout-DarkKat version)
+     *   8 - Theme.Material (Blackout version)
+     */
+    int getDayNightTheme();
+
+    /**
      * Tells if UI mode is locked or not.
      */
     boolean isUiModeLocked();

@@ -6599,6 +6599,28 @@ public final class Settings {
         public static final String UI_NIGHT_MODE = "ui_night_mode";
 
         /**
+         * The current night theme
+         * 3 - Theme.Material (DarkKat version)
+         * 2 - Theme.Material
+         * 7 - Theme.Material (Blackout-DarkKat version)
+         * 8 - Theme.Material (Blackout version)
+         * default: 2
+         * @hide
+         */
+        public static final String UI_NIGHT_THEME = "ui_night_theme";
+
+        /**
+         * The current day theme
+         * 4 - Theme.Material.Light (Whiteout-DarkKat version)
+         * 5 - Theme.Material.Light (DarkKat version)
+         * 6 - Theme.Material.Light (Whiteout version)
+         * 1 - Theme.Material.Light
+         * default: 1
+         * @hide
+         */
+        public static final String UI_DAY_THEME = "ui_day_theme";
+
+        /**
          * Whether screensavers are enabled.
          * @hide
          */
