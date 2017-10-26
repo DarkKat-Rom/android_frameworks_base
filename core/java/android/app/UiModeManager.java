@@ -98,7 +98,15 @@ public class UiModeManager {
     public static String ACTION_EXIT_DESK_MODE = "android.app.action.EXIT_DESK_MODE";
 
     /** @hide */
-    @IntDef({MODE_NIGHT_AUTO, MODE_NIGHT_NO, MODE_NIGHT_YES})
+    @IntDef({MODE_NIGHT_AUTO,
+             MODE_NIGHT_NO,
+             MODE_NIGHT_YES,
+             MODE_NIGHT_YES_DK,
+             MODE_NIGHT_NO_DK_WHITEOUT,
+             MODE_NIGHT_NO_DK,
+             MODE_NIGHT_NO_WHITEOUT,
+             MODE_NIGHT_YES_DK_BLACKOUT,
+             MODE_NIGHT_YES_BLACKOUT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NightMode {}
 
@@ -110,15 +118,51 @@ public class UiModeManager {
     
     /**
      * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
-     * never run in night mode.
+     * always run in day mode Theme.Material.Light).
      */
     public static final int MODE_NIGHT_NO = Configuration.UI_MODE_NIGHT_NO >> 4;
     
     /**
      * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
-     * always run in night mode.
+     * always run in night mode (Theme.Material).
      */
     public static final int MODE_NIGHT_YES = Configuration.UI_MODE_NIGHT_YES >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * always run in night mode (Theme.Material (DarkKat version)).
+     */
+    public static final int MODE_NIGHT_YES_DK = Configuration.UI_MODE_NIGHT_YES_DK >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * always run in day mode (Theme.Material.Light (Whiteout-DarkKat version)).
+     */
+    public static final int MODE_NIGHT_NO_DK_WHITEOUT = Configuration.UI_MODE_NIGHT_NO_DK_WHITEOUT >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * always run in day mode (Theme.Material.Light (DarkKat version)).
+     */
+    public static final int MODE_NIGHT_NO_DK = Configuration.UI_MODE_NIGHT_NO_DK >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * never run in day mode (Theme.Material.Light (Whiteout version)).
+     */
+    public static final int MODE_NIGHT_NO_WHITEOUT = Configuration.UI_MODE_NIGHT_NO_WHITEOUT >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * always run in day mode (Theme.Material (Blackout-DarkKat version)).
+     */
+    public static final int MODE_NIGHT_YES_DK_BLACKOUT = Configuration.UI_MODE_NIGHT_YES_DK_BLACKOUT >> 4;
+
+    /**
+     * Constant for {@link #setNightMode(int)} and {@link #getNightMode()}:
+     * always run in night mode (Theme.Material (Blackout version)).
+     */
+    public static final int MODE_NIGHT_YES_BLACKOUT = Configuration.UI_MODE_NIGHT_YES_BLACKOUT >> 4;
 
     private IUiModeManager mService;
 
@@ -216,6 +260,18 @@ public class UiModeManager {
      *       {@code notnight} mode</li>
      *   <li><em>{@link #MODE_NIGHT_YES}</em> sets the device into
      *       {@code night} mode</li>
+     *   <li><em>{@link #MODE_NIGHT_YES_DK}</em> sets the device into
+     *       {@code darkkat } mode</li>
+     *   <li><em>{@link #MODE_NIGHT_NO_DK_WHITEOUT}</em> sets the device into
+     *       {@code darkkatwhite } mode</li>
+     *   <li><em>{@link #MODE_NIGHT_NO_DK}</em> sets the device into
+     *       {@code darkkatday } mode</li>
+     *   <li><em>{@link #MODE_NIGHT_NO_WHITEOUT}</em> sets the device into
+     *       {@code whiteout } mode</li>
+     *   <li><em>{@link #MODE_NIGHT_YES_DK_BLACKOUT}</em> sets the device into
+     *       {@code darkkatblack } mode</li>
+     *   <li><em>{@link #MODE_NIGHT_YES_BLACKOUT}</em> sets the device into
+     *       {@code blackout } mode</li>
      *   <li><em>{@link #MODE_NIGHT_AUTO}</em> automatically switches between
      *       {@code night} and {@code notnight} based on the device's current
      *       location and certain other sensors</li>
@@ -246,6 +302,12 @@ public class UiModeManager {
      * <ul>
      *   <li>{@link #MODE_NIGHT_NO}</li>
      *   <li>{@link #MODE_NIGHT_YES}</li>
+     *   <li>{@link #MODE_NIGHT_YES_DK}</li>
+     *   <li>{@link #MODE_NIGHT_NO_DK_WHITEOUT}</li>
+     *   <li>{@link #MODE_NIGHT_NO_DK}</li>
+     *   <li>{@link #MODE_NIGHT_NO_WHITEOUT}</li>
+     *   <li>{@link #MODE_NIGHT_YES_DK_BLACKOUT}</li>
+     *   <li>{@link #MODE_NIGHT_YES_BLACKOUT}</li>
      *   <li>{@link #MODE_NIGHT_AUTO}</li>
      *   <li>{@code -1} on error</li>
      * </ul>
@@ -257,6 +319,17 @@ public class UiModeManager {
         if (mService != null) {
             try {
                 return mService.getNightMode();
+            } catch (RemoteException e) {
+                throw e.rethrowFromSystemServer();
+            }
+        }
+        return -1;
+    }
+
+    public @NightMode int getDayNightTheme() {
+        if (mService != null) {
+            try {
+                return mService.getDayNightTheme();
             } catch (RemoteException e) {
                 throw e.rethrowFromSystemServer();
             }

@@ -787,6 +787,12 @@
              0 - MODE_NIGHT_AUTO
              1 - MODE_NIGHT_NO
              2 - MODE_NIGHT_YES
+             3 - MODE_NIGHT_YES_DK
+             4 - MODE_NIGHT_NO_DK_WHITEOUT
+             5 - MODE_NIGHT_NO_DK
+             6 - MODE_NIGHT_NO_WHITEOUT
+             7 - MODE_NIGHT_YES_DK_BLACKOUT
+             8 - MODE_NIGHT_YES_BLACKOUT
     -->
     <integer name="config_defaultNightMode">1</integer>
 

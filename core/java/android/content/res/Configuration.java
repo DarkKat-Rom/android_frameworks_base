@@ -642,7 +642,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
     public static final int UI_MODE_TYPE_VR_HEADSET = 0x07;
 
     /** Constant for {@link #uiMode}: bits that encode the night mode. */
-    public static final int UI_MODE_NIGHT_MASK = 0x30;
+    public static final int UI_MODE_NIGHT_MASK = 0xf0;
     /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
      * value indicating that no mode type has been set. */
     public static final int UI_MODE_NIGHT_UNDEFINED = 0x00;
@@ -656,6 +656,24 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      * <a href="{@docRoot}guide/topics/resources/providing-resources.html#NightQualifier">night</a>
      * resource qualifier. */
     public static final int UI_MODE_NIGHT_YES = 0x20;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "darkkat". */
+    public static final int UI_MODE_NIGHT_YES_DK = 0x30;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "darkkatwhite". */
+    public static final int UI_MODE_NIGHT_NO_DK_WHITEOUT = 0x40;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "darkkatday". */
+    public static final int UI_MODE_NIGHT_NO_DK = 0x50;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "whiteout". */
+    public static final int UI_MODE_NIGHT_NO_WHITEOUT = 0x60;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "darkkatblack". */
+    public static final int UI_MODE_NIGHT_YES_DK_BLACKOUT = 0x70;
+    /** Constant for {@link #uiMode}: a {@link #UI_MODE_NIGHT_MASK}
+     * value that corresponds to the NightQualifier "blackout". */
+    public static final int UI_MODE_NIGHT_YES_BLACKOUT = 0x80;
 
     /**
      * Bit mask of the ui mode.  Currently there are two fields:
@@ -668,7 +686,10 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      *
      * <p>The {@link #UI_MODE_NIGHT_MASK} defines whether the screen
      * is in a special mode. They may be one of {@link #UI_MODE_NIGHT_UNDEFINED},
-     * {@link #UI_MODE_NIGHT_NO} or {@link #UI_MODE_NIGHT_YES}.
+     * {@link #UI_MODE_NIGHT_NO}, {@link #UI_MODE_NIGHT_YES},
+     * {@link #UI_MODE_NIGHT_YES_DK}, {@link #UI_MODE_NIGHT_NO_DK_WHITEOUT},
+     * {@link #UI_MODE_NIGHT_NO_DK}, {@link #UI_MODE_NIGHT_NO_WHITEOUT},
+     * {@link #UI_MODE_NIGHT_YES_DK_BLACKOUT} or {@link #UI_MODE_NIGHT_YES_BLACKOUT},
      */
     public int uiMode;
 
@@ -1005,6 +1026,12 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             case UI_MODE_NIGHT_UNDEFINED: sb.append(" ?night"); break;
             case UI_MODE_NIGHT_NO: /* not-night is not interesting to print */ break;
             case UI_MODE_NIGHT_YES: sb.append(" night"); break;
+            case UI_MODE_NIGHT_YES_DK: sb.append(" darkkat"); break;
+            case UI_MODE_NIGHT_NO_DK_WHITEOUT: sb.append(" darkkatwhite"); break;
+            case UI_MODE_NIGHT_NO_DK: sb.append(" darkkatday"); break;
+            case UI_MODE_NIGHT_NO_WHITEOUT: sb.append(" whiteout"); break;
+            case UI_MODE_NIGHT_YES_DK_BLACKOUT: sb.append(" darkkatblack"); break;
+            case UI_MODE_NIGHT_YES_BLACKOUT: sb.append(" blackout"); break;
             default: sb.append(" night="); sb.append(uiMode&UI_MODE_NIGHT_MASK); break;
         }
         switch (touchscreen) {
@@ -2026,6 +2053,24 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         switch (config.uiMode & Configuration.UI_MODE_NIGHT_MASK) {
             case Configuration.UI_MODE_NIGHT_YES:
                 parts.add("night");
+                break;
+            case Configuration.UI_MODE_NIGHT_YES_DK:
+                parts.add("darkkat");
+                break;
+            case Configuration.UI_MODE_NIGHT_NO_DK_WHITEOUT:
+                parts.add("darkkatwhite");
+                break;
+            case Configuration.UI_MODE_NIGHT_NO_DK:
+                parts.add("darkkatday");
+                break;
+            case Configuration.UI_MODE_NIGHT_NO_WHITEOUT:
+                parts.add("whiteout");
+                break;
+            case Configuration.UI_MODE_NIGHT_YES_DK_BLACKOUT:
+                parts.add("darkkatblack");
+                break;
+            case Configuration.UI_MODE_NIGHT_YES_BLACKOUT:
+                parts.add("blackout");
                 break;
             case Configuration.UI_MODE_NIGHT_NO:
                 parts.add("notnight");
