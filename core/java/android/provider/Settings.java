@@ -6533,6 +6533,16 @@ public final class Settings {
         public static final String UI_DAY_THEME = "ui_day_theme";
 
         /**
+         * Wether to use an optional light status and action bar
+         * Supported themes:
+         * Theme.Material.Light (Whiteout-DarkKat version)
+         * Theme.Material.Light (DarkKat version)
+         * Theme.Material.Light
+         * @hide
+         */
+        public static final String USE_LIGHT_STATUS_BAR = "use_light_status_bar";
+
+        /**
          * Whether screensavers are enabled.
          * @hide
          */
