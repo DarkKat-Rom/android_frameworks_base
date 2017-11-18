@@ -3923,6 +3923,22 @@ public final class Settings {
         public static final String COLOR_PICKER_FAVORITES_4 = "color_picker_favorite_4";
 
         /**
+         * Wether to show the location in the detailed weather view
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_SHOW_LOCATION = "detailed_weather_show_location";
+
+        /**
+         * Condition icon on the detailed weather view
+         * 0 - Monochrome
+         * 1 - Colored
+         * 2 - VClouds
+         * default: 0
+         * @hide
+         */
+        public static final String DETAILED_WEATHER_CONDITION_ICON = "detailed_weather_condition_icon";
+
+        /**
          * Wether to confirm power off
          * @hide
          */
