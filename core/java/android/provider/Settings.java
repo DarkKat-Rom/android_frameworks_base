@@ -6683,6 +6683,17 @@ public final class Settings {
         public static final String USE_LIGHT_STATUS_BAR = "use_light_status_bar";
 
         /**
+         * Wether to use an optional light navigation bar
+         * Supported themes:
+         * Theme.Material.Light (Whiteout-DarkKat version)
+         * Theme.Material.Light (DarkKat version)
+         * Theme.Material.Light (Whiteout version)
+         * Theme.Material.Light
+         * @hide
+         */
+        public static final String USE_LIGHT_NAVIGATION_BAR = "use_light_navigation_bar";
+
+        /**
          * Whether screensavers are enabled.
          * @hide
          */

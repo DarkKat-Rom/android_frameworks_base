@@ -47,4 +47,19 @@ public class ThemeHelper {
         return Settings.Secure.getInt(context.getContentResolver(),
             Settings.Secure.USE_LIGHT_STATUS_BAR, 0) == 1;
     }
+
+    public static boolean themeSupportsOptionalĹightNB(Context context) {
+        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(
+                Context.UI_MODE_SERVICE);
+        int dayNightTheme = uiModeManager.getDayNightTheme();
+        return dayNightTheme == UiModeManager.MODE_NIGHT_NO
+            || dayNightTheme == UiModeManager.MODE_NIGHT_NO_DK_WHITEOUT
+            || dayNightTheme == UiModeManager.MODE_NIGHT_NO_WHITEOUT
+            || dayNightTheme == UiModeManager.MODE_NIGHT_NO_DK;
+    }
+
+    public static boolean useLightNavigationBar(Context context) {
+        return Settings.Secure.getInt(context.getContentResolver(),
+            Settings.Secure.USE_LIGHT_NAVIGATION_BAR, 0) == 1;
+    }
 }
