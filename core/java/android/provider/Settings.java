@@ -3939,6 +3939,17 @@ public final class Settings {
         public static final String DETAILED_WEATHER_CONDITION_ICON = "detailed_weather_condition_icon";
 
         /**
+         * Turn on ambient display on notification
+         * (Used for devices without a proximity sensor)
+         * 0 - Always
+         * 1 - Never
+         * 2 - Only on secure lock screen
+         * default: 2
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_PULSE_ON_NOTIFICATION = "ambient_display_pulse_on_notification";
+
+        /**
          * Wether to confirm power off
          * @hide
          */
