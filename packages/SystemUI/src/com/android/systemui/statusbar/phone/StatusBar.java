@@ -141,6 +141,7 @@ import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationMessagingUtil;
+import com.android.internal.util.darkkat.AmbientDisplayHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardStatusView;
@@ -2700,7 +2701,13 @@ public class StatusBar extends SystemUI implements DemoMode,
         } else {
             updateNotificationRanking(null);
             if (isHeadsUp) {
-                mDozeServiceHost.fireNotificationHeadsUp();
+                boolean firePulseOnNotification = true;
+                if (!AmbientDisplayHelper.deviceHasProximitySensor(mContext)) {
+                    firePulseOnNotification = AmbientDisplayHelper.pulseOnNotification(mContext);
+                }
+                if (firePulseOnNotification) {
+                    mDozeServiceHost.fireNotificationHeadsUp();
+                }
             }
         }
 
