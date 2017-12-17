@@ -23,8 +23,6 @@
 
     <!-- Advanced restart menu -->
 
-    <!-- Title of the advanced restart menu -->
-    <string name="advanced_restart_menu_dialog_title_text">Erweiterter Neustart</string>
     <!-- Title for the advanced restart menu action (restart) -->
     <string name="advanced_restart_restart_to_system">System</string>
     <!-- Title for the advanced restart menu action (quick reboot) -->

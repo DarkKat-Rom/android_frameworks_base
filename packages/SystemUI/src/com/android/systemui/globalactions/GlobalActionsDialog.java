@@ -366,7 +366,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                         && advancedRestartEnabled()) {
                 mItems.add(new AdvancedRestartMenuAction());
             } else if (ADVANCED_RESTART_ACTION_KEY_RESTART_TO_SYSTEM.equals(actionKey)) {
-//                mItems.add(new DialogTitle());
                 mItems.add(new RestartToSystemAction());
             } else if (ADVANCED_RESTART_ACTION_KEY_RESTART_TO_QUICK_RESTART.equals(actionKey)) {
                 mItems.add(new RestartToQuickRebootAction());
@@ -969,77 +968,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
         boolean isEnabled();
     }
-
-/**
-    private static class DialogTitle implements Action, View.OnClickListener {
-        private final int mTitleResId;
-        private final CharSequence mTitle;
-
-        protected DialogTitle() {
-            mTitleResId = 0;
-            mTitle = null;
-        }
-
-        protected DialogTitle(int titleResId) {
-            mTitleResId = titleResId;
-            mTitle = null;
-        }
-
-        protected DialogTitle(CharSequence title) {
-            mTitleResId = 0;
-            mTitle = title;
-        }
-
-        @Override
-        public CharSequence getLabelForAccessibility(Context context) {
-            if (mTitle != null) {
-                return mTitle;
-            } else if (mTitleResId > 0) {
-                return context.getString(mTitleResId);
-            } else {
-                return context.getString(R.string.advanced_restart_menu_dialog_title_text);
-            }
-        }
-
-        @Override
-        public View create(
-                Context context, View convertView, ViewGroup parent, LayoutInflater inflater) {
-            View v = inflater.inflate(R.layout.advanced_restart_menu_dialog_title, parent, false);
-            TextView tv = (TextView) v.findViewById(R.id.advanced_restart_menu_dialog_title_view);
-
-            if (mTitle != null) {
-                tv.setText(mTitle);
-            } else if (mTitleResId > 0) {
-                tv.setText(mTitleResId);
-            }
-
-            v.setOnClickListener(this);
-            return v;
-        }
-
-        public void onPress() {
-        }
-
-        @Override
-        public boolean showDuringKeyguard() {
-            return true;
-        }
-
-        @Override
-        public boolean showBeforeProvisioning() {
-            return true;
-        }
-
-        @Override
-        public boolean isEnabled() {
-            return true;
-        }
-
-        @Override
-        public void onClick(View v) {
-        }
-    }
- */
 
     /**
      * An action that also supports long press.

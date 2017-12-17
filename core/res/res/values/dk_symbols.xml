@@ -26,9 +26,6 @@
     <java-symbol type="drawable" name="ic_advanced_restart_restart_to_quick_restart" />
     <java-symbol type="drawable" name="ic_advanced_restart_reboot_to_recovery" />
     <java-symbol type="drawable" name="ic_advanced_restart_reboot_to_bootloader" />
-    <java-symbol type="id" name="advanced_restart_menu_dialog_title_view" />
-    <java-symbol type="layout" name="advanced_restart_menu_dialog_title" />
-    <java-symbol type="string" name="advanced_restart_menu_dialog_title_text" />
     <java-symbol type="string" name="advanced_restart_restart_to_system" />
     <java-symbol type="string" name="advanced_restart_restart_to_quick_restart" />
     <java-symbol type="string" name="advanced_restart_reboot_to_recovery" />
