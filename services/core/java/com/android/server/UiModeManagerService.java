@@ -219,8 +219,9 @@ final class UiModeManagerService extends SystemService {
             boolean applyTheme = false;
             if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.UI_NIGHT_THEME))) {
-                int nightTheme = Settings.Secure.getInt(getContext().getContentResolver(),
-                        Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
+//                int nightTheme = Settings.Secure.getInt(getContext().getContentResolver(),
+//                        Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
+                int nightTheme = UiModeManager.MODE_NIGHT_YES;
                 if (mNightTheme != nightTheme) {
                     mNightTheme = nightTheme;
                     if (mNightMode == UiModeManager.MODE_NIGHT_YES
@@ -230,8 +231,9 @@ final class UiModeManagerService extends SystemService {
                 }
             } else if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.UI_DAY_THEME))) {
-                int dayTheme = Settings.Secure.getInt(getContext().getContentResolver(),
-                        Settings.Secure.UI_DAY_THEME, UiModeManager.MODE_NIGHT_NO);
+//                int dayTheme = Settings.Secure.getInt(getContext().getContentResolver(),
+//                        Settings.Secure.UI_DAY_THEME, UiModeManager.MODE_NIGHT_NO);
+                int dayTheme = UiModeManager.MODE_NIGHT_NO;
                 if (mDayTheme != dayTheme) {
                     mDayTheme = dayTheme;
                     if (mNightMode == UiModeManager.MODE_NIGHT_NO
@@ -285,13 +287,13 @@ final class UiModeManagerService extends SystemService {
 
         final int defaultNightMode = res.getInteger(
                 com.android.internal.R.integer.config_defaultNightMode);
-        mNightMode = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_MODE, defaultNightMode);
-        mNightTheme = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
-        mDayTheme = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_DAY_THEME, UiModeManager.MODE_NIGHT_NO);
-        mDayNightTheme = mNightMode != UiModeManager.MODE_NIGHT_NO ? mNightTheme : mDayTheme;
+//        mNightMode = Settings.Secure.getInt(context.getContentResolver(),
+//                Settings.Secure.UI_NIGHT_MODE, defaultNightMode);
+//        mNightTheme = Settings.Secure.getInt(context.getContentResolver(),
+//                Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
+//        mDayTheme = Settings.Secure.getInt(context.getContentResolver(),
+//                Settings.Secure.UI_DAY_THEME, UiModeManager.MODE_NIGHT_NO);
+//        mDayNightTheme = mNightMode != UiModeManager.MODE_NIGHT_NO ? mNightTheme : mDayTheme;
 
         // Update the initial, static configurations.
         SystemServerInitThreadPool.get().submit(() -> {
@@ -377,10 +379,10 @@ final class UiModeManagerService extends SystemService {
             try {
                 synchronized (mLock) {
                     if (mNightMode != mode) {
-                        Settings.Secure.putInt(getContext().getContentResolver(),
-                                Settings.Secure.UI_NIGHT_MODE, mode);
-                        mNightMode = mode;
-                        updateLocked(0, 0);
+//                        Settings.Secure.putInt(getContext().getContentResolver(),
+//                                Settings.Secure.UI_NIGHT_MODE, mode);
+//                        mNightMode = mode;
+//                        updateLocked(0, 0);
                     }
                 }
             } finally {
@@ -518,14 +520,16 @@ final class UiModeManagerService extends SystemService {
                 mTwilightManager.registerListener(mTwilightListener, mHandler);
             }
             updateComputedNightModeLocked();
-            uiMode |= (mComputedNightMode ? mNightTheme : mDayTheme) << 4;
-            mDayNightTheme = mComputedNightMode ? mNightTheme : mDayTheme;
+//            uiMode |= (mComputedNightMode ? mNightTheme : mDayTheme) << 4;
+//            mDayNightTheme = mComputedNightMode ? mNightTheme : mDayTheme;
+            uiMode |= mNightMode << 4;
         } else {
             if (mTwilightManager != null) {
                 mTwilightManager.unregisterListener(mTwilightListener);
             }
-            uiMode |= (mNightMode == UiModeManager.MODE_NIGHT_YES ? mNightTheme : mDayTheme) << 4;
-            mDayNightTheme = mNightMode == UiModeManager.MODE_NIGHT_YES ? mNightTheme : mDayTheme;
+//            uiMode |= (mNightMode == UiModeManager.MODE_NIGHT_YES ? mNightTheme : mDayTheme) << 4;
+//            mDayNightTheme = mNightMode == UiModeManager.MODE_NIGHT_YES ? mNightTheme : mDayTheme;
+            uiMode |= mNightMode << 4;
         }
 
         if (LOG) {

@@ -212,7 +212,7 @@ public final class ShutdownThread extends Thread {
                 sConfirmDialog.dismiss();
             }
             sConfirmDialog = new AlertDialog.Builder(context,
-                    com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert)
+                    com.android.internal.R.style.Theme_ShutdownThreadDialog)
                     .setTitle(titleResourceId)
                     .setMessage(resourceId)
                     .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
@@ -334,7 +334,7 @@ public final class ShutdownThread extends Thread {
     private static ProgressDialog showShutdownDialog(Context context) {
         // Throw up a system dialog to indicate the device is rebooting / shutting down.
         ProgressDialog pd = new ProgressDialog(context,
-                com.android.internal.R.style.Theme_Material_DayNight_Dialog_Alert);
+                com.android.internal.R.style.Theme_ShutdownThreadDialog);
 
         // Path 1: Reboot to recovery for update
         //   Condition: mReason startswith REBOOT_RECOVERY_UPDATE

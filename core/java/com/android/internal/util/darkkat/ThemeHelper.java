@@ -34,6 +34,16 @@ public class ThemeHelper {
         return uiModeManager.getDayNightTheme();
     }
 
+    public static int getDayTheme(Context context) {
+        return Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.UI_DAY_THEME, UiModeManager.MODE_NIGHT_NO);
+    }
+
+    public static int getNightTheme(Context context) {
+        return Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
+    }
+
     public static boolean themeSupportsOptionalĹightSB(Context context) {
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(
                 Context.UI_MODE_SERVICE);

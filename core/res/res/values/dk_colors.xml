@@ -20,6 +20,9 @@
     <color name="darkkat_blue_grey">#ff1b1f23</color>
     <color name="darkkat_blue_blue_grey">#ff1f2429</color>
     <color name="darkkat_accent">#ff5a8596</color>
+    <color name="primary_color_darkkat">#ff2196f3</color>  <!-- material blue 500 -->
+    <color name="primary_color_dark_darkkat">#ff1976d2</color>  <!-- material blue 700 -->
+    <color name="accent_darkkat">#ff5a8596</color>  <!-- 12% holo blue light over material blue grey 500 -->
 
     <!-- Blackout theme -->
     <color name="primary_color_blackout">#ff101010</color>

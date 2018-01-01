@@ -54,6 +54,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -150,6 +151,11 @@ import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationMessagingUtil;
 import com.android.internal.util.darkkat.AmbientDisplayHelper;
+import com.android.internal.util.darkkat.DKSettingsThemeOverlayHelper;
+import com.android.internal.util.darkkat.ShutdownThreadThemeOverlayHelper;
+import com.android.internal.util.darkkat.SystemUIThemeOverlayHelper;
+import com.android.internal.util.darkkat.TerminalThemeOverlayHelper;
+import com.android.internal.util.darkkat.ThemeOverlayHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -451,6 +457,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     // settings
     private QSPanel mQSPanel;
+    private int mSystemUIThemeOverlayMode = SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_CURRENT_OVERLAY;
 
     // top bar
     protected KeyguardStatusBarView mKeyguardStatusBar;
@@ -856,6 +863,9 @@ public class StatusBar extends SystemUI implements DemoMode,
                 true,
                 mLockscreenSettingsObserver,
                 UserHandle.USER_ALL);
+
+        SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe();
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -2887,11 +2897,45 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateTheme();
     }
 
+    private boolean isThemeEnabled(String packageName) {
+        OverlayInfo oi = null;
+        try {
+            oi = mOverlayManager.getOverlayInfo(packageName, mCurrentUserId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return oi != null && oi.isEnabled();
+    }
+
+    private String getEnabledThemeOverlayPackageName(String targetPackageName) {
+        String enabledPackageName = ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
+        List<OverlayInfo> allOverlays = null;
+        OverlayInfo oi = null;
+
+        try {
+            allOverlays = mOverlayManager.getOverlayInfosForTarget(
+                    targetPackageName, mCurrentUserId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        if (allOverlays != null) {
+            for (int i = 0; i < allOverlays.size(); i++) {
+                oi = allOverlays.get(i);
+                if (oi.isEnabled()) {
+                    enabledPackageName = oi.packageName;
+                    break;
+                }
+            }
+        }
+        return enabledPackageName;
+    }
+
     public boolean isUsingDarkTheme() {
         OverlayInfo themeInfo = null;
         try {
-            themeInfo = mOverlayManager.getOverlayInfo("com.android.systemui.theme.dark",
-                    mCurrentUserId);
+            themeInfo = mOverlayManager.getOverlayInfo(
+                    SystemUIThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME, mCurrentUserId);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -4677,20 +4721,9 @@ public class StatusBar extends SystemUI implements DemoMode,
      */
     protected void updateTheme() {
         final boolean inflated = mStackScroller != null;
-
-        // The system wallpaper defines if QS should be light or dark.
-        WallpaperColors systemColors = mColorExtractor
-                .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final boolean useDarkTheme = systemColors != null
-                && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
-        if (isUsingDarkTheme() != useDarkTheme) {
-            try {
-                mOverlayManager.setEnabled("com.android.systemui.theme.dark",
-                        useDarkTheme, mCurrentUserId);
-            } catch (RemoteException e) {
-                Log.w(TAG, "Can't change theme", e);
-            }
-        }
+        updateSystemUIThemeOverlay();
+        updateDKSettingsThemeOverlay();
+        updateTerminalThemeOverlay();
 
         // Lock wallpaper defines the color of the majority of the views, hence we'll use it
         // to set our default theme.
@@ -4717,6 +4750,119 @@ public class StatusBar extends SystemUI implements DemoMode,
 
             // Make sure we have the correct navbar/statusbar colors.
             mStatusBarWindowManager.setKeyguardDark(useDarkText);
+        }
+    }
+
+    private void updateSystemUIThemeOverlay() {
+        mSystemUIThemeOverlayMode = SystemUIThemeOverlayHelper.getThemeOverlayMode(mContext);
+        String packageName;
+
+        // Name of the ShutdownThread dialogs overlay package
+        // The ShutdownThread is not part of the SystemUI,
+        // but the ShutdownThread dialogs theme should match the
+        // theme used for the global action dialog.
+        String dialogPackageName;
+
+        if (mSystemUIThemeOverlayMode != SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_CURRENT_OVERLAY) {
+            // The system wallpaper defines if QS should be light or dark.
+            WallpaperColors systemColors = mColorExtractor
+                    .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+            final boolean useDarkTheme = systemColors != null
+                    && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+            if (mSystemUIThemeOverlayMode == SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_AUTO_DEFAULT) {
+                packageName = useDarkTheme
+                        ? SystemUIThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME
+                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
+                dialogPackageName = useDarkTheme
+                        ? ShutdownThreadThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME
+                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
+
+            } else {
+                packageName = useDarkTheme
+                        ? SystemUIThemeOverlayHelper.getThemeOverlayDarkPackageName(mContext)
+                        : SystemUIThemeOverlayHelper.getThemeOverlayLightPackageName(mContext);
+                dialogPackageName = useDarkTheme
+                        ? ShutdownThreadThemeOverlayHelper.getThemeOverlayDarkPackageName(mContext)
+                        : ShutdownThreadThemeOverlayHelper.getThemeOverlayLightPackageName(mContext);
+            }
+        } else {
+            packageName = SystemUIThemeOverlayHelper.getThemeOverlayPackageName(mContext);
+            dialogPackageName = ShutdownThreadThemeOverlayHelper.getThemeOverlayPackageName(mContext);
+        }
+        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
+            String enabledPackageName = getEnabledThemeOverlayPackageName(
+                    SystemUIThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
+            if (!enabledPackageName.equals(packageName)) {
+                setThemeOverlay(enabledPackageName, false);
+            }
+        } else {
+            if (!isThemeEnabled(packageName)) {
+                setThemeOverlay(packageName);
+            }
+        }
+
+        if (dialogPackageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
+            String enabledDialogPackageName = getEnabledThemeOverlayPackageName(
+                    ShutdownThreadThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
+            if (!enabledDialogPackageName.equals(dialogPackageName)) {
+                setThemeOverlay(enabledDialogPackageName, false);
+            }
+        } else {
+            if (!isThemeEnabled(dialogPackageName)) {
+                setThemeOverlay(dialogPackageName);
+            }
+        }
+    }
+
+    private void updateDKSettingsThemeOverlay() {
+        String packageName = DKSettingsThemeOverlayHelper.getThemeOverlayPackageName(mContext);
+
+        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
+            String enabledPackageName = getEnabledThemeOverlayPackageName(
+                    DKSettingsThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
+            if (!enabledPackageName.equals(packageName)) {
+                setThemeOverlay(enabledPackageName, false);
+            }
+        } else {
+            if (!isThemeEnabled(packageName)) {
+                setThemeOverlay(packageName);
+            }
+        }
+    }
+
+    private void updateTerminalThemeOverlay() {
+        String packageName = TerminalThemeOverlayHelper.getThemeOverlayPackageName(mContext);
+
+        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
+            String enabledPackageName = getEnabledThemeOverlayPackageName(
+                    TerminalThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
+            if (!enabledPackageName.equals(packageName)) {
+                setThemeOverlay(enabledPackageName, false);
+            }
+        } else {
+            if (!isThemeEnabled(packageName)) {
+                setThemeOverlay(packageName);
+            }
+        }
+    }
+
+    private void setThemeOverlay(String packageName) {
+        setThemeOverlay(packageName, true);
+    }
+
+    private void setThemeOverlay(String packageName, boolean enable) {
+        if (enable) {
+            try {
+                mOverlayManager.setEnabledExclusive(packageName, true, mCurrentUserId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Can't change theme", e);
+            }
+        } else {
+            try {
+                mOverlayManager.setEnabled(packageName, false, mCurrentUserId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Can't change theme", e);
+            }
         }
     }
 
@@ -5844,6 +5990,43 @@ public class StatusBar extends SystemUI implements DemoMode,
             updateNotifications();
         }
     };
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY_AUTO_DARK_THEME),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY_AUTO_LIGHT_THEME),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SYSTEMUI_THEME_OVERLAY_MODE),
+                    false, this, UserHandle.USER_ALL);
+
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY_AUTO_DARK_THEME))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.THEME_OVERLAY_AUTO_LIGHT_THEME))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.SYSTEMUI_THEME_OVERLAY_MODE))) {
+                updateTheme();
+            }
+        }
+    }
 
     private RemoteViews.OnClickHandler mOnClickHandler = new RemoteViews.OnClickHandler() {
 

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) 2017, The Android Open Source Project
-
-     Copyright (C) 2017 DarkKat
+<!-- Copyright (C) 2017 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,5 +15,10 @@
 -->
 <resources>
 
-    <string name="sysui_overlay_dark">QS Theme.Material</string>
+    <style name="qs_base" parent="@*android:style/Theme.DeviceDefault.QuickSettings">
+        <item name="android:colorPrimary">@android:color/white</item>
+        <item name="android:colorPrimaryDark">@*android:color/material_grey_100</item>
+        <item name="android:colorSecondary">@*android:color/material_grey_100</item>
+        <item name="android:colorAccent">@*android:color/accent_whiteout</item>
+    </style>
 </resources>

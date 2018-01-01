@@ -3967,6 +3967,53 @@ public final class Settings {
         public static final String COLOR_PICKER_FAVORITES_4 = "color_picker_favorite_4";
 
         /**
+         * Theme overlay
+         * 1: Material Light theme
+         * 2: Material theme
+         * 3: Material theme (DarkKat version)
+         * 4: Material Light theme (DarkKat Whiteout version)
+         * 5: Material Light theme (DarkKat version)
+         * 6: Material Light theme (Whiteout version)
+         * 7: Material theme (DarkKat Blackout version)
+         * 8: Material theme (Blackout version)
+         * default: 1
+         * @hide
+         */
+        public static final String THEME_OVERLAY = "theme_overlay";
+
+        /**
+         * Theme overlay for auto mode (dark)
+         * 2: Material theme
+         * 3: Material theme (DarkKat version)
+         * 7: Material theme (DarkKat Blackout version)
+         * 8: Material theme (Blackout version)
+         * default: 2
+         * @hide
+         */
+        public static final String THEME_OVERLAY_AUTO_DARK_THEME = "theme_overlay_auto_dark_theme";
+
+        /**
+         * Theme overlay for auto mode (light)
+         * 1: Material Light theme
+         * 4: Material Light theme (DarkKat Whiteout version)
+         * 5: Material Light theme (DarkKat version)
+         * 6: Material Light theme (Whiteout version)
+         * default: 1
+         * @hide
+         */
+        public static final String THEME_OVERLAY_AUTO_LIGHT_THEME = "theme_overlay_auto_light_theme";
+
+        /**
+         * Mode of SystemUI theme overlay, (Quick settings, gloabal actions dialog, volume dialog)
+         * 0: Auto default, (Material/Material Light theme)
+         * 1: Auto light/dark, (auto mode dark/light theme)
+         * 2: Current overlay theme
+         * default: 2
+         * @hide
+         */
+        public static final String SYSTEMUI_THEME_OVERLAY_MODE = "systemui_theme_overlay_mode";
+
+        /**
          * Wether to show the location in the detailed weather view
          * @hide
          */

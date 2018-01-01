@@ -43,4 +43,5 @@
     <java-symbol type="string" name="advanced_restart_restart_to_system_message" />
     <java-symbol type="string" name="advanced_restart_reboot_to_recovery_message" />
     <java-symbol type="string" name="advanced_restart_reboot_to_bootloader_message" />
+    <java-symbol type="style" name="Theme.ShutdownThreadDialog" />
 </resources>
