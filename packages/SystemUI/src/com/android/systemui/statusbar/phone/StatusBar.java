@@ -152,6 +152,7 @@ import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationMessagingUtil;
 import com.android.internal.util.darkkat.AmbientDisplayHelper;
 import com.android.internal.util.darkkat.DKSettingsThemeOverlayHelper;
+import com.android.internal.util.darkkat.DKWeatherThemeOverlayHelper;
 import com.android.internal.util.darkkat.ShutdownThreadThemeOverlayHelper;
 import com.android.internal.util.darkkat.SystemUIThemeOverlayHelper;
 import com.android.internal.util.darkkat.TerminalThemeOverlayHelper;
@@ -4723,6 +4724,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         final boolean inflated = mStackScroller != null;
         updateSystemUIThemeOverlay();
         updateDKSettingsThemeOverlay();
+        updateDKWeatherThemeOverlay();
         updateTerminalThemeOverlay();
 
         // Lock wallpaper defines the color of the majority of the views, hence we'll use it
@@ -4820,6 +4822,22 @@ public class StatusBar extends SystemUI implements DemoMode,
         if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
             String enabledPackageName = getEnabledThemeOverlayPackageName(
                     DKSettingsThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
+            if (!enabledPackageName.equals(packageName)) {
+                setThemeOverlay(enabledPackageName, false);
+            }
+        } else {
+            if (!isThemeEnabled(packageName)) {
+                setThemeOverlay(packageName);
+            }
+        }
+    }
+
+    private void updateDKWeatherThemeOverlay() {
+        String packageName = DKWeatherThemeOverlayHelper.getThemeOverlayPackageName(mContext);
+
+        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
+            String enabledPackageName = getEnabledThemeOverlayPackageName(
+                    DKWeatherThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
             if (!enabledPackageName.equals(packageName)) {
                 setThemeOverlay(enabledPackageName, false);
             }
