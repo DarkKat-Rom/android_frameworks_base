@@ -39,6 +39,28 @@ public class ShutdownThreadThemeOverlayHelper {
     public static final String THEME_OVERLAY_TARGET_PACKAGE_NAME =
             "android";
 
+    public static String getThemeOverlayPackageName(Context context, boolean useDarkTheme) {
+        int overlayMode = SystemUIThemeOverlayHelper.getThemeOverlayMode(context);
+        String packageName;
+
+        switch (overlayMode) {
+            case SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_AUTO_DEFAULT:
+                packageName = useDarkTheme
+                        ? SystemUIThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME
+                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
+                break;
+            case SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_AUTO_DARK_LIGHT:
+                packageName = useDarkTheme
+                        ? getThemeOverlayDarkPackageName(context)
+                        : getThemeOverlayLightPackageName(context);
+                break;
+            default:
+                packageName = getThemeOverlayPackageName(context);
+                break;
+        }
+        return packageName;
+    }
+
     public static String getThemeOverlayPackageName(Context context) {
         int themeOverlay = ThemeOverlayHelper.getThemeOverlay(context);
         String packageName = null;

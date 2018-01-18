@@ -33,50 +33,14 @@ public class ThemeOverlayHelper {
     public static final String THEME_OVERLAY_NONE_PACKAGE_NAME = "none";
 
     public static int getThemeOverlay(Context context) {
-        int nightMode = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_MODE, 1);
-        int defaultDayNightTheme = Settings.Secure.getInt(context.getContentResolver(),
-                (nightMode == 1 ? Settings.Secure.UI_DAY_THEME : Settings.Secure.UI_NIGHT_THEME), 1);
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.THEME_OVERLAY, defaultDayNightTheme);
+        return ThemeHelper.getTheme(context);
     }
 
     public static int getThemeOverlayAutoDarkTheme(Context context) {
-        int defaultTheme = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_NIGHT_THEME, 2);
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.THEME_OVERLAY_AUTO_DARK_THEME, defaultTheme);
+        return ThemeHelper.getNightTheme(context);
     }
 
     public static int getThemeOverlayAutoLightTheme(Context context) {
-        int defaultTheme = Settings.Secure.getInt(context.getContentResolver(),
-                Settings.Secure.UI_DAY_THEME, 1);
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.THEME_OVERLAY_AUTO_LIGHT_THEME, defaultTheme);
-    }
-
-    public static boolean themeSupportsOptionalĹightSB(Context context) {
-        int themeOverlay = getThemeOverlay(context);
-        return themeOverlay == THEME_OVERLAY_LIGHT
-            || themeOverlay == THEME_OVERLAY_DARKKAT_WHITE
-            || themeOverlay == THEME_OVERLAY_DARKKAT_LIGHT;
-    }
-
-    public static boolean useLightStatusBar(Context context) {
-        return Settings.Secure.getInt(context.getContentResolver(),
-            Settings.Secure.USE_LIGHT_STATUS_BAR, 0) == 1;
-    }
-
-    public static boolean themeSupportsOptionalĹightNB(Context context) {
-        int themeOverlay = getThemeOverlay(context);
-        return themeOverlay == THEME_OVERLAY_LIGHT
-            || themeOverlay == THEME_OVERLAY_DARKKAT_WHITE
-            || themeOverlay == THEME_OVERLAY_WHITEOUT
-            || themeOverlay == THEME_OVERLAY_DARKKAT_LIGHT;
-    }
-
-    public static boolean useLightNavigationBar(Context context) {
-        return Settings.Secure.getInt(context.getContentResolver(),
-            Settings.Secure.USE_LIGHT_NAVIGATION_BAR, 0) == 1;
+        return ThemeHelper.getDayTheme(context);
     }
 }
