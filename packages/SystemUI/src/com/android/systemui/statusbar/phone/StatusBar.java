@@ -151,11 +151,8 @@ import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationMessagingUtil;
 import com.android.internal.util.darkkat.AmbientDisplayHelper;
-import com.android.internal.util.darkkat.DKSettingsThemeOverlayHelper;
-import com.android.internal.util.darkkat.DKWeatherThemeOverlayHelper;
 import com.android.internal.util.darkkat.ShutdownThreadThemeOverlayHelper;
 import com.android.internal.util.darkkat.SystemUIThemeOverlayHelper;
-import com.android.internal.util.darkkat.TerminalThemeOverlayHelper;
 import com.android.internal.util.darkkat.ThemeOverlayHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
@@ -458,7 +455,6 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     // settings
     private QSPanel mQSPanel;
-    private int mSystemUIThemeOverlayMode = SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_CURRENT_OVERLAY;
 
     // top bar
     protected KeyguardStatusBarView mKeyguardStatusBar;
@@ -4723,9 +4719,6 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected void updateTheme() {
         final boolean inflated = mStackScroller != null;
         updateSystemUIThemeOverlay();
-        updateDKSettingsThemeOverlay();
-        updateDKWeatherThemeOverlay();
-        updateTerminalThemeOverlay();
 
         // Lock wallpaper defines the color of the majority of the views, hence we'll use it
         // to set our default theme.
@@ -4756,7 +4749,9 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     private void updateSystemUIThemeOverlay() {
-        mSystemUIThemeOverlayMode = SystemUIThemeOverlayHelper.getThemeOverlayMode(mContext);
+        int overlayMode = SystemUIThemeOverlayHelper.getThemeOverlayMode(mContext);
+        boolean useDarkTheme = false;
+
         String packageName;
 
         // Name of the ShutdownThread dialogs overlay package
@@ -4765,32 +4760,17 @@ public class StatusBar extends SystemUI implements DemoMode,
         // theme used for the global action dialog.
         String dialogPackageName;
 
-        if (mSystemUIThemeOverlayMode != SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_CURRENT_OVERLAY) {
+        if (overlayMode != SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_CURRENT_OVERLAY) {
             // The system wallpaper defines if QS should be light or dark.
             WallpaperColors systemColors = mColorExtractor
                     .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-            final boolean useDarkTheme = systemColors != null
+            useDarkTheme = systemColors != null
                     && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
-            if (mSystemUIThemeOverlayMode == SystemUIThemeOverlayHelper.THEME_OVERLAY_MODE_AUTO_DEFAULT) {
-                packageName = useDarkTheme
-                        ? SystemUIThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME
-                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
-                dialogPackageName = useDarkTheme
-                        ? ShutdownThreadThemeOverlayHelper.THEME_OVERLAY_DARK_PACKAGE_NAME
-                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
-
-            } else {
-                packageName = useDarkTheme
-                        ? SystemUIThemeOverlayHelper.getThemeOverlayDarkPackageName(mContext)
-                        : SystemUIThemeOverlayHelper.getThemeOverlayLightPackageName(mContext);
-                dialogPackageName = useDarkTheme
-                        ? ShutdownThreadThemeOverlayHelper.getThemeOverlayDarkPackageName(mContext)
-                        : ShutdownThreadThemeOverlayHelper.getThemeOverlayLightPackageName(mContext);
-            }
-        } else {
-            packageName = SystemUIThemeOverlayHelper.getThemeOverlayPackageName(mContext);
-            dialogPackageName = ShutdownThreadThemeOverlayHelper.getThemeOverlayPackageName(mContext);
         }
+
+        packageName = SystemUIThemeOverlayHelper.getThemeOverlayPackageName(mContext, useDarkTheme);
+        dialogPackageName =
+                ShutdownThreadThemeOverlayHelper.getThemeOverlayPackageName(mContext, useDarkTheme);
         if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
             String enabledPackageName = getEnabledThemeOverlayPackageName(
                     SystemUIThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
@@ -4812,54 +4792,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         } else {
             if (!isThemeEnabled(dialogPackageName)) {
                 setThemeOverlay(dialogPackageName);
-            }
-        }
-    }
-
-    private void updateDKSettingsThemeOverlay() {
-        String packageName = DKSettingsThemeOverlayHelper.getThemeOverlayPackageName(mContext);
-
-        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
-            String enabledPackageName = getEnabledThemeOverlayPackageName(
-                    DKSettingsThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
-            if (!enabledPackageName.equals(packageName)) {
-                setThemeOverlay(enabledPackageName, false);
-            }
-        } else {
-            if (!isThemeEnabled(packageName)) {
-                setThemeOverlay(packageName);
-            }
-        }
-    }
-
-    private void updateDKWeatherThemeOverlay() {
-        String packageName = DKWeatherThemeOverlayHelper.getThemeOverlayPackageName(mContext);
-
-        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
-            String enabledPackageName = getEnabledThemeOverlayPackageName(
-                    DKWeatherThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
-            if (!enabledPackageName.equals(packageName)) {
-                setThemeOverlay(enabledPackageName, false);
-            }
-        } else {
-            if (!isThemeEnabled(packageName)) {
-                setThemeOverlay(packageName);
-            }
-        }
-    }
-
-    private void updateTerminalThemeOverlay() {
-        String packageName = TerminalThemeOverlayHelper.getThemeOverlayPackageName(mContext);
-
-        if (packageName.equals(ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME)) {
-            String enabledPackageName = getEnabledThemeOverlayPackageName(
-                    TerminalThemeOverlayHelper.THEME_OVERLAY_TARGET_PACKAGE_NAME);
-            if (!enabledPackageName.equals(packageName)) {
-                setThemeOverlay(enabledPackageName, false);
-            }
-        } else {
-            if (!isThemeEnabled(packageName)) {
-                setThemeOverlay(packageName);
             }
         }
     }
@@ -6016,14 +5948,14 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY),
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY_AUTO_DARK_THEME),
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_THEME),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY_AUTO_LIGHT_THEME),
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_DAY_THEME),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SYSTEMUI_THEME_OVERLAY_MODE),
@@ -6033,12 +5965,12 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY))
-                || uri.equals(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY_AUTO_DARK_THEME))
-                || uri.equals(Settings.System.getUriFor(
-                    Settings.System.THEME_OVERLAY_AUTO_LIGHT_THEME))
+            if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_MODE))
+                || uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_NIGHT_THEME))
+                || uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.UI_DAY_THEME))
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.SYSTEMUI_THEME_OVERLAY_MODE))) {
                 updateTheme();

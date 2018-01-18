@@ -43,6 +43,28 @@ public class SystemUIThemeOverlayHelper {
     public static final String THEME_OVERLAY_TARGET_PACKAGE_NAME =
             "com.android.systemui";
 
+    public static String getThemeOverlayPackageName(Context context, boolean useDarkTheme) {
+        int overlayMode = getThemeOverlayMode(context);
+        String packageName;
+
+        switch (overlayMode) {
+            case THEME_OVERLAY_MODE_AUTO_DEFAULT:
+                packageName = useDarkTheme
+                        ? THEME_OVERLAY_DARK_PACKAGE_NAME
+                        : ThemeOverlayHelper.THEME_OVERLAY_NONE_PACKAGE_NAME;
+                break;
+            case THEME_OVERLAY_MODE_AUTO_DARK_LIGHT:
+                packageName = useDarkTheme
+                        ? getThemeOverlayDarkPackageName(context)
+                        : getThemeOverlayLightPackageName(context);
+                break;
+            default:
+                packageName = getThemeOverlayPackageName(context);
+                break;
+        }
+        return packageName;
+    }
+
     public static int getThemeOverlayMode(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.SYSTEMUI_THEME_OVERLAY_MODE, THEME_OVERLAY_MODE_CURRENT_OVERLAY);
