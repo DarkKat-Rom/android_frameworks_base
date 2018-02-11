@@ -3993,6 +3993,12 @@ public final class Settings {
         public static final String DETAILED_WEATHER_CONDITION_ICON = "detailed_weather_condition_icon";
 
         /**
+         *  Whether to show the music visualizer on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
+
+        /**
          * Clock (and date) position on the status bar
          * 0: Right clock
          * 1: Center clock
