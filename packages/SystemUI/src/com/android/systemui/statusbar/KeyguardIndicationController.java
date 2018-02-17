@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.app.IBatteryStats;
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
 import com.android.settingslib.Utils;
@@ -80,7 +81,6 @@ public class KeyguardIndicationController {
     private String mRestingIndication;
     private String mTransientIndication;
     private int mTransientTextColor;
-    private int mInitialTextColor;
     private boolean mVisible;
 
     private boolean mPowerPluggedIn;
@@ -115,7 +115,6 @@ public class KeyguardIndicationController {
         mIndicationArea = indicationArea;
         mTextView = (KeyguardIndicationTextView) indicationArea.findViewById(
                 R.id.keyguard_indication_text);
-        mInitialTextColor = mTextView != null ? mTextView.getCurrentTextColor() : Color.WHITE;
         mDisclosure = (KeyguardIndicationTextView) indicationArea.findViewById(
                 R.id.keyguard_indication_enterprise_disclosure);
         mLockIcon = lockIcon;
@@ -247,7 +246,7 @@ public class KeyguardIndicationController {
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
     public void showTransientIndication(String transientIndication) {
-        showTransientIndication(transientIndication, mInitialTextColor);
+        showTransientIndication(transientIndication, getNormalTextColor());
     }
 
     /**
@@ -289,7 +288,7 @@ public class KeyguardIndicationController {
                 if (!TextUtils.isEmpty(mTransientIndication)) {
                     // When dozing we ignore any text color and use white instead, because
                     // colors can be hard to read in low brightness.
-                    mTextView.setTextColor(Color.WHITE);
+                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColorDark(mContext));
                     mTextView.switchIndication(mTransientIndication);
                 } else {
                     mTextView.switchIndication(null);
@@ -303,29 +302,29 @@ public class KeyguardIndicationController {
             String trustManagedIndication = getTrustManagedIndication();
             if (!mUserManager.isUserUnlocked(userId)) {
                 mTextView.switchIndication(com.android.internal.R.string.lockscreen_storage_locked);
-                mTextView.setTextColor(mInitialTextColor);
+                mTextView.setTextColor(getNormalTextColor());
             } else if (!TextUtils.isEmpty(mTransientIndication)) {
                 mTextView.switchIndication(mTransientIndication);
                 mTextView.setTextColor(mTransientTextColor);
             } else if (!TextUtils.isEmpty(trustGrantedIndication)
                     && updateMonitor.getUserHasTrust(userId)) {
                 mTextView.switchIndication(trustGrantedIndication);
-                mTextView.setTextColor(mInitialTextColor);
+                mTextView.setTextColor(getNormalTextColor());
             } else if (mPowerPluggedIn) {
                 String indication = computePowerIndication();
                 if (DEBUG_CHARGING_SPEED) {
                     indication += ",  " + (mChargingWattage / 1000) + " mW";
                 }
                 mTextView.switchIndication(indication);
-                mTextView.setTextColor(mInitialTextColor);
+                mTextView.setTextColor(getNormalTextColor());
             } else if (!TextUtils.isEmpty(trustManagedIndication)
                     && updateMonitor.getUserTrustIsManaged(userId)
                     && !updateMonitor.getUserHasTrust(userId)) {
                 mTextView.switchIndication(trustManagedIndication);
-                mTextView.setTextColor(mInitialTextColor);
+                mTextView.setTextColor(getNormalTextColor());
             } else {
                 mTextView.switchIndication(mRestingIndication);
-                mTextView.setTextColor(mInitialTextColor);
+                mTextView.setTextColor(getNormalTextColor());
             }
         }
     }
@@ -376,6 +375,12 @@ public class KeyguardIndicationController {
     public void setStatusBarKeyguardViewManager(
             StatusBarKeyguardViewManager statusBarKeyguardViewManager) {
         mStatusBarKeyguardViewManager = statusBarKeyguardViewManager;
+    }
+
+    private int getNormalTextColor() {
+        final boolean lockDarkText = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
+        return lockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+                : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
     }
 
     private final BroadcastReceiver mTickReceiver = new BroadcastReceiver() {

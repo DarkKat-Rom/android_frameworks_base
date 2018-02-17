@@ -36,6 +36,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
+
 public class VisualizerView extends View
         implements Palette.PaletteAsyncListener {
 
@@ -59,6 +61,8 @@ public class VisualizerView extends View
     private boolean mOccluded = false;
 
     private int mColor;
+    private int mCustomColor;
+    private int mColorToUse;
     private Bitmap mCurrentBitmap;
 
     private SettingsObserver mObserver;
@@ -143,10 +147,12 @@ public class VisualizerView extends View
         super(context, attrs, defStyle);
 
         mColor = Color.TRANSPARENT;
+        mCustomColor = LockScreenColorHelper.getIconColorDark(mContext);
+        mColorToUse = LockScreenColorHelper.colorizeVisualizer(mContext) ? mCustomColor : mColor;
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(mColor);
+        mPaint.setColor(mColorToUse);
 
         mFFTPoints = new float[128];
         mValueAnimators = new ValueAnimator[32];
@@ -293,7 +299,10 @@ public class VisualizerView extends View
         if (bitmap != null) {
             Palette.generateAsync(bitmap, this);
         } else {
-            setColor(Color.TRANSPARENT);
+            mColor = Color.TRANSPARENT;
+            if (!LockScreenColorHelper.colorizeVisualizer(mContext)) {
+                setColor(mColor);
+            }
         }
     }
 
@@ -309,7 +318,10 @@ public class VisualizerView extends View
             }
         }
 
-        setColor(color);
+        mColor = color;
+        if (!LockScreenColorHelper.colorizeVisualizer(mContext)) {
+            setColor(mColor);
+        }
     }
 
     private void setColor(int color) {
@@ -319,8 +331,8 @@ public class VisualizerView extends View
 
         color = Color.argb(140, Color.red(color), Color.green(color), Color.blue(color));
 
-        if (mColor != color) {
-            mColor = color;
+        if (mColorToUse != color) {
+            mColorToUse = color;
 
             if (mVisualizer != null) {
                 if (mVisualizerColorAnimator != null) {
@@ -328,12 +340,12 @@ public class VisualizerView extends View
                 }
 
                 mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
-                        mPaint.getColor(), mColor);
+                        mPaint.getColor(), mColorToUse);
                 mVisualizerColorAnimator.setStartDelay(600);
                 mVisualizerColorAnimator.setDuration(1200);
                 mVisualizerColorAnimator.start();
             } else {
-                mPaint.setColor(mColor);
+                mPaint.setColor(mColorToUse);
             }
         }
     }
@@ -365,6 +377,11 @@ public class VisualizerView extends View
                 }
             }
         }
+    }
+
+    public void updateColor() {
+        mCustomColor = LockScreenColorHelper.getIconColorDark(mContext);
+        setColor(LockScreenColorHelper.colorizeVisualizer(mContext) ? mCustomColor : mColor);
     }
 
     private class SettingsObserver extends ContentObserver {

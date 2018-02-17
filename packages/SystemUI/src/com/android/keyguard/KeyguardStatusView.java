@@ -41,6 +41,7 @@ import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.android.internal.util.ArrayUtils;
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.systemui.ChargingView;
 import com.android.systemui.statusbar.policy.DateView;
@@ -71,6 +72,7 @@ public class KeyguardStatusView extends GridLayout {
     private int mTextColor;
     private int mDateTextColor;
     private int mAlarmTextColor;
+    private boolean mLockDarkText = false;
 
     private KeyguardUpdateMonitorCallback mInfoCallback = new KeyguardUpdateMonitorCallback() {
 
@@ -85,6 +87,7 @@ public class KeyguardStatusView extends GridLayout {
                 if (DEBUG) Slog.v(TAG, "refresh statusview showing:" + showing);
                 refresh();
                 updateOwnerInfo();
+                updateColors();
             }
         }
 
@@ -148,22 +151,31 @@ public class KeyguardStatusView extends GridLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        mLockDarkText = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
+        mTextColor = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+                : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        mDateTextColor = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+                 : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        mAlarmTextColor = mLockDarkText ? LockScreenColorHelper.getSecondaryTextColorLight(mContext)
+                 : LockScreenColorHelper.getSecondaryTextColorDark(mContext);
         mClockContainer = findViewById(R.id.keyguard_clock_container);
         mAlarmStatusView = findViewById(R.id.alarm_status);
+        mAlarmStatusView.setTextColor(mAlarmTextColor);
+        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(mAlarmTextColor));
         mDateView = findViewById(R.id.date_view);
+        mDateView.setTextColor(mDateTextColor);
         mClockView = findViewById(R.id.clock_view);
+        mClockView.setTextColor(mTextColor);
         mClockView.setShowCurrentUserTime(true);
         if (KeyguardClockAccessibilityDelegate.isNeeded(mContext)) {
             mClockView.setAccessibilityDelegate(new KeyguardClockAccessibilityDelegate(mContext));
         }
         mOwnerInfo = findViewById(R.id.owner_info);
+        mOwnerInfo.setTextColor(mAlarmTextColor);
         mBatteryDoze = findViewById(R.id.battery_doze);
+        mBatteryDoze.setImageTintList(LockScreenColorHelper.getIconTintDark(mContext));
         mKeyguardStatusArea = findViewById(R.id.keyguard_status_area);
         mVisibleInDoze = new View[]{mBatteryDoze, mClockView, mKeyguardStatusArea};
-        mTextColor = mClockView.getCurrentTextColor();
-        mDateTextColor = mDateView.getCurrentTextColor();
-        mAlarmTextColor = mAlarmStatusView.getCurrentTextColor();
-
         boolean shouldMarquee = KeyguardUpdateMonitor.getInstance(mContext).isDeviceInteractive();
         setEnableMarquee(shouldMarquee);
         refresh();
@@ -344,11 +356,30 @@ public class KeyguardStatusView extends GridLayout {
 
         updateDozeVisibleViews();
         mBatteryDoze.setDark(dark);
-        mClockView.setTextColor(ColorUtils.blendARGB(mTextColor, Color.WHITE, darkAmount));
-        mDateView.setTextColor(ColorUtils.blendARGB(mDateTextColor, Color.WHITE, darkAmount));
-        int blendedAlarmColor = ColorUtils.blendARGB(mAlarmTextColor, Color.WHITE, darkAmount);
+
+        final int textColorDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        final int dateTextColorDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        final int alarmTextColorDark = LockScreenColorHelper.getSecondaryTextColorDark(mContext);
+        mClockView.setTextColor(ColorUtils.blendARGB(mTextColor, textColorDark, darkAmount));
+        mDateView.setTextColor(ColorUtils.blendARGB(mDateTextColor, dateTextColorDark, darkAmount));
+        int blendedAlarmColor = ColorUtils.blendARGB(mAlarmTextColor, alarmTextColorDark, darkAmount);
         mAlarmStatusView.setTextColor(blendedAlarmColor);
         mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(blendedAlarmColor));
+    }
+
+    private void updateColors() {
+        mTextColor = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+                : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        mDateTextColor = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+                 : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        mAlarmTextColor = mLockDarkText ? LockScreenColorHelper.getSecondaryTextColorLight(mContext)
+                 : LockScreenColorHelper.getSecondaryTextColorDark(mContext);
+        mAlarmStatusView.setTextColor(mAlarmTextColor);
+        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(mAlarmTextColor));
+        mDateView.setTextColor(mDateTextColor);
+        mClockView.setTextColor(mTextColor);
+        mOwnerInfo.setTextColor(mAlarmTextColor);
+        mBatteryDoze.setImageTintList(LockScreenColorHelper.getIconTintDark(mContext));
     }
 
     public void setPulsing(boolean pulsing) {

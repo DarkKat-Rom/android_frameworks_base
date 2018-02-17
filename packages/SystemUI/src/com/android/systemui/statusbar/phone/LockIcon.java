@@ -17,6 +17,7 @@
 package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
@@ -24,6 +25,8 @@ import android.graphics.drawable.InsetDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.R;
@@ -305,6 +308,18 @@ public class LockIcon extends KeyguardAffordanceView implements OnUserInfoChange
             return STATE_FINGERPRINT;
         } else {
             return STATE_LOCKED;
+        }
+    }
+
+    @Override
+    public void updateColors() {
+        mNormalColor = mLockDarkText ? LockScreenColorHelper.getIconColorLight(mContext)
+                : LockScreenColorHelper.getIconColorDark(mContext);
+        setImageTintList(ColorStateList.valueOf(mNormalColor));
+        if (mTrustDrawable != null) {
+            mTrustDrawable.stop();
+            mTrustDrawable = new TrustDrawable(getContext());
+            setBackground(mTrustDrawable);
         }
     }
 
