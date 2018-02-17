@@ -4824,6 +4824,10 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     }
 
+    private void updateVisualizerColor() {
+        mVisualizerView.updateColor();
+    }
+
     private void setThemeOverlay(String packageName) {
         setThemeOverlay(packageName, true);
     }
@@ -5996,6 +6000,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SYSTEMUI_THEME_OVERLAY_MODE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_COLORIZE_VISUALIZER),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_ICON_COLOR_DARK),
+                    false, this, UserHandle.USER_ALL);
 
         }
 
@@ -6010,6 +6020,11 @@ public class StatusBar extends SystemUI implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.SYSTEMUI_THEME_OVERLAY_MODE))) {
                 updateTheme();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_COLORIZE_VISUALIZER))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.LOCK_SCREEN_ICON_COLOR_DARK))) {
+                updateVisualizerColor();
             }
         }
     }

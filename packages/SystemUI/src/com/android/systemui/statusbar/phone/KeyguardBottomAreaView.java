@@ -599,7 +599,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
         if (changedView == this && visibility == VISIBLE) {
+            mLeftAffordanceView.updateColors();
             mLockIcon.update();
+            mLockIcon.updateColors();
+            mRightAffordanceView.updateColors();
             updateCameraVisibility();
         }
     }

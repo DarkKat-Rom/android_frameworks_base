@@ -3977,6 +3977,37 @@ public final class Settings {
         public static final String SYSTEMUI_THEME_OVERLAY_MODE = "systemui_theme_overlay_mode";
 
         /**
+         * Wether to colorize the music visualizer on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_COLORIZE_VISUALIZER =
+                "lock_screen_colorize_visualizer";
+
+        /**
+         * Color of the text on the lock screen when wallpaper is dark colored
+         * @hide
+         */
+        public static final String LOCK_SCREEN_TEXT_COLOR_DARK = "lock_screen_text_color_dark";
+
+        /**
+         * Color of the icons on the lock screen when wallpaper is dark colored
+         * @hide
+         */
+        public static final String LOCK_SCREEN_ICON_COLOR_DARK = "lock_screen_icon_color_dark";
+
+        /**
+         * Color of the text on the lock screen when wallpaper is dark colored
+         * @hide
+         */
+        public static final String LOCK_SCREEN_TEXT_COLOR_LIGHT = "lock_screen_text_color_light";
+
+        /**
+         * Color of the icons on the lock screen when wallpaper is light colored
+         * @hide
+         */
+        public static final String LOCK_SCREEN_ICON_COLOR_LIGHT = "lock_screen_icon_color_light";
+
+        /**
          * Wether to show the location in the detailed weather view
          * @hide
          */

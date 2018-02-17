@@ -31,6 +31,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Interpolator;
 
+import com.android.internal.util.darkkat.LockScreenColorHelper;
+
 import com.android.settingslib.Utils;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -71,6 +73,7 @@ public class TrustDrawable extends Drawable {
 
     public TrustDrawable(Context context) {
         Resources r = context.getResources();
+        final boolean lockDarkText = context.getThemeResId() == R.style.Theme_SystemUI_Light;
         mInnerRadiusVisibleMin = r.getDimension(R.dimen.trust_circle_inner_radius_visible_min);
         mInnerRadiusVisibleMax = r.getDimension(R.dimen.trust_circle_inner_radius_visible_max);
         mInnerRadiusExit = r.getDimension(R.dimen.trust_circle_inner_radius_exit);
@@ -83,7 +86,8 @@ public class TrustDrawable extends Drawable {
 
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Utils.getColorAttr(context, R.attr.wallpaperTextColor));
+        mPaint.setColor(lockDarkText ? LockScreenColorHelper.getIconColorLight(context)
+                : LockScreenColorHelper.getIconColorDark(context));
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(mThickness);
     }
