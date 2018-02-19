@@ -48,4 +48,14 @@
         android:gravity="center"
         android:visibility="gone"
         />
+    <TextView
+        android:id="@+id/weather_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:textColor="?attr/wallpaperTextColorSecondary"
+        android:gravity="center"
+        android:visibility="gone"
+        style="@style/widget_label"
+        />
 </LinearLayout>

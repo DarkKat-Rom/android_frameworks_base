@@ -154,6 +154,8 @@ import com.android.internal.util.darkkat.AmbientDisplayHelper;
 import com.android.internal.util.darkkat.ShutdownThreadThemeOverlayHelper;
 import com.android.internal.util.darkkat.SystemUIThemeOverlayHelper;
 import com.android.internal.util.darkkat.ThemeOverlayHelper;
+import com.android.internal.util.darkkat.WeatherServiceControllerImpl;
+import com.android.internal.util.darkkat.WeatherServiceController;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -1116,6 +1118,8 @@ public class StatusBar extends SystemUI implements DemoMode,
                 mNotificationPanel.getLockIcon());
         mNotificationPanel.setKeyguardIndicationController(mKeyguardIndicationController);
 
+        WeatherServiceController weatherServiceController = new WeatherServiceControllerImpl(mContext);
+        mNotificationPanel.setWeatherServiceController(weatherServiceController);
 
         mAmbientIndicationContainer = mStatusBarWindow.findViewById(
                 R.id.ambient_indication_container);
@@ -1355,6 +1359,9 @@ public class StatusBar extends SystemUI implements DemoMode,
                 .setStatusBarKeyguardViewManager(mStatusBarKeyguardViewManager);
         mKeyguardIndicationController.setVisible(mState == StatusBarState.KEYGUARD);
         mKeyguardIndicationController.setDozing(mDozing);
+
+        WeatherServiceControllerImpl weatherServiceController = new WeatherServiceControllerImpl(mContext);
+        mNotificationPanel.setWeatherServiceController(weatherServiceController);
         if (mBrightnessMirrorController != null) {
             mBrightnessMirrorController.onOverlayChanged();
         }

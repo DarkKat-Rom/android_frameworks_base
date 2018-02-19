@@ -48,6 +48,7 @@ import android.widget.FrameLayout;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.darkkat.WeatherServiceController;
 import com.android.keyguard.KeyguardStatusView;
 import com.android.systemui.DejankUtils;
 import com.android.systemui.Interpolators;
@@ -364,6 +365,10 @@ public class NotificationPanelView extends PanelView implements
 
     public void setKeyguardIndicationController(KeyguardIndicationController indicationController) {
         mKeyguardBottomArea.setKeyguardIndicationController(indicationController);
+    }
+
+    public void setWeatherServiceController(WeatherServiceController weatherServiceController) {
+        mKeyguardStatusView.setWeatherServiceController(weatherServiceController);
     }
 
     @Override
