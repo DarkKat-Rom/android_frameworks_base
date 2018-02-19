@@ -4030,6 +4030,27 @@ public final class Settings {
         public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
 
         /**
+         *  Whether to show the weather on the status area of the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_STATUS_AREA_SHOW_WEATHER =
+                "lock_screen_status_area_show_weather";
+
+        /**
+         *  Whether to show the weather location on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_STATUS_AREA_SHOW_WEATHER_LOCATION =
+                "lock_screen_status_area_show_weather_location";
+
+        /**
+         *  Whether to hide the weather on the lock screen, when an alarm was set
+         * @hide
+         */
+        public static final String LOCK_SCREEN_STATUS_AREA_HIDE_WEATHER_ON_ALARM =
+                "lock_screen_status_area_hide_weather_on_alarm";
+
+        /**
          * Clock (and date) position on the status bar
          * 0: Right clock
          * 1: Center clock
