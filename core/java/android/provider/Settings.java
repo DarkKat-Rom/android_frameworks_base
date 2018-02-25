@@ -4051,6 +4051,38 @@ public final class Settings {
                 "lock_screen_status_area_hide_weather_on_alarm";
 
         /**
+         *  Battery status type on the lock screen
+         * 0: Hidden
+         * 1: While discharging
+         * 2: While charging
+         * 2: While discharging and charging
+         * default: 2
+         * @hide
+         */
+        public static final String LOCK_SCREEN_BATTERY_STATUS_TYPE = "lock_screen_battery_status_type";
+
+        /**
+         *  Whether to show the battery temperature on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_BATTERY_TEMP =
+                "lock_screen_show_battery_temp";
+
+        /**
+         *  Whether to show advanced battery charging info on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_ADVANCED_BATTERY_CHARGING_INFO =
+                "lock_screen_show_advanced_battery_charging_info";
+
+        /**
+         *  Whether to show battery status on ambient display
+         * @hide
+         */
+        public static final String AMBIENT_DISPLAY_SHOW_BATTERY_STATUS =
+                "ambient_display_show_battery_status";
+
+        /**
          * Clock (and date) position on the status bar
          * 0: Right clock
          * 1: Center clock
