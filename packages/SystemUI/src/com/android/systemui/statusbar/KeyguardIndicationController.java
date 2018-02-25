@@ -41,6 +41,7 @@ import android.view.ViewGroup;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.util.darkkat.LockScreenColorHelper;
+import com.android.internal.util.darkkat.LockscreenHelper;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
 import com.android.settingslib.Utils;
@@ -53,6 +54,8 @@ import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.util.wakelock.SettableWakeLock;
 import com.android.systemui.util.wakelock.WakeLock;
 
+import java.text.DecimalFormat;
+
 /**
  * Controls the indications and error messages shown on the Keyguard
  */
@@ -64,6 +67,8 @@ public class KeyguardIndicationController {
     private static final int MSG_HIDE_TRANSIENT = 1;
     private static final int MSG_CLEAR_FP_MSG = 2;
     private static final long TRANSIENT_FP_ERROR_TIMEOUT = 1300;
+
+    private static final DecimalFormat ONE_DIGITS_FORMAT = new DecimalFormat("##0.#");
 
     private final Context mContext;
     private ViewGroup mIndicationArea;
@@ -85,8 +90,17 @@ public class KeyguardIndicationController {
 
     private boolean mPowerPluggedIn;
     private boolean mPowerCharged;
+    private int mPlugged;
+    private int mCurrentTemperature;
+    private int mCurrentMicroAmp;
+    private int mCurrentMicroVolt;
+    private int mCurrentMicroAmpHours;
+    private int mCurrentMicroWatt;
+    private int mMaxChargingMicroAmp;
+    private int mMaxChargingMicroVolt;
+    private int mMaxChargingMicroAmpHours;
+    private int mMaxChargingMicroWatt;
     private int mChargingSpeed;
-    private int mChargingWattage;
     private String mMessageToShowOnScreenOn;
 
     private KeyguardUpdateMonitorCallback mUpdateMonitorCallback;
@@ -284,16 +298,18 @@ public class KeyguardIndicationController {
             // Walk down a precedence-ordered list of what indication
             // should be shown based on user or device state
             if (mDozing) {
-                // If we're dozing, never show a persistent indication.
-                if (!TextUtils.isEmpty(mTransientIndication)) {
-                    // When dozing we ignore any text color and use white instead, because
-                    // colors can be hard to read in low brightness.
-                    mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColorDark(mContext));
-                    mTextView.switchIndication(mTransientIndication);
-                } else {
-                    mTextView.switchIndication(null);
+                if (!LockscreenHelper.showBatteryStatusOnAmbientDisplay(mContext)) {
+                    // If we're dozing, never show a persistent indication.
+                    if (!TextUtils.isEmpty(mTransientIndication)) {
+                        // When dozing we ignore any text color and use white instead, because
+                        // colors can be hard to read in low brightness.
+                        mTextView.setTextColor(LockScreenColorHelper.getPrimaryTextColorDark(mContext));
+                        mTextView.switchIndication(mTransientIndication);
+                    } else {
+                        mTextView.switchIndication(null);
+                    }
+                    return;
                 }
-                return;
             }
 
             KeyguardUpdateMonitor updateMonitor = KeyguardUpdateMonitor.getInstance(mContext);
@@ -311,10 +327,22 @@ public class KeyguardIndicationController {
                 mTextView.switchIndication(trustGrantedIndication);
                 mTextView.setTextColor(getNormalTextColor());
             } else if (mPowerPluggedIn) {
-                String indication = computePowerIndication();
-                if (DEBUG_CHARGING_SPEED) {
-                    indication += ",  " + (mChargingWattage / 1000) + " mW";
+                boolean showBatteryChargingStatus
+                        = LockscreenHelper.showBatteryChargingStatus(mContext);
+                if (showBatteryChargingStatus) {
+                    String indication = computeChargingPowerIndication();
+                    if (DEBUG_CHARGING_SPEED
+                            && !LockscreenHelper.showAdvancedBatteryChargingInfo(mContext)) {
+                        indication += ",  " + (mMaxChargingMicroWatt / 1000) + " mW";
+                    }
+                    mTextView.switchIndication(indication);
+                    mTextView.setTextColor(getNormalTextColor());
+                } else {
+                    mTextView.switchIndication(mRestingIndication);
+                    mTextView.setTextColor(getNormalTextColor());
                 }
+            } else if (LockscreenHelper.showBatteryDischargingStatus(mContext)) {
+                String indication = computePowerIndication();
                 mTextView.switchIndication(indication);
                 mTextView.setTextColor(getNormalTextColor());
             } else if (!TextUtils.isEmpty(trustManagedIndication)
@@ -329,7 +357,7 @@ public class KeyguardIndicationController {
         }
     }
 
-    private String computePowerIndication() {
+    private String computeChargingPowerIndication() {
         if (mPowerCharged) {
             return mContext.getResources().getString(R.string.keyguard_charged);
         }
@@ -342,34 +370,139 @@ public class KeyguardIndicationController {
         } catch (RemoteException e) {
             Log.e(TAG, "Error calling IBatteryStats: ", e);
         }
-        final boolean hasChargingTime = chargingTimeRemaining > 0;
 
-        int chargingId;
+        int chargingTypeId = 0;
+        int pluggedTypeId = R.string.keyguard_indication_charging;
+        final boolean hasChargingTime = chargingTimeRemaining > 0;
+        String chargingType = "";
+        String pluggedType = "";
+        String chargingTime = "";
+        String chargingStatus = "";
+
         switch (mChargingSpeed) {
             case KeyguardUpdateMonitor.BatteryStatus.CHARGING_FAST:
-                chargingId = hasChargingTime
-                        ? R.string.keyguard_indication_charging_time_fast
-                        : R.string.keyguard_plugged_in_charging_fast;
+                chargingTypeId = R.string.keyguard_indication_charging_part_fast;
                 break;
             case KeyguardUpdateMonitor.BatteryStatus.CHARGING_SLOWLY:
-                chargingId = hasChargingTime
-                        ? R.string.keyguard_indication_charging_time_slowly
-                        : R.string.keyguard_plugged_in_charging_slowly;
+                chargingTypeId = R.string.keyguard_indication_charging_part_slowly;
                 break;
             default:
-                chargingId = hasChargingTime
-                        ? R.string.keyguard_indication_charging_time
-                        : R.string.keyguard_plugged_in;
+                break;
+        }
+        switch (mPlugged) {
+            case BatteryManager.BATTERY_PLUGGED_AC:
+                pluggedTypeId = R.string.keyguard_indication_charging_ac;
+                break;
+            case BatteryManager.BATTERY_PLUGGED_USB:
+                pluggedTypeId = R.string.keyguard_indication_charging_usb;
+                break;
+            case BatteryManager.BATTERY_PLUGGED_WIRELESS:
+                pluggedTypeId = R.string.keyguard_indication_charging_wireless;
+                break;
+            default:
                 break;
         }
 
+        if (chargingTypeId > 0) {
+            chargingType = mContext.getResources().getString(chargingTypeId);
+        }
         if (hasChargingTime) {
             String chargingTimeFormatted = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
                     mContext, chargingTimeRemaining);
-            return mContext.getResources().getString(chargingId, chargingTimeFormatted);
-        } else {
-            return mContext.getResources().getString(chargingId);
+            chargingTime = mContext.getResources().getString
+                    (R.string.keyguard_indication_charging_part_time, chargingTimeFormatted);
         }
+        chargingStatus = mContext.getResources().getString(pluggedTypeId, chargingType, chargingTime);
+
+        boolean onFirstRow = true;
+        int count = 0;
+        if (LockscreenHelper.showAdvancedBatteryChargingInfo(mContext)) {
+            if (mCurrentTemperature > 0) {
+                chargingStatus += ", " + mCurrentTemperature / 10 + " °C";
+            }
+            if (mCurrentMicroAmp > 0 || mMaxChargingMicroAmp > 0) {
+                chargingStatus += "\n";
+                chargingStatus += (mCurrentMicroAmp > 0
+                        ? (mCurrentMicroAmp / 1000) + " mA (" : "N/A (");
+                chargingStatus += (mMaxChargingMicroAmp > 0
+                        ? (mMaxChargingMicroAmp / 1000) + " mA)" : "N/A)");
+                onFirstRow = false;
+                count += 1;
+            }
+            if (mCurrentMicroVolt > 0 || mMaxChargingMicroVolt > 0) {
+                if (onFirstRow) {
+                    chargingStatus += "\n";
+                    onFirstRow = false;
+                } else {
+                    chargingStatus += count == 0 ? "" : ", ";
+                }
+                chargingStatus += (mCurrentMicroVolt > 0
+                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroVolt / 1000000f) + " V (" : "N/A (");
+                chargingStatus += (mMaxChargingMicroVolt > 0
+                        ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroVolt / 1000000f) + " V)" : "N/A)");
+                count += 1;
+            }
+            if (mCurrentMicroAmpHours > 0 || mMaxChargingMicroAmpHours > 0) {
+                if (onFirstRow || count == 2) {
+                    chargingStatus += "\n";
+                    if (onFirstRow) {
+                        onFirstRow = false;
+                    } else {
+                        count = 0;
+                    }
+                } else {
+                    chargingStatus += count == 0 ? "" : ", ";
+                }
+                chargingStatus += (mCurrentMicroAmpHours > 0
+                        ? (mCurrentMicroAmpHours / 1000) + " mAh (" : "N/A (");
+                chargingStatus += (mMaxChargingMicroAmpHours > 0
+                        ? (mMaxChargingMicroAmpHours / 1000) + " mAh)" : "N/A)");
+                count += 1;
+            }
+            if (mCurrentMicroWatt > 0 || mMaxChargingMicroWatt > 0) {
+                if (onFirstRow || count == 2) {
+                    chargingStatus += "\n";
+                } else {
+                    chargingStatus += count == 0 ? "" : ", ";
+                }
+                chargingStatus += (mCurrentMicroWatt > 0
+                        ? ONE_DIGITS_FORMAT.format(mCurrentMicroWatt / 1000000f) + " W (" : "N/A (");
+                chargingStatus += (mMaxChargingMicroWatt > 0
+                        ? ONE_DIGITS_FORMAT.format(mMaxChargingMicroWatt/ 1000000f) + " W)" : "N/A)");
+            }
+        }
+        return chargingStatus;
+    }
+
+    private String computePowerIndication() {
+        // Try fetching battery remaining time from battery stats.
+        long batteryTimeRemaining = 0;
+        try {
+            batteryTimeRemaining = mBatteryInfo.computeBatteryTimeRemaining();
+
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error calling IBatteryStats: ", e);
+        }
+
+        final boolean hasBatteryTime = batteryTimeRemaining > 0;
+        int batteryId = R.string.keyguard_indication_discharging;
+        String batteryTime = "";
+        String batteryStatus = "";
+
+        if (hasBatteryTime) {
+            String batteryTimeFormatted = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
+                    mContext, batteryTimeRemaining);
+            batteryTime = mContext.getResources().getString(
+                    R.string.keyguard_indication_discharging_part_time, batteryTimeFormatted);
+        }
+        batteryStatus = mContext.getResources().getString(batteryId, batteryTime);
+
+        if (LockscreenHelper.showBatteryTemp(mContext)) {
+            if (mCurrentTemperature > 0) {
+                batteryStatus += (batteryStatus.isEmpty() ? "" : ", ") + mCurrentTemperature / 10 + " °C";
+            }
+        }
+        return batteryStatus;
     }
 
     public void setStatusBarKeyguardViewManager(
@@ -420,20 +553,34 @@ public class KeyguardIndicationController {
 
         @Override
         public void onRefreshBatteryInfo(KeyguardUpdateMonitor.BatteryStatus status) {
+            BatteryManager batteryManager =
+                    (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
+
             boolean isChargingOrFull = status.status == BatteryManager.BATTERY_STATUS_CHARGING
                     || status.status == BatteryManager.BATTERY_STATUS_FULL;
             boolean wasPluggedIn = mPowerPluggedIn;
             mPowerPluggedIn = status.isPluggedIn() && isChargingOrFull;
             mPowerCharged = status.isCharged();
-            mChargingWattage = status.maxChargingWattage;
+            mPlugged = status.plugged;
+            mCurrentTemperature = status.currentTemperature;
+            mCurrentMicroAmp = status.currentMicroAmp;
+            mCurrentMicroVolt = status.currentMicroVolt;
+            mCurrentMicroAmpHours = status.currentMicroAmpHours;
+            mCurrentMicroWatt = status.currentMicroWatt;
+            mMaxChargingMicroAmp = status.maxChargingMicroAmp;
+            mMaxChargingMicroVolt = status.maxChargingMicroVolt;
+            mMaxChargingMicroAmpHours = status.maxChargingMicroAmpHours;
+            mMaxChargingMicroWatt = status.maxChargingMicroWatt;
             mChargingSpeed = status.getChargingSpeed(mSlowThreshold, mFastThreshold);
             updateIndication();
             if (mDozing) {
-                if (!wasPluggedIn && mPowerPluggedIn) {
-                    showTransientIndication(computePowerIndication());
-                    hideTransientIndicationDelayed(HIDE_DELAY_MS);
-                } else if (wasPluggedIn && !mPowerPluggedIn) {
-                    hideTransientIndication();
+                if (!LockscreenHelper.showBatteryStatusOnAmbientDisplay(mContext)) {
+                    if (!wasPluggedIn && mPowerPluggedIn) {
+                        showTransientIndication(computeChargingPowerIndication());
+                        hideTransientIndicationDelayed(HIDE_DELAY_MS);
+                    } else if (wasPluggedIn && !mPowerPluggedIn) {
+                        hideTransientIndication();
+                    }
                 }
             }
         }

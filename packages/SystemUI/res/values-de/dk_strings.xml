@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018 DarkKat
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Lock screen -->
+    <string name="keyguard_indication_discharging">Wird nicht aufgeladen%1$s</string>
+    <string name="keyguard_indication_discharging_part_time">&#160;(entladen in %1$s)</string>
+    <string name="keyguard_indication_charging">%1$sAufladen%2$s</string>
+    <string name="keyguard_indication_charging_ac">%1$sAufladen über Netzteil%2$s</string>
+    <string name="keyguard_indication_charging_usb">%1$sAufladen über USB%2$s</string>
+    <string name="keyguard_indication_charging_wireless">%1$sKabelloses Aufladen%2$s</string>
+    <string name="keyguard_indication_charging_part_fast">Schnelles&#160;</string>
+    <string name="keyguard_indication_charging_part_slowly">Langsames&#160;</string>
+    <string name="keyguard_indication_charging_part_time">&#160;(voll in %1$s)</string>
+</resources>

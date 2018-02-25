@@ -18,12 +18,16 @@ package com.android.keyguard;
 
 import static android.content.Intent.ACTION_USER_UNLOCKED;
 import static android.os.BatteryManager.BATTERY_HEALTH_UNKNOWN;
+import static android.os.BatteryManager.BATTERY_PROPERTY_CURRENT_NOW;
+import static android.os.BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER;
 import static android.os.BatteryManager.BATTERY_STATUS_FULL;
 import static android.os.BatteryManager.BATTERY_STATUS_UNKNOWN;
 import static android.os.BatteryManager.EXTRA_HEALTH;
 import static android.os.BatteryManager.EXTRA_LEVEL;
 import static android.os.BatteryManager.EXTRA_MAX_CHARGING_CURRENT;
 import static android.os.BatteryManager.EXTRA_MAX_CHARGING_VOLTAGE;
+import static android.os.BatteryManager.EXTRA_TEMPERATURE;
+import static android.os.BatteryManager.EXTRA_VOLTAGE;
 import static android.os.BatteryManager.EXTRA_PLUGGED;
 import static android.os.BatteryManager.EXTRA_STATUS;
 
@@ -74,13 +78,18 @@ import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.IccCardConstants.State;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.TelephonyIntents;
+import com.android.internal.util.darkkat.LockscreenHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.systemui.recents.misc.SystemServicesProxy;
 import com.android.systemui.recents.misc.SystemServicesProxy.TaskStackListener;
 
 import com.google.android.collect.Lists;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -104,6 +113,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
     private static final boolean DEBUG = KeyguardConstants.DEBUG;
     private static final boolean DEBUG_SIM_STATES = KeyguardConstants.DEBUG_SIM_STATES;
     private static final int LOW_BATTERY_THRESHOLD = 20;
+    private static final String BATTERY_CAPACITY_FILE_PATH = "/sys/class/power_supply/battery/capacity";
 
     private static final String ACTION_FACE_UNLOCK_STARTED
             = "com.android.facelock.FACE_UNLOCK_STARTED";
@@ -723,15 +733,42 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                     || Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
                 mHandler.sendEmptyMessage(MSG_TIME_UPDATE);
             } else if (Intent.ACTION_BATTERY_CHANGED.equals(action)) {
+                BatteryManager batteryManager =
+                        (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
+                int batteryMultiplicator = mContext.getResources().getInteger(
+                        R.integer.keyguard_indication_battery_multiplicator);
                 final int status = intent.getIntExtra(EXTRA_STATUS, BATTERY_STATUS_UNKNOWN);
                 final int plugged = intent.getIntExtra(EXTRA_PLUGGED, 0);
                 final int level = intent.getIntExtra(EXTRA_LEVEL, 0);
                 final int health = intent.getIntExtra(EXTRA_HEALTH, BATTERY_HEALTH_UNKNOWN);
 
+                final int currentTemperature = intent.getIntExtra(EXTRA_TEMPERATURE, -1);
+                int currentMicroAmp = batteryManager.getIntProperty(BATTERY_PROPERTY_CURRENT_NOW)
+                        * batteryMultiplicator;
+                final int currentMicroVolt = intent.getIntExtra(EXTRA_VOLTAGE, -1) * 1000;
+                int currentMicroAmpHours = batteryManager.getIntProperty(BATTERY_PROPERTY_CHARGE_COUNTER);
+                int currentMicroWatt;
                 final int maxChargingMicroAmp = intent.getIntExtra(EXTRA_MAX_CHARGING_CURRENT, -1);
                 int maxChargingMicroVolt = intent.getIntExtra(EXTRA_MAX_CHARGING_VOLTAGE, -1);
+                int maxChargingMicroAmpHours = mContext.getResources().getInteger(
+                        R.integer.keyguard_indication_max_battery_capacity);
                 final int maxChargingMicroWatt;
 
+                if (currentMicroAmpHours == 0) {
+                    currentMicroAmpHours = calculateCurrentMicroAmpHours(maxChargingMicroAmpHours);
+                }
+                if (currentMicroAmp < 0 && plugged != 0 /* discharging */) {
+                    // At least on hammerhead the the BatteryManager returns
+                    // a negative value when charging.
+                    currentMicroAmp = currentMicroAmp * -1;
+                }
+                if (currentMicroAmp > 0) {
+                    // Calculating muW = muA * muV / (10^6 mu^2 / mu); splitting up the divisor
+                    // to maintain precision equally on both factors.
+                    currentMicroWatt = (currentMicroAmp / 1000) * (currentMicroVolt / 1000);
+                } else {
+                    currentMicroWatt = -1;
+                }
                 if (maxChargingMicroVolt <= 0) {
                     maxChargingMicroVolt = DEFAULT_CHARGING_VOLTAGE_MICRO_VOLT;
                 }
@@ -745,7 +782,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 }
                 final Message msg = mHandler.obtainMessage(
                         MSG_BATTERY_UPDATE, new BatteryStatus(status, level, plugged, health,
-                                maxChargingMicroWatt));
+                                currentTemperature, currentMicroAmp, currentMicroVolt, currentMicroAmpHours,
+                                currentMicroWatt, maxChargingMicroAmp, maxChargingMicroVolt,
+                                maxChargingMicroAmpHours, maxChargingMicroWatt));
                 mHandler.sendMessage(msg);
             } else if (TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(action)) {
                 SimData args = SimData.fromIntent(intent);
@@ -926,14 +965,33 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         public final int level;
         public final int plugged;
         public final int health;
-        public final int maxChargingWattage;
+        public final int currentTemperature;
+        public final int currentMicroAmp;
+        public final int currentMicroVolt;
+        public final int currentMicroAmpHours;
+        public final int currentMicroWatt;
+        public final int maxChargingMicroAmp;
+        public final int maxChargingMicroVolt;
+        public final int maxChargingMicroAmpHours;
+        public final int maxChargingMicroWatt;
+
         public BatteryStatus(int status, int level, int plugged, int health,
-                int maxChargingWattage) {
+                int currentTemperature, int currentMicroAmp, int currentMicroVolt, int currentMicroAmpHours,
+                int currentMicroWatt, int maxChargingMicroAmp, int maxChargingMicroVolt,
+                int maxChargingMicroAmpHours, int maxChargingMicroWatt) {
             this.status = status;
             this.level = level;
             this.plugged = plugged;
             this.health = health;
-            this.maxChargingWattage = maxChargingWattage;
+            this.currentTemperature = currentTemperature;
+            this.currentMicroAmp = currentMicroAmp;
+            this.currentMicroVolt = currentMicroVolt;
+            this.currentMicroAmpHours = currentMicroAmpHours;
+            this.currentMicroWatt = currentMicroWatt;
+            this.maxChargingMicroAmp = maxChargingMicroAmp;
+            this.maxChargingMicroVolt = maxChargingMicroVolt;
+            this.maxChargingMicroAmpHours = maxChargingMicroAmpHours;
+            this.maxChargingMicroWatt = maxChargingMicroWatt;
         }
 
         /**
@@ -965,11 +1023,45 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         public final int getChargingSpeed(int slowThreshold, int fastThreshold) {
-            return maxChargingWattage <= 0 ? CHARGING_UNKNOWN :
-                    maxChargingWattage < slowThreshold ? CHARGING_SLOWLY :
-                    maxChargingWattage > fastThreshold ? CHARGING_FAST :
+            return maxChargingMicroWatt <= 0 ? CHARGING_UNKNOWN :
+                    maxChargingMicroWatt < slowThreshold ? CHARGING_SLOWLY :
+                    maxChargingMicroWatt > fastThreshold ? CHARGING_FAST :
                     CHARGING_REGULAR;
         }
+    }
+
+    private int calculateCurrentMicroAmpHours(int maxMicroAmpHours) {
+        File file = new File(BATTERY_CAPACITY_FILE_PATH);
+        int currentValue = 0;
+        if (file.exists()) {
+            int percentageValue = 0;
+            String text = null;
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader br = new BufferedReader(isr);
+                text = br.readLine();
+                br.close();
+                isr.close();
+                fis.close();
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                text = null;
+            }
+            if (text != null) {
+                try	{
+                    percentageValue = Integer.valueOf(text);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, e.getMessage());
+                    percentageValue = 0;
+                }
+            }
+            if (percentageValue != 0 && maxMicroAmpHours != 0) {
+                float tempvalue = maxMicroAmpHours / 100f * percentageValue;
+                currentValue = Math.round(tempvalue);
+            }
+        }
+        return currentValue;
     }
 
     public class StrongAuthTracker extends LockPatternUtils.StrongAuthTracker {
@@ -1118,7 +1210,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         // Take a guess at initial SIM state, battery status and PLMN until we get an update
-        mBatteryStatus = new BatteryStatus(BATTERY_STATUS_UNKNOWN, 100, 0, 0, 0);
+        mBatteryStatus = new BatteryStatus(BATTERY_STATUS_UNKNOWN, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         // Watch for interesting updates
         final IntentFilter filter = new IntentFilter();
@@ -1452,9 +1544,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
      */
     private void handleBatteryUpdate(BatteryStatus status) {
         if (DEBUG) Log.d(TAG, "handleBatteryUpdate");
-        final boolean batteryUpdateInteresting = isBatteryUpdateInteresting(mBatteryStatus, status);
-        mBatteryStatus = status;
+        final boolean batteryUpdateInteresting = isBatteryUpdateInteresting(mContext, mBatteryStatus, status);
         if (batteryUpdateInteresting) {
+            mBatteryStatus = status;
             for (int i = 0; i < mCallbacks.size(); i++) {
                 KeyguardUpdateMonitorCallback cb = mCallbacks.get(i).get();
                 if (cb != null) {
@@ -1591,12 +1683,18 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
     }
 
-    private static boolean isBatteryUpdateInteresting(BatteryStatus old, BatteryStatus current) {
+    private static boolean isBatteryUpdateInteresting(Context context, BatteryStatus old,
+            BatteryStatus current) {
         final boolean nowPluggedIn = current.isPluggedIn();
         final boolean wasPluggedIn = old.isPluggedIn();
         final boolean stateChangedWhilePluggedIn =
             wasPluggedIn == true && nowPluggedIn == true
             && (old.status != current.status);
+
+        // when showing any battery status change is always interesting
+        if (LockscreenHelper.showAnyBatteryStatus(context)) {
+            return true;
+        }
 
         // change in plug state is always interesting
         if (wasPluggedIn != nowPluggedIn || stateChangedWhilePluggedIn) {
@@ -1614,7 +1712,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         }
 
         // change in charging current while plugged in
-        if (nowPluggedIn && current.maxChargingWattage != old.maxChargingWattage) {
+        if (nowPluggedIn && current.maxChargingMicroWatt != old.maxChargingMicroWatt) {
             return true;
         }
 
