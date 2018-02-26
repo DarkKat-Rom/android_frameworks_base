@@ -46,7 +46,6 @@ import com.android.internal.util.darkkat.LockscreenHelper;
 import com.android.internal.util.darkkat.WeatherServiceController;
 import com.android.internal.util.darkkat.WeatherServiceController.WeatherInfo;
 import com.android.internal.widget.LockPatternUtils;
-import com.android.systemui.ChargingView;
 import com.android.systemui.statusbar.policy.DateView;
 
 import java.util.Locale;
@@ -66,7 +65,6 @@ public class KeyguardStatusView extends GridLayout implements
     private TextClock mClockView;
     private TextView mOwnerInfo;
     private ViewGroup mClockContainer;
-    private ChargingView mBatteryDoze;
     private View mKeyguardStatusArea;
     private Runnable mPendingMarqueeStart;
     private Handler mHandler;
@@ -184,10 +182,8 @@ public class KeyguardStatusView extends GridLayout implements
         }
         mOwnerInfo = findViewById(R.id.owner_info);
         mOwnerInfo.setTextColor(mAlarmTextColor);
-        mBatteryDoze = findViewById(R.id.battery_doze);
-        mBatteryDoze.setImageTintList(LockScreenColorHelper.getIconTintDark(mContext));
         mKeyguardStatusArea = findViewById(R.id.keyguard_status_area);
-        mVisibleInDoze = new View[]{mBatteryDoze, mClockView, mKeyguardStatusArea};
+        mVisibleInDoze = new View[]{mClockView, mKeyguardStatusArea};
         boolean shouldMarquee = KeyguardUpdateMonitor.getInstance(mContext).isDeviceInteractive();
         setEnableMarquee(shouldMarquee);
         refresh();
@@ -393,7 +389,6 @@ public class KeyguardStatusView extends GridLayout implements
         }
 
         updateDozeVisibleViews();
-        mBatteryDoze.setDark(dark);
 
         final int textColorDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
         final int dateTextColorDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
@@ -435,7 +430,6 @@ public class KeyguardStatusView extends GridLayout implements
         mDateView.setTextColor(mDateTextColor);
         mClockView.setTextColor(mTextColor);
         mOwnerInfo.setTextColor(mAlarmTextColor);
-        mBatteryDoze.setImageTintList(LockScreenColorHelper.getIconTintDark(mContext));
     }
 
     public void setPulsing(boolean pulsing) {
