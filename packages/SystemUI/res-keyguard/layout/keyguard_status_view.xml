@@ -29,46 +29,25 @@
     androidprv:layout_maxHeight="@dimen/keyguard_security_height"
     android:gravity="center_horizontal|top">
     <LinearLayout
+        android:id="@+id/keyguard_clock_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
         android:orientation="vertical">
-        <RelativeLayout
-            android:id="@+id/keyguard_clock_container"
-            android:layout_width="match_parent"
+        <TextClock
+            android:id="@+id/clock_view"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|top">
-            <TextClock
-                android:id="@+id/clock_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentTop="true"
-                android:textColor="?attr/wallpaperTextColor"
-                android:singleLine="true"
-                style="@style/widget_big_thin"
-                android:format12Hour="@string/keyguard_widget_12_hours_format"
-                android:format24Hour="@string/keyguard_widget_24_hours_format"
-                android:layout_marginBottom="@dimen/bottom_text_spacing_digital" />
-            <com.android.systemui.ChargingView
-                android:id="@+id/battery_doze"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/clock_view"
-                android:layout_alignBottom="@id/clock_view"
-                android:layout_toEndOf="@id/clock_view"
-                android:visibility="invisible"
-                android:src="@drawable/ic_aod_charging_24dp"
-                android:contentDescription="@string/accessibility_ambient_display_charging"
-            />
+            android:layout_gravity="center_horizontal"
+            android:textColor="?attr/wallpaperTextColor"
+            android:singleLine="true"
+            style="@style/widget_big_thin"
+            android:format12Hour="@string/keyguard_widget_12_hours_format"
+            android:format24Hour="@string/keyguard_widget_24_hours_format"
+            android:layout_marginBottom="@dimen/bottom_text_spacing_digital" />
 
-            <include layout="@layout/keyguard_status_area"
-                android:id="@+id/keyguard_status_area"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/clock_view" />
-        </RelativeLayout>
-
+        <include layout="@layout/keyguard_status_area"
+                android:id="@+id/keyguard_status_area" />
         <TextView
             android:id="@+id/owner_info"
             android:layout_marginLeft="16dp"
@@ -77,7 +56,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/date_owner_info_margin"
             android:layout_gravity="center_horizontal"
-            android:layout_centerHorizontal="true"
             android:textColor="?attr/wallpaperTextColorSecondary"
             android:textSize="@dimen/widget_label_font_size"
             android:letterSpacing="0.05"
