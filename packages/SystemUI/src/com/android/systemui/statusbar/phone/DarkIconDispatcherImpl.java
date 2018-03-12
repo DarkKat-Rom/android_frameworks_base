@@ -103,4 +103,8 @@ public class DarkIconDispatcherImpl implements DarkIconDispatcher {
             mReceivers.valueAt(i).onDarkChanged(mTintArea, mDarkIntensity, mIconTint);
         }
     }
+
+    public void updateColors() {
+        setIconTintInternal(mDarkIntensity);
+    }
 }

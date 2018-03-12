@@ -35,6 +35,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.SignalDrawable;
@@ -94,6 +95,8 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     private int mIconTint = Color.WHITE;
     private float mDarkIntensity;
     private final Rect mTintArea = new Rect();
+
+    private boolean mColorize = false;
 
     ViewGroup mEthernetGroup, mWifiGroup;
     View mNoSimsCombo;
@@ -594,34 +597,49 @@ public class SignalClusterView extends LinearLayout implements NetworkController
 
     @Override
     public void onDarkChanged(Rect tintArea, float darkIntensity, int tint) {
-        boolean changed = tint != mIconTint || darkIntensity != mDarkIntensity
-                || !mTintArea.equals(tintArea);
         mIconTint = tint;
         mDarkIntensity = darkIntensity;
         mTintArea.set(tintArea);
-        if (changed && isAttachedToWindow()) {
+        if (isAttachedToWindow()) {
             applyIconTint();
         }
     }
 
     private void applyIconTint() {
-        setTint(mVpn, DarkIconDispatcher.getTint(mTintArea, mVpn, mIconTint));
-        setTint(mAirplane, DarkIconDispatcher.getTint(mTintArea, mAirplane, mIconTint));
+        if (!mColorize) {
+            setTint(mVpn, DarkIconDispatcher.getTint(mTintArea, mVpn, mIconTint));
+            setTint(mAirplane, DarkIconDispatcher.getTint(mTintArea, mAirplane, mIconTint));
+            setTint(mWifiActivityIn,
+                    DarkIconDispatcher.getTint(mTintArea, mWifiActivityIn, mIconTint));
+            setTint(mWifiActivityOut,
+                    DarkIconDispatcher.getTint(mTintArea, mWifiActivityOut, mIconTint));
+        } else {
+            setTint(mVpn, StatusBarColorHelper.getIconSingleToneTint(mContext, mTintArea, mVpn,
+                    mDarkIntensity));
+            setTint(mAirplane, StatusBarColorHelper.getIconSingleToneTint(mContext, mTintArea,
+                    mAirplane, mDarkIntensity));
+            setTint(mWifiActivityIn, StatusBarColorHelper.getIconSingleToneTint(mContext, mTintArea,
+                    mWifiActivityIn, mDarkIntensity));
+            setTint(mWifiActivityOut, StatusBarColorHelper.getIconSingleToneTint(mContext, mTintArea,
+                    mWifiActivityOut, mDarkIntensity));
+            setTint(mNoSims, StatusBarColorHelper.getIconColor(mContext));
+            setTint(mNoSimsDark, StatusBarColorHelper.getIconColorDarkMode(mContext));
+            setTint(mWifi, StatusBarColorHelper.getIconColor(mContext));
+            setTint(mWifiDark, StatusBarColorHelper.getIconColorDarkMode(mContext));
+            setTint(mEthernet, StatusBarColorHelper.getIconColor(mContext));
+            setTint(mEthernetDark, StatusBarColorHelper.getIconColorDarkMode(mContext));
+        }
         applyDarkIntensity(
                 DarkIconDispatcher.getDarkIntensity(mTintArea, mNoSims, mDarkIntensity),
                 mNoSims, mNoSimsDark);
         applyDarkIntensity(
                 DarkIconDispatcher.getDarkIntensity(mTintArea, mWifi, mDarkIntensity),
                 mWifi, mWifiDark);
-        setTint(mWifiActivityIn,
-                DarkIconDispatcher.getTint(mTintArea, mWifiActivityIn, mIconTint));
-        setTint(mWifiActivityOut,
-                DarkIconDispatcher.getTint(mTintArea, mWifiActivityOut, mIconTint));
         applyDarkIntensity(
                 DarkIconDispatcher.getDarkIntensity(mTintArea, mEthernet, mDarkIntensity),
                 mEthernet, mEthernetDark);
         for (int i = 0; i < mPhoneStates.size(); i++) {
-            mPhoneStates.get(i).setIconTint(mIconTint, mDarkIntensity, mTintArea);
+            mPhoneStates.get(i).setIconTint(mColorize, mIconTint, mDarkIntensity, mTintArea);
         }
     }
 
@@ -638,7 +656,12 @@ public class SignalClusterView extends LinearLayout implements NetworkController
         return isBranded ? R.drawable.stat_sys_branded_vpn : R.drawable.stat_sys_vpn_ic;
     }
 
+    public void setColorize(boolean colorize) {
+        mColorize = colorize;
+    }
+
     private class PhoneState {
+        private final Context mContext;
         private final int mSubId;
         private boolean mMobileVisible = false;
         private int mMobileStrengthId = 0, mMobileTypeId = 0;
@@ -659,6 +682,7 @@ public class SignalClusterView extends LinearLayout implements NetworkController
             ViewGroup root = (ViewGroup) LayoutInflater.from(context)
                     .inflate(R.layout.mobile_signal_group, null);
             setViews(root);
+            mContext = context;
             mSubId = subId;
         }
 
@@ -725,17 +749,30 @@ public class SignalClusterView extends LinearLayout implements NetworkController
             }
         }
 
-        public void setIconTint(int tint, float darkIntensity, Rect tintArea) {
+        public void setIconTint(boolean colorize, int tint, float darkIntensity, Rect tintArea) {
+            if (!colorize) {
+                setTint(mMobileType, DarkIconDispatcher.getTint(tintArea, mMobileType, tint));
+                setTint(mMobileRoaming, DarkIconDispatcher.getTint(tintArea, mMobileRoaming,
+                        tint));
+                setTint(mMobileActivityIn,
+                        DarkIconDispatcher.getTint(tintArea, mMobileActivityIn, tint));
+                setTint(mMobileActivityOut,
+                        DarkIconDispatcher.getTint(tintArea, mMobileActivityOut, tint));
+            } else {
+                setTint(mMobileType, StatusBarColorHelper.getIconSingleToneTint(mContext, tintArea,
+                        mMobileType, darkIntensity));
+                setTint(mMobileRoaming, StatusBarColorHelper.getIconSingleToneTint(mContext, tintArea,
+                        mMobileRoaming, darkIntensity));
+                setTint(mMobileActivityIn, StatusBarColorHelper.getIconSingleToneTint(mContext, tintArea,
+                        mMobileActivityIn, darkIntensity));
+                setTint(mMobileActivityOut, StatusBarColorHelper.getIconSingleToneTint(mContext, tintArea,
+                        mMobileActivityOut, darkIntensity));
+                setTint(mMobile, StatusBarColorHelper.getIconColor(mContext));
+                setTint(mMobileDark, StatusBarColorHelper.getIconColorDarkMode(mContext));
+            }
             applyDarkIntensity(
                     DarkIconDispatcher.getDarkIntensity(tintArea, mMobile, darkIntensity),
                     mMobile, mMobileDark);
-            setTint(mMobileType, DarkIconDispatcher.getTint(tintArea, mMobileType, tint));
-            setTint(mMobileRoaming, DarkIconDispatcher.getTint(tintArea, mMobileRoaming,
-                    tint));
-            setTint(mMobileActivityIn,
-                    DarkIconDispatcher.getTint(tintArea, mMobileActivityIn, tint));
-            setTint(mMobileActivityOut,
-                    DarkIconDispatcher.getTint(tintArea, mMobileActivityOut, tint));
         }
     }
 }

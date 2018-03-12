@@ -50,15 +50,17 @@ import android.view.animation.Interpolator;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationColorUtil;
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.notification.NotificationIconDozeHelper;
 import com.android.systemui.statusbar.notification.NotificationUtils;
+import com.android.systemui.statusbar.policy.DarkIconDispatcher.DarkReceiver;
 
 import java.text.NumberFormat;
 import java.util.Arrays;
 
-public class StatusBarIconView extends AnimatedImageView {
+public class StatusBarIconView extends AnimatedImageView implements DarkReceiver {
     public static final int NO_COLOR = 0;
 
     /**
@@ -831,6 +833,12 @@ public class StatusBarIconView extends AnimatedImageView {
             mLayoutRunnable.run();
             mLayoutRunnable = null;
         }
+    }
+
+    @Override
+    public void onDarkChanged(Rect area, float darkIntensity, int tint) {
+        setStaticDrawableColor(StatusBarColorHelper.getIconSingleToneTint(getContext(), area, this,
+                darkIntensity));
     }
 
     public void executeOnLayout(Runnable runnable) {

@@ -34,6 +34,7 @@ import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.StatusBarIconView;
 import com.android.systemui.statusbar.policy.DarkIconDispatcher;
+import com.android.systemui.statusbar.policy.DarkIconDispatcher.DarkReceiver;
 
 public interface StatusBarIconController {
 
@@ -79,7 +80,7 @@ public interface StatusBarIconController {
         protected void onIconAdded(int index, String slot, boolean blocked,
                 StatusBarIcon icon) {
             StatusBarIconView v = addIcon(index, slot, blocked, icon);
-            mDarkIconDispatcher.addDarkReceiver(v);
+            mDarkIconDispatcher.addDarkReceiver((DarkReceiver) v);
         }
 
         @Override
@@ -93,21 +94,15 @@ public interface StatusBarIconController {
         @Override
         protected void destroy() {
             for (int i = 0; i < mGroup.getChildCount(); i++) {
-                mDarkIconDispatcher.removeDarkReceiver((ImageView) mGroup.getChildAt(i));
+                mDarkIconDispatcher.removeDarkReceiver((DarkReceiver) mGroup.getChildAt(i));
             }
             mGroup.removeAllViews();
         }
 
         @Override
         protected void onRemoveIcon(int viewIndex) {
-            mDarkIconDispatcher.removeDarkReceiver((ImageView) mGroup.getChildAt(viewIndex));
+            mDarkIconDispatcher.removeDarkReceiver((DarkReceiver) mGroup.getChildAt(viewIndex));
             super.onRemoveIcon(viewIndex);
-        }
-
-        @Override
-        public void onSetIcon(int viewIndex, StatusBarIcon icon) {
-            super.onSetIcon(viewIndex, icon);
-            mDarkIconDispatcher.applyDark((ImageView) mGroup.getChildAt(viewIndex));
         }
     }
 

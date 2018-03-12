@@ -39,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.settingslib.Utils;
 import com.android.settingslib.graph.BatteryMeterDrawableBase;
 import com.android.systemui.settings.CurrentUserTracker;
@@ -78,6 +79,8 @@ public class BatteryMeterView extends LinearLayout implements
     private float mDarkIntensity;
     private int mUser;
 
+    private boolean mColorize;
+
     public BatteryMeterView(Context context) {
         this(context, null, 0);
     }
@@ -94,6 +97,7 @@ public class BatteryMeterView extends LinearLayout implements
 
         TypedArray atts = context.obtainStyledAttributes(attrs, R.styleable.BatteryMeterView,
                 defStyle, 0);
+        mColorize = atts.getBoolean(R.styleable.BatteryMeterView_colorize, true);
         final int frameColor = atts.getColor(R.styleable.BatteryMeterView_frameColor,
                 context.getColor(R.color.meter_background_color));
         mDrawable = new BatteryMeterDrawableBase(context, frameColor);
@@ -261,13 +265,26 @@ public class BatteryMeterView extends LinearLayout implements
     @Override
     public void onDarkChanged(Rect area, float darkIntensity, int tint) {
         mDarkIntensity = darkIntensity;
-        float intensity = DarkIconDispatcher.isInArea(area, this) ? darkIntensity : 0;
-        int foreground = getColorForDarkIntensity(intensity, mLightModeFillColor,
-                mDarkModeFillColor);
-        int background = getColorForDarkIntensity(intensity, mLightModeBackgroundColor,
-                mDarkModeBackgroundColor);
+        int foreground = 0;
+        int background = 0;
+        int text = 0;
+        if (mColorize) {
+            foreground = StatusBarColorHelper.getIconDualToneFillTint(getContext(), area, this,
+                    darkIntensity);
+            background = StatusBarColorHelper.getIconDualToneBackgroundTint(getContext(), area, this,
+                    darkIntensity);
+            text = StatusBarColorHelper.getTextSingleToneTint(getContext(), area, this,
+                    darkIntensity);
+        } else {
+            float intensity = DarkIconDispatcher.isInArea(area, this) ? darkIntensity : 0;
+            foreground = getColorForDarkIntensity(intensity, mLightModeFillColor,
+                    mDarkModeFillColor);
+            background = getColorForDarkIntensity(intensity, mLightModeBackgroundColor,
+                    mDarkModeBackgroundColor);
+            text = foreground;
+        }
         mDrawable.setColors(foreground, background);
-        setTextColor(foreground);
+        setTextColor(text);
     }
 
     public void setTextColor(int color) {

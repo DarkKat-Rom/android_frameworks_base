@@ -27,6 +27,15 @@ public class ColorConstants {
     // Theme Holo
     public static final int HOLO_BLUE_LIGHT = 0xff33b5e5;
 
+    // SystemUI
+    public static final int LIGHT_MODE_COLOR_SINGLE_TONE          = WHITE;
+    public static final int LIGHT_MODE_COLOR_DUAL_TONE_BACKGROUND = 0x4dffffff;
+    public static final int LIGHT_MODE_COLOR_DUAL_TONE_FILL       = WHITE;
+
+    public static final int DARK_MODE_COLOR_SINGLE_TONE          = 0x99000000;
+    public static final int DARK_MODE_COLOR_DUAL_TONE_BACKGROUND = 0x3d000000;
+    public static final int DARK_MODE_COLOR_DUAL_TONE_FILL       = 0x7a000000;
+
     // Alpha values
 
     // General
@@ -41,4 +50,13 @@ public class ColorConstants {
     public static final int TEXT_PRIMARY_ALPHA_DAY   = 222;
     public static final int TEXT_SECONDARY_ALPHA_DAY = 138;
     public static final int ICON_NORMAL_ALPHA_DAY    = TEXT_SECONDARY_ALPHA_DAY;
+
+    // SystemUI
+    public static final int LIGHT_MODE_ALPHA_SINGLE_TONE          = FULLY_OPAQUE_ALPHA;
+    public static final int LIGHT_MODE_ALPHA_DUAL_TONE_BACKGROUND = 77;
+    public static final int LIGHT_MODE_ALPHA_DUAL_TONE_FILL       = FULLY_OPAQUE_ALPHA;
+
+    public static final int DARK_MODE_ALPHA_SINGLE_TONE          = 153;
+    public static final int DARK_MODE_ALPHA_DUAL_TONE_BACKGROUND = 61;
+    public static final int DARK_MODE_ALPHA_DUAL_TONE_FILL       = 122;
 }

@@ -4008,6 +4008,43 @@ public final class Settings {
         public static final String LOCK_SCREEN_ICON_COLOR_LIGHT = "lock_screen_icon_color_light";
 
         /**
+         * Color of the text on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_TEXT_COLOR = "status_bar_text_color";
+
+        /**
+         * Color of the icons on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_ICON_COLOR = "status_bar_icon_color";
+
+        /**
+         * Color of the text on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_TEXT_COLOR_DARK_MODE = "status_bar_text_color_dark_mode";
+
+        /**
+         * Color of the icons on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_ICON_COLOR_DARK_MODE = "status_bar_icon_color_dark_mode";
+
+        /**
+         * Color of the battery status text on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_TEXT_COLOR = "status_bar_battery_text_color";
+
+        /**
+         * Color of the battery status text on the status bar, (dark mode)
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE =
+                "status_bar_battery_text_color_dark_mode";
+
+        /**
          * Wether to show the location in the detailed weather view
          * @hide
          */

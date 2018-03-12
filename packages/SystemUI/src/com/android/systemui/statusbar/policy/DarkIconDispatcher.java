@@ -37,6 +37,8 @@ public interface DarkIconDispatcher {
     // addDarkReceiver.
     void applyDark(ImageView object);
 
+    void updateColors();
+
     int DEFAULT_ICON_TINT = Color.WHITE;
     Rect sTmpRect = new Rect();
     int[] sTmpInt2 = new int[2];
