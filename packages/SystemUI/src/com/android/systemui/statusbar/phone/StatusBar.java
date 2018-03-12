@@ -1419,8 +1419,10 @@ public class StatusBar extends SystemUI implements DemoMode,
                         0, 0, 0);
                 newCluster.setLayoutParams(layoutParams);
                 viewParent.addView(newCluster, index);
+                newCluster.setColorize(true);
                 return newCluster;
             }
+            signalCluster.setColorize(true);
             return signalCluster;
         }
         return null;
@@ -4835,6 +4837,11 @@ public class StatusBar extends SystemUI implements DemoMode,
         mVisualizerView.updateColor();
     }
 
+    private void updateStatusbarColors() {
+        Dependency.get(DarkIconDispatcher.class).updateColors();
+        mKeyguardStatusBar.updateColors();
+    }
+
     private void setThemeOverlay(String packageName) {
         setThemeOverlay(packageName, true);
     }
@@ -6013,7 +6020,24 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LOCK_SCREEN_ICON_COLOR_DARK),
                     false, this, UserHandle.USER_ALL);
-
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR_DARK_MODE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR_DARK_MODE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -6032,6 +6056,19 @@ public class StatusBar extends SystemUI implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.LOCK_SCREEN_ICON_COLOR_DARK))) {
                 updateVisualizerColor();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_TEXT_COLOR_DARK_MODE))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_ICON_COLOR_DARK_MODE))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE))) {
+                updateStatusbarColors();
             }
         }
     }

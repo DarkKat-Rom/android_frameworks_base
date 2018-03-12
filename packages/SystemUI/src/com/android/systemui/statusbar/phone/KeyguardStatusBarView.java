@@ -34,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.settingslib.Utils;
 import com.android.systemui.BatteryMeterView;
 import com.android.systemui.Dependency;
@@ -334,22 +335,27 @@ public class KeyguardStatusBarView extends RelativeLayout
     }
 
     public void onOverlayChanged() {
-        @ColorInt int textColor = Utils.getColorAttr(mContext, R.attr.wallpaperTextColor);
-        @ColorInt int iconColor = Utils.getDefaultColor(mContext, Color.luminance(textColor) < 0.5 ?
-                R.color.dark_mode_icon_color_single_tone :
-                R.color.light_mode_icon_color_single_tone);
-        float intensity = textColor == Color.WHITE ? 0 : 1;
-        mCarrierLabel.setTextColor(iconColor);
-        mBatteryView.setFillColor(iconColor);
-        mIconManager.setTint(iconColor);
+        updateColors();
+        // Reload user avatar
+        ((UserInfoControllerImpl) Dependency.get(UserInfoController.class))
+                .onDensityOrFontScaleChanged();
+    }
+
+    public void updateColors() {
+        @ColorInt int wallpaperTextColor = Utils.getColorAttr(mContext, R.attr.wallpaperTextColor);
         Rect tintArea = new Rect(0, 0, 0, 0);
+        float intensity = wallpaperTextColor == Color.WHITE ? 0 : 1;
+        @ColorInt int textColor = StatusBarColorHelper.getTextSingleToneTint(getContext(), tintArea, this,
+                    intensity);
+        @ColorInt int iconColor = StatusBarColorHelper.getIconSingleToneTint(getContext(), tintArea, this,
+                    intensity);
+
+        mCarrierLabel.setTextColor(textColor);
+        mIconManager.setTint(iconColor);
 
         applyDarkness(R.id.signal_cluster, tintArea, intensity, iconColor);
         applyDarkness(R.id.battery, tintArea, intensity, iconColor);
         applyDarkness(R.id.clock, tintArea, intensity, iconColor);
-        // Reload user avatar
-        ((UserInfoControllerImpl) Dependency.get(UserInfoController.class))
-                .onDensityOrFontScaleChanged();
     }
 
     private void applyDarkness(int id, Rect tintArea, float intensity, int color) {

@@ -167,6 +167,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         Dependency.get(StatusBarIconController.class).addIconGroup(mDarkIconManager);
         mSystemIconArea = mStatusBar.findViewById(R.id.system_icon_area);
         mSignalClusterView = mStatusBar.findViewById(R.id.signal_cluster);
+        mSignalClusterView.setColorize(true);
         mClockDefault = (Clock) mStatusBar.findViewById(R.id.clock);
         mClockCentered = (Clock) mStatusBar.findViewById(R.id.center_clock);
         mCenterClockLayout = mStatusBar.findViewById(R.id.center_clock_layout);

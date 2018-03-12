@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationColorUtil;
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.ExpandableNotificationRow;
 import com.android.systemui.statusbar.NotificationData;
@@ -35,7 +36,7 @@ public class NotificationIconAreaController implements DarkReceiver {
     private int mIconSize;
     private int mIconHPadding;
     private int mIconTint = Color.WHITE;
-
+    private float mDarkIntensity = 0f;
     private StatusBar mStatusBar;
     protected View mNotificationIconArea;
     private NotificationIconContainer mNotificationIcons;
@@ -115,6 +116,7 @@ public class NotificationIconAreaController implements DarkReceiver {
      * @param darkIntensity
      */
     public void onDarkChanged(Rect tintArea, float darkIntensity, int iconTint) {
+        mDarkIntensity = darkIntensity;
         if (tintArea == null) {
             mTintArea.setEmpty();
         } else {
@@ -281,7 +283,7 @@ public class NotificationIconAreaController implements DarkReceiver {
         int color = StatusBarIconView.NO_COLOR;
         boolean colorize = !isPreL || NotificationUtils.isGrayscale(v, mNotificationColorUtil);
         if (colorize) {
-            color = DarkIconDispatcher.getTint(mTintArea, v, mIconTint);
+            color = StatusBarColorHelper.getIconSingleToneTint(mContext, mTintArea, v, mDarkIntensity);
         }
         v.setStaticDrawableColor(color);
         v.setDecorColor(mIconTint);

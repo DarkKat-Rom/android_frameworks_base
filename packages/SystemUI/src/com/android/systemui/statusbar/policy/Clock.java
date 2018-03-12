@@ -42,6 +42,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.systemui.DemoMode;
 import com.android.systemui.Dependency;
 import com.android.systemui.FontSizeUtils;
@@ -96,6 +97,8 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
     private int mDateStyle = DATE_STYLE_REGULAR;
     private boolean mDateSizeSmall = false;
 
+    private boolean mColorize;
+
     public Clock(Context context) {
         this(context, null);
     }
@@ -117,6 +120,7 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
                 mAmPmStyle = a.getInt(R.styleable.Clock_amPmStyle, AM_PM_STYLE_NORMAL);
             }
             mShowDark = a.getBoolean(R.styleable.Clock_showDark, true);
+            mColorize = a.getBoolean(R.styleable.Clock_colorize, true);
         } finally {
             a.recycle();
         }
@@ -227,7 +231,12 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
 
     @Override
     public void onDarkChanged(Rect area, float darkIntensity, int tint) {
-        setTextColor(DarkIconDispatcher.getTint(area, this, tint));
+        if (mColorize) {
+            setTextColor(StatusBarColorHelper.getTextSingleToneTint(getContext(), area, this,
+                    darkIntensity));
+        } else {
+            setTextColor(DarkIconDispatcher.getTint(area, this, tint));
+        }
     }
 
     @Override

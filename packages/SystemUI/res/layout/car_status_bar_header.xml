@@ -40,5 +40,6 @@
         android:singleLine="true"
         android:paddingStart="@dimen/status_bar_clock_starting_padding"
         android:paddingEnd="@dimen/status_bar_clock_end_padding"
-        systemui:showDark="false" />
+        systemui:showDark="false"
+        systemui:colorize="false" />
 </com.android.systemui.qs.car.CarStatusBarHeader>
