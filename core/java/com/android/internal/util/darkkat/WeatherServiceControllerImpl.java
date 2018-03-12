@@ -106,7 +106,7 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
                     .setClassName(PACKAGE_NAME, PACKAGE_NAME + ".WeatherService");
             updateIntent.setAction(PACKAGE_NAME + ".ACTION_UPDATE");
             updateIntent.putExtra("force", true);
-            mContext.startService(updateIntent);
+            mContext.startForegroundService(updateIntent);
             mWeatherObserver.observe();
             queryWeather();
         }
