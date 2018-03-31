@@ -72,4 +72,18 @@ public class ThemeHelper {
         return Settings.Secure.getInt(context.getContentResolver(),
             Settings.Secure.USE_LIGHT_NAVIGATION_BAR, 0) == 1;
     }
+
+    public static boolean isNightMode(Context context) {
+        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(
+                Context.UI_MODE_SERVICE);
+        if (uiModeManager != null) {
+            int dayNightTheme = uiModeManager.getDayNightTheme();
+            return dayNightTheme == UiModeManager.MODE_NIGHT_YES
+                || dayNightTheme == UiModeManager.MODE_NIGHT_YES_DK
+                || dayNightTheme == UiModeManager.MODE_NIGHT_YES_DK_BLACKOUT
+                || dayNightTheme == UiModeManager.MODE_NIGHT_YES_BLACKOUT;
+        } else {
+            return false;
+        }
+    }
 }

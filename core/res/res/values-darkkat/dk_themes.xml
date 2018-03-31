@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2017 DarkKat
+<!-- Copyright (C) 2018 DarkKat
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -16,13 +16,8 @@
 
 <resources>
 
-    <!-- Theme.Material.Light (DarkKat version) -->
-    <color name="background_material_light">@color/white</color>
-
-    <color name="primary_material_dark">@color/material_blue_grey_950</color>
-
-    <color name="accent_material_dark">@color/darkkat_accent</color>
-    <color name="accent_material_light">@color/darkkat_accent</color>
-
-    <color name="system_notification_accent_color">@color/accent_darkkat</color>
+    <!-- Theme.Material (DarkKat version) -->
+    <style name="Notification.Guts.Theme" parent="Theme.DeviceDefault">
+        <item name="colorAccent">@color/accent_darkkat</item>
+    </style>
 </resources>

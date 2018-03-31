@@ -13,7 +13,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+
 <resources>
 
+    <!-- Theme.Material.Light -->
     <style name="Theme.ShutdownThreadDialog" parent="Theme.Material.Light.Dialog.Alert" />
+    <style name="Notification.Guts.Theme" parent="Theme.DeviceDefault.Light" />
 </resources>

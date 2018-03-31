@@ -18,6 +18,9 @@
 
     <!-- DarkKat colors -->
     <color name="darkkat_blue_grey">#ff1b1f23</color>
+    <color name="darkkat_blue_grey_2">#ff1f2327</color>  <!-- 2% white over darkkat blue grey -->
+    <color name="darkkat_blue_grey_4">#ff23272b</color>  <!-- 2% white over darkkat blue grey -->
+
     <color name="darkkat_blue_blue_grey">#ff1f2429</color>
     <color name="darkkat_accent">#ff5a8596</color>
     <color name="primary_color_darkkat">#ff2196f3</color>  <!-- material blue 500 -->
@@ -33,4 +36,15 @@
     <!-- Accent color on Blackout theme, and also accent color on Whiteout theme,
          when Whiteout theme uses a dark action bar -->
     <color name="accent_blackout">@color/white</color>
+
+    <color name="notification_legacy_background_color">#ff1a1a1a</color>
+    <color name="notification_material_background_dimmed_color">#ccffffff</color>
+    <color name="notification_material_background_low_priority_color">#fff5f5f5</color>
+    <color name="notification_divider_color">#FF616161</color>
+    <color name="notification_shade_background_color">#ffeeeeee</color>
+    <color name="notification_ripple_untinted_color">#28000000</color>
+    <color name="notification_ripple_color_low_priority">#30000000</color>
+    <color name="notification_ripple_tinted_color">#30ffffff</color>
+    <color name="notification_gear_color">#ff757575</color>
+    <color name="notification_guts_bg_color">#eeeeee</color>
 </resources>

@@ -23,4 +23,6 @@
 
     <color name="accent_material_dark">@color/darkkat_accent</color>
     <color name="accent_material_light">@color/darkkat_accent</color>
+
+    <color name="system_notification_accent_color">@color/accent_darkkat</color>
 </resources>
