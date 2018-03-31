@@ -21,4 +21,6 @@
 
     <color name="accent_material_dark">@color/accent_blackout</color>
     <color name="accent_material_light">@color/accent_whiteout</color>
+
+    <color name="system_notification_accent_color">@color/black</color>
 </resources>

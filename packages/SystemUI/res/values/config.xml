@@ -395,7 +395,7 @@
 
     <!-- Whether or not there should be dividing lines between child notifications when the
          group has been expanded. -->
-    <bool name="config_showDividersWhenGroupNotificationExpanded">false</bool>
+    <bool name="config_showDividersWhenGroupNotificationExpanded">true</bool>
 
     <!-- Whether or not the dividing lines should be shown when the container is expanding and
          collapsing. If this value is true, then the lines will only show when the container has

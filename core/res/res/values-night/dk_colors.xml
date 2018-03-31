@@ -16,35 +16,21 @@
 
 <resources>
 
-    <!-- Theme.Material (Blackout version) -->
-    <color name="background_material_dark">@color/black</color>
-    <color name="background_floating_material_dark">@color/primary_color_blackout</color>
-
-    <color name="primary_material_dark">@color/primary_color_blackout</color>
-
-    <color name="accent_material_dark">@color/accent_blackout</color>
-
-    <color name="timepicker_default_ampm_selected_background_color_material">@color/accent_blackout</color>
-    <color name="timepicker_default_selector_color_material">@color/accent_blackout</color>
-
-    <color name="datepicker_default_circle_background_color_material_dark">@color/accent_blackout</color>
-
+    <!-- Theme.Material -->
     <color name="notification_primary_text_color_light">@color/primary_text_default_material_dark</color>
     <color name="notification_secondary_text_color_light">@color/secondary_text_material_dark</color>
-    <color name="notification_material_background_color">@color/black</color>
+    <color name="notification_material_background_color">@color/material_blue_grey_950</color>
     <color name="notification_progress_background_color">@color/secondary_text_material_dark</color>
-    <color name="notification_action_list">#ff0a0a0a</color>
-    <color name="notification_action_list_dark">@color/black</color>
-    <color name="system_notification_accent_color">@color/white</color>
+    <color name="notification_action_list">@color/material_blue_grey_900</color>
+    <color name="notification_action_list_dark">@color/material_blue_grey_950</color>
 
-    <color name="notification_legacy_background_color">@color/black</color>
-    <color name="notification_material_background_dimmed_color">#cc000000</color>
-    <color name="notification_material_background_low_priority_color">#ff050505</color>
+    <color name="notification_material_background_dimmed_color">#cc21272b</color>
+    <color name="notification_material_background_low_priority_color">@color/material_blue_grey_800</color>
     <color name="notification_divider_color">#ffe0e0e0</color>
-    <color name="notification_shade_background_color">#ff0a0a0a</color>
+    <color name="notification_shade_background_color">@color/material_blue_grey_900</color>
     <color name="notification_ripple_untinted_color">#28ffffff</color>
     <color name="notification_ripple_color_low_priority">#30ffffff</color>
     <color name="notification_ripple_tinted_color">#30ffffff</color>
     <color name="notification_gear_color">@color/white</color>
-    <color name="notification_guts_bg_color">#ff0a0a0a</color>
+    <color name="notification_guts_bg_color">@color/material_blue_grey_900</color>
 </resources>

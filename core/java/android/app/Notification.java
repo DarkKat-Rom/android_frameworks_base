@@ -79,6 +79,7 @@ import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.NotificationColorUtil;
 import com.android.internal.util.Preconditions;
+import com.android.internal.util.darkkat.ThemeHelper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -2817,13 +2818,7 @@ public class Notification implements Parcelable
             mContext = context;
             Resources res = mContext.getResources();
             mTintActionButtons = res.getBoolean(R.bool.config_tintNotificationActionButtons);
-
-            if (res.getBoolean(R.bool.config_enableNightMode)) {
-                Configuration currentConfig = res.getConfiguration();
-                mInNightMode = (currentConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK)
-                        == Configuration.UI_MODE_NIGHT_YES;
-            }
-
+            mInNightMode = ThemeHelper.isNightMode(mContext);
             if (toAdopt == null) {
                 mN = new Notification();
                 if (context.getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.N) {
@@ -4795,7 +4790,7 @@ public class Notification implements Parcelable
 
         private CharSequence processLegacyText(CharSequence charSequence, boolean ambient) {
             boolean isAlreadyLightText = isLegacy() || textColorsNeedInversion();
-            boolean wantLightText = ambient;
+            boolean wantLightText = ambient || mInNightMode;
             if (isAlreadyLightText != wantLightText) {
                 return getColorUtil().invertCharSequenceColors(charSequence);
             } else {
@@ -6217,7 +6212,7 @@ public class Notification implements Parcelable
                 sb.append(bidi.unicodeWrap(m.mSender),
                         makeFontColorSpan(colorize
                                 ? builder.getPrimaryTextColor()
-                                : Color.BLACK),
+                                : mBuilder.resolveContrastColor()),
                         0 /* flags */);
             }
             CharSequence text = m.mText == null ? "" : m.mText;

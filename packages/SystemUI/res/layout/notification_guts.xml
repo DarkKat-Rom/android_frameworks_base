@@ -23,4 +23,4 @@
     android:visibility="gone"
     android:clickable="true"
     android:gravity="top|start"
-    android:theme="@*android:style/Theme.DeviceDefault.Light"/>
+    android:theme="@*android:style/Notification.Guts.Theme"/>
