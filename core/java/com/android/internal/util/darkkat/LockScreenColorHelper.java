@@ -71,6 +71,18 @@ public class LockScreenColorHelper {
         return (ColorConstants.FULLY_OPAQUE_ALPHA << 24) | (color & 0x00ffffff);
     }
 
+    public static int getNormalIconColorDark(Context context) {
+        int color = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_ICON_COLOR_DARK, ColorConstants.WHITE);
+        return (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24) | (color & 0x00ffffff);
+    }
+
+    public static int getNormalIconColorLight(Context context) {
+        int color = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_ICON_COLOR_LIGHT, ColorConstants.BLACK);
+        return (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24) | (color & 0x00ffffff);
+    }
+
     public static ColorStateList getIconTintDark(Context context) {
         return ColorStateList.valueOf(getIconColorDark(context));
     }
@@ -80,14 +92,10 @@ public class LockScreenColorHelper {
     }
 
     public static ColorStateList getNormalIconTintDark(Context context) {
-        int baseColor = getIconColorDark(context);
-        return ColorStateList.valueOf(
-                (ColorConstants.ICON_NORMAL_ALPHA_NIGHT << 24) | (baseColor & 0x00ffffff));
+        return ColorStateList.valueOf(getNormalIconColorDark(context));
     }
 
     public static ColorStateList getNormalIconTintLight(Context context) {
-        int baseColor = getIconColorLight(context);
-        return ColorStateList.valueOf(
-                (ColorConstants.ICON_NORMAL_ALPHA_DAY << 24) | (baseColor & 0x00ffffff));
+        return ColorStateList.valueOf(getNormalIconColorLight(context));
     }
 }

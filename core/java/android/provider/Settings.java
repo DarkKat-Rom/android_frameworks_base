@@ -4067,6 +4067,26 @@ public final class Settings {
         public static final String LOCK_SCREEN_SHOW_VISUALIZER = "lock_screen_show_visualizer";
 
         /**
+         *  Whether to show additional widgets on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_SHOW_WIDGETS = "lock_screen_show_widgets";
+
+        /**
+         *  Whether to show the weather hour forecast widget on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_WIDGETS_SHOW_WEATHER_HOUR_FORECAST =
+                "lock_screen_widgets_show_weather_hour_forecast";
+
+        /**
+         *  Whether to show the weather day forecast widget on the lock screen
+         * @hide
+         */
+        public static final String LOCK_SCREEN_WIDGETS_SHOW_WEATHER_DAY_FORECAST =
+                "lock_screen_widgets_show_weather_day_forecast";
+
+        /**
          *  Whether to show the weather on the status area of the lock screen
          * @hide
          */

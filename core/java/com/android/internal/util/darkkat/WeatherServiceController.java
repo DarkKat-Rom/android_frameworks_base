@@ -20,6 +20,7 @@ package com.android.internal.util.darkkat;
 
 import android.graphics.drawable.Drawable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface WeatherServiceController {
@@ -51,7 +52,10 @@ public interface WeatherServiceController {
         public String formattedSnow1H = null;
         public String formattedSnow3H = null;
         public List<DayForecast> forecasts;
+        public List<HourForecast> hourforecasts;
         public String timestamp = null;
+        public String sunrise = null;
+        public String sunset = null;
     }
 
     public static class DayForecast {
@@ -64,5 +68,25 @@ public interface WeatherServiceController {
         public String temperatureHigh;
         public String formattedTemperatureLow;
         public String formattedTemperatureHigh;
+        public String formattedTemperatureMorning;
+        public String formattedTemperatureDay;
+        public String formattedTemperatureEvening;
+        public String formattedTemperatureNight;
+    }
+
+    public static class HourForecast {
+        public String condition;
+        public int conditionCode;
+        public Drawable conditionDrawableMonochrome;
+        public Drawable conditionDrawableColored;
+        public Drawable conditionDrawableVClouds;
+        public String formattedTemperature;
+        public String formattedHumidity;
+        public String formattedWind;
+        public String formattedPressure;
+        public String formattedRain;
+        public String formattedSnow;
+        public String day;
+        public String time;
     }
 }

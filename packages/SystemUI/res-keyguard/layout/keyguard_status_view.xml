@@ -34,17 +34,51 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
         android:orientation="vertical">
-        <TextClock
-            android:id="@+id/clock_view"
-            android:layout_width="wrap_content"
+
+        <com.android.keyguard.darkkat.KeyguardWidgetScroller
+            android:id="@+id/widget_scroller"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="?attr/wallpaperTextColor"
-            android:singleLine="true"
-            style="@style/widget_big_thin"
-            android:format12Hour="@string/keyguard_widget_12_hours_format"
-            android:format24Hour="@string/keyguard_widget_24_hours_format"
-            android:layout_marginBottom="@dimen/bottom_text_spacing_digital" />
+            android:layout_marginBottom="@dimen/bottom_text_spacing_digital"
+            android:requiresFadingEdge="none"
+            android:scrollbars="none"
+            android:scrollIndicators="none"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/widget_scroller_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.android.keyguard.darkkat.KeyguardClockWidget
+                    android:id="@+id/clock_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center"
+                    android:textColor="?attr/wallpaperTextColor"
+                    android:singleLine="true"
+                    style="@style/widget_big_thin"
+                    android:format12Hour="@string/keyguard_widget_12_hours_format"
+                    android:format24Hour="@string/keyguard_widget_24_hours_format" />
+
+                <com.android.keyguard.darkkat.KeyguardWeatherWidgetHourForecast
+                    android:id="@+id/weather_widget_hour_forecast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal" />
+
+                <com.android.keyguard.darkkat.KeyguardWeatherWidgetDayForecast
+                    android:id="@+id/weather_widget_day_forecast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal" />
+
+            </LinearLayout>
+        </com.android.keyguard.darkkat.KeyguardWidgetScroller>
 
         <include layout="@layout/keyguard_status_area"
                 android:id="@+id/keyguard_status_area" />
