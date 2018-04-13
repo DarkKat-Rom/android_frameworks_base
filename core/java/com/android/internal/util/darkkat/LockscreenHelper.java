@@ -26,6 +26,21 @@ public class LockscreenHelper {
     public static final int BATTERY_STATUS_TYPE_CHARGING             = 2;
     public static final int BATTERY_STATUS_TYPE_DISCHARGING_CHARGING = 3;
 
+    public static boolean showWidgets(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_SHOW_WIDGETS, 0) == 1;
+    }
+
+    public static boolean showWeatherWidgetHourForecast(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_WIDGETS_SHOW_WEATHER_HOUR_FORECAST, 0) == 1;
+    }
+
+    public static boolean showWeatherWidgetDayForecast(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.LOCK_SCREEN_WIDGETS_SHOW_WEATHER_DAY_FORECAST, 0) == 1;
+    }
+
     public static boolean showWeather(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.LOCK_SCREEN_STATUS_AREA_SHOW_WEATHER, 0) == 1;

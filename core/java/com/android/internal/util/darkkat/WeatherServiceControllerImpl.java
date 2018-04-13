@@ -51,6 +51,7 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
     private static final Uri SETTINGS_URI
             = Uri.parse("content://net.darkkatrom.dkweather.provider/settings");
     private static final String[] WEATHER_PROJECTION = new String[] {
+            "type",
             "city",
             "condition",
             "condition_code",
@@ -67,12 +68,28 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
             "formatted_snow1h",
             "formatted_snow3h",
             "time_stamp",
-            "forecast_condition",
-            "forecast_condition_code",
-            "forecast_temperature_low",
-            "forecast_temperature_high",
-            "forecast_formatted_temperature_low",
-            "forecast_formatted_temperature_high"
+            "sunrise",
+            "sunset",
+            "dayforecast_condition",
+            "dayforecast_condition_code",
+            "dayforecast_temperature_low",
+            "dayforecast_temperature_high",
+            "dayforecast_formatted_temperature_low",
+            "dayforecast_formatted_temperature_high",
+            "dayforecast_formatted_temperature_morning",
+            "dayforecast_formatted_temperature_day",
+            "dayforecast_formatted_temperature_evening",
+            "dayforecast_formatted_temperature_night",
+            "hourforecast_condition",
+            "hourforecast_condition_code",
+            "hourforecast_formatted_temperature",
+            "hourforecast_formatted_humidity",
+            "hourforecast_formatted_wind",
+            "hourforecast_formatted_pressure",
+            "hourforecast_formatted_rain",
+            "hourforecast_formatted_snow",
+            "hourforecast_day",
+            "hourforecast_time"
     };
     private static final String[] SETTINGS_PROJECTION = new String[] {
             "enabled",
@@ -80,6 +97,9 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
     };
 
     private static final boolean DEBUG = false;
+
+    private static final int TYPE_CURRENT_WEATHER = 1;
+    private static final int TYPE_DAYFORECAST = 2;
 
     private final Context mContext;
     private final Handler mHandler;
@@ -148,49 +168,77 @@ public class WeatherServiceControllerImpl implements WeatherServiceController {
             try {
                 if (c.getCount() > 0) {
                     List<DayForecast> forecastList = new ArrayList<DayForecast>();
-                    for (int i = 0; i < 6; i++) {
+                    List<HourForecast> hourForecastList = new ArrayList<HourForecast>();
+                    for (int i = 0; i < c.getCount(); i++) {
                         c.moveToPosition(i);
-                        if (i == 0) {
-                            mCachedInfo.city = c.getString(0);
-                            mCachedInfo.condition = c.getString(1);
-                            mCachedInfo.conditionCode = c.getInt(2);
+                        int type = c.getInt(0);
+                        if (type == TYPE_CURRENT_WEATHER) {
+                            mCachedInfo.city = c.getString(1);
+                            mCachedInfo.condition = c.getString(2);
+                            mCachedInfo.conditionCode = c.getInt(3);
                             mCachedInfo.conditionDrawableMonochrome = getIcon(mCachedInfo.conditionCode,
                                     WeatherHelper.ICON_MONOCHROME);
                             mCachedInfo.conditionDrawableColored = getIcon(mCachedInfo.conditionCode,
                                     WeatherHelper.ICON_COLORED);
                             mCachedInfo.conditionDrawableVClouds = getIcon(mCachedInfo.conditionCode,
                                     WeatherHelper.ICON_VCLOUDS);
-                            mCachedInfo.formattedTemperature = c.getString(3);
-                            mCachedInfo.temperatureLow = c.getString(4);
-                            mCachedInfo.temperatureHigh = c.getString(5);
-                            mCachedInfo.formattedTemperatureLow = c.getString(6);
-                            mCachedInfo.formattedTemperatureHigh = c.getString(7);
-                            mCachedInfo.formattedHumidity = c.getString(8);
-                            mCachedInfo.formattedWind = c.getString(9);
-                            mCachedInfo.formattedPressure = c.getString(10);
-                            mCachedInfo.formattedRain1H = c.getString(11);
-                            mCachedInfo.formattedRain3H = c.getString(12);
-                            mCachedInfo.formattedSnow1H = c.getString(13);
-                            mCachedInfo.formattedSnow3H = c.getString(14);
-                            mCachedInfo.timestamp = c.getString(15);
-                        } else {
+                            mCachedInfo.formattedTemperature = c.getString(4);
+                            mCachedInfo.temperatureLow = c.getString(5);
+                            mCachedInfo.temperatureHigh = c.getString(6);
+                            mCachedInfo.formattedTemperatureLow = c.getString(7);
+                            mCachedInfo.formattedTemperatureHigh = c.getString(8);
+                            mCachedInfo.formattedHumidity = c.getString(9);
+                            mCachedInfo.formattedWind = c.getString(10);
+                            mCachedInfo.formattedPressure = c.getString(11);
+                            mCachedInfo.formattedRain1H = c.getString(12);
+                            mCachedInfo.formattedRain3H = c.getString(13);
+                            mCachedInfo.formattedSnow1H = c.getString(14);
+                            mCachedInfo.formattedSnow3H = c.getString(15);
+                            mCachedInfo.timestamp = c.getString(16);
+                            mCachedInfo.sunrise = c.getString(17);
+                            mCachedInfo.sunset = c.getString(18);
+                        } else if (type == TYPE_DAYFORECAST) {
                             DayForecast day = new DayForecast();
-                            day.condition = c.getString(16);
-                            day.conditionCode = c.getInt(17);
+                            day.condition = c.getString(19);
+                            day.conditionCode = c.getInt(20);
                             day.conditionDrawableMonochrome = getIcon(day.conditionCode,
                                     WeatherHelper.ICON_MONOCHROME);
                             day.conditionDrawableColored = getIcon(day.conditionCode,
                                     WeatherHelper.ICON_COLORED);
                             day.conditionDrawableVClouds = getIcon(day.conditionCode,
                                     WeatherHelper.ICON_VCLOUDS);
-                            day.temperatureLow = c.getString(18);
-                            day.temperatureHigh = c.getString(19);
-                            day.formattedTemperatureLow = c.getString(20);
-                            day.formattedTemperatureHigh = c.getString(21);
+                            day.temperatureLow = c.getString(21);
+                            day.temperatureHigh = c.getString(22);
+                            day.formattedTemperatureLow = c.getString(23);
+                            day.formattedTemperatureHigh = c.getString(24);
+                            day.formattedTemperatureMorning = c.getString(25);
+                            day.formattedTemperatureDay = c.getString(26);
+                            day.formattedTemperatureEvening = c.getString(27);
+                            day.formattedTemperatureNight = c.getString(28);
                             forecastList.add(day);
+                        } else {
+                            HourForecast hour = new HourForecast();
+                            hour.condition = c.getString(29);
+                            hour.conditionCode = c.getInt(30);
+                            hour.conditionDrawableMonochrome = getIcon(hour.conditionCode,
+                                    WeatherHelper.ICON_MONOCHROME);
+                            hour.conditionDrawableColored = getIcon(hour.conditionCode,
+                                    WeatherHelper.ICON_COLORED);
+                            hour.conditionDrawableVClouds = getIcon(hour.conditionCode,
+                                    WeatherHelper.ICON_VCLOUDS);
+                            hour.formattedTemperature = c.getString(31);
+                            hour.formattedHumidity = c.getString(32);
+                            hour.formattedWind = c.getString(33);
+                            hour.formattedPressure = c.getString(34);
+                            hour.formattedRain = c.getString(35);
+                            hour.formattedSnow = c.getString(36);
+                            hour.day = c.getString(37);
+                            hour.time = c.getString(38);
+                            hourForecastList.add(hour);
                         }
                     }
                     mCachedInfo.forecasts = forecastList;
+                    mCachedInfo.hourforecasts = hourForecastList;
                 }
             } finally {
                 c.close();
