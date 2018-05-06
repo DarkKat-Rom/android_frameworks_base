@@ -76,14 +76,4 @@ public class WeatherHelper {
                 WeatherServiceControllerImpl.PACKAGE_NAME + ".activities.AppSettingsActivity");
         return settings;
     }
-
-    public static boolean detailedWeatherShowLocation(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.DETAILED_WEATHER_SHOW_LOCATION, 1) == 1;
-    }
-
-    public static int getDetailedWeatherConditionIconType(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.DETAILED_WEATHER_CONDITION_ICON, ICON_MONOCHROME);
-    }
 }

@@ -4045,22 +4045,6 @@ public final class Settings {
                 "status_bar_battery_text_color_dark_mode";
 
         /**
-         * Wether to show the location in the detailed weather view
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_SHOW_LOCATION = "detailed_weather_show_location";
-
-        /**
-         * Condition icon on the detailed weather view
-         * 0 - Monochrome
-         * 1 - Colored
-         * 2 - VClouds
-         * default: 0
-         * @hide
-         */
-        public static final String DETAILED_WEATHER_CONDITION_ICON = "detailed_weather_condition_icon";
-
-        /**
          *  Whether to show the music visualizer on the lock screen
          * @hide
          */
