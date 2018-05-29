@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
@@ -50,6 +51,7 @@ import android.view.animation.Interpolator;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.NotificationColorUtil;
+import com.android.internal.util.darkkat.LockScreenColorHelper;
 import com.android.internal.util.darkkat.StatusBarColorHelper;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
@@ -530,7 +532,12 @@ public class StatusBarIconView extends AnimatedImageView implements DarkReceiver
     }
 
     private void updateDecorColor() {
-        int color = NotificationUtils.interpolateColors(mDecorColor, Color.WHITE, mDarkAmount);
+        updateDecorColor(false);
+    }
+
+    private void updateDecorColor(boolean isOnShelf) {
+        int color = NotificationUtils.interpolateColors(mDecorColor, isOnShelf
+                ? getAmbientColor() : Color.WHITE, mDarkAmount);
         if (mDotPaint.getColor() != color) {
             mDotPaint.setColor(color);
 
@@ -538,6 +545,18 @@ public class StatusBarIconView extends AnimatedImageView implements DarkReceiver
                 invalidate();
             }
         }
+    }
+
+    /**
+     * Set the static color that should be used for the drawable of this icon if it's not
+     * transitioning this also immediately sets the color.
+     */
+    public void setStaticDrawableColor() {
+        mDrawableColor = getAmbientColor();
+        setColorInternal(getAmbientColor());
+        updateContrastedStaticColor();
+        mIconColor = getAmbientColor();
+        mDozer.setColor(getAmbientColor());
     }
 
     /**
@@ -558,19 +577,48 @@ public class StatusBarIconView extends AnimatedImageView implements DarkReceiver
     }
 
     private void updateIconColor() {
+        updateIconColor(false);
+    }
+
+    private void updateIconColor(boolean isOnShelf) {
+        int color;
         if (mCurrentSetColor != NO_COLOR) {
-            if (mMatrixColorFilter == null) {
-                mMatrix = new float[4 * 5];
-                mMatrixColorFilter = new ColorMatrixColorFilter(mMatrix);
+            if (isOnShelf) {
+                color = NotificationUtils.interpolateColors(
+                        mCurrentSetColor, getAmbientColor(), mDarkAmount);
+
+                Drawable imageDrawable = getDrawable();
+                if (imageDrawable != null) {
+                    Drawable d = imageDrawable.mutate();
+                    d.setColorFilter(null);
+                    d.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                }
+            } else {
+                if (mMatrixColorFilter == null) {
+                    mMatrix = new float[4 * 5];
+                    mMatrixColorFilter = new ColorMatrixColorFilter(mMatrix);
+                }
+                color = NotificationUtils.interpolateColors(
+                        mCurrentSetColor, Color.WHITE, mDarkAmount);
+                updateTintMatrix(mMatrix, color, DARK_ALPHA_BOOST * mDarkAmount);
+                mMatrixColorFilter.setColorMatrixArray(mMatrix);
+                setColorFilter(mMatrixColorFilter);
+                invalidate();  // setColorFilter only invalidates if the filter instance changed.
             }
-            int color = NotificationUtils.interpolateColors(
-                    mCurrentSetColor, Color.WHITE, mDarkAmount);
-            updateTintMatrix(mMatrix, color, DARK_ALPHA_BOOST * mDarkAmount);
-            mMatrixColorFilter.setColorMatrixArray(mMatrix);
-            setColorFilter(mMatrixColorFilter);
-            invalidate();  // setColorFilter only invalidates if the filter instance changed.
         } else {
-            mDozer.updateGrayscale(this, mDarkAmount);
+            if (isOnShelf) {
+                color = NotificationUtils.interpolateColors(
+                        0xff000000, getAmbientColor(), mDarkAmount);
+
+                Drawable imageDrawable = getDrawable();
+                if (imageDrawable != null) {
+                    Drawable d = imageDrawable.mutate();
+                    d.setColorFilter(null);
+                    d.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                }
+            } else {
+                mDozer.updateGrayscale(this, mDarkAmount);
+            }
         }
     }
 
@@ -785,11 +833,15 @@ public class StatusBarIconView extends AnimatedImageView implements DarkReceiver
     }
 
     public void setDark(boolean dark, boolean fade, long delay) {
+        setDark(dark, fade, delay, false);
+    }
+
+    public void setDark(boolean dark, boolean fade, long delay, boolean isOnShelf) {
         mDozer.setIntensityDark(f -> {
             mDarkAmount = f;
             updateIconScale();
-            updateDecorColor();
-            updateIconColor();
+            updateDecorColor(isOnShelf);
+            updateIconColor(isOnShelf);
             updateAllowAnimation();
         }, dark, fade, delay);
     }
@@ -843,6 +895,10 @@ public class StatusBarIconView extends AnimatedImageView implements DarkReceiver
 
     public void executeOnLayout(Runnable runnable) {
         mLayoutRunnable = runnable;
+    }
+
+    private int getAmbientColor() {
+        return LockScreenColorHelper.getIconColorDark(mContext);
     }
 
     public interface OnVisibilityChangedListener {
