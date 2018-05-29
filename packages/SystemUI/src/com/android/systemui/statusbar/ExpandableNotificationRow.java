@@ -385,17 +385,21 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
         boolean isPreL = Boolean.TRUE.equals(expandedIcon.getTag(R.id.icon_is_pre_L));
         boolean colorize = !isPreL || NotificationUtils.isGrayscale(expandedIcon,
                 NotificationColorUtil.getInstance(mContext));
-        int color = StatusBarIconView.NO_COLOR;
-        if (colorize) {
-            NotificationHeaderView header = getVisibleNotificationHeader();
-            if (header != null) {
-                color = header.getOriginalIconColor();
-            } else {
-                color = mEntry.getContrastedColor(mContext, mIsLowPriority && !isExpanded(),
-                        getBackgroundColorWithoutTint());
+        if (mDark && colorize) {
+            expandedIcon.setDark(true, false, 0, true);
+        } else {
+            int color = StatusBarIconView.NO_COLOR;
+            if (colorize) {
+                NotificationHeaderView header = getVisibleNotificationHeader();
+                if (header != null) {
+                    color = header.getOriginalIconColor();
+                } else {
+                    color = mEntry.getContrastedColor(mContext, mIsLowPriority && !isExpanded(),
+                            getBackgroundColorWithoutTint());
+                }
             }
+            expandedIcon.setStaticDrawableColor(color);
         }
-        expandedIcon.setStaticDrawableColor(color);
     }
 
     public void setAboveShelfChangedListener(AboveShelfChangedListener aboveShelfChangedListener) {

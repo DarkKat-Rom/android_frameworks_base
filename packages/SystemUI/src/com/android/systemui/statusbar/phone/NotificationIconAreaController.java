@@ -156,6 +156,7 @@ public class NotificationIconAreaController implements DarkReceiver {
                 NotificationShelf.SHOW_AMBIENT_ICONS);
 
         applyNotificationIconsTint();
+        mShelfIcons.setDarkIfAmbient();
     }
 
     /**

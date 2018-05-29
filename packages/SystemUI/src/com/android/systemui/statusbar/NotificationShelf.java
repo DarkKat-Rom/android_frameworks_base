@@ -94,6 +94,7 @@ public class NotificationShelf extends ActivatableNotificationView implements
     protected void onFinishInflate() {
         super.onFinishInflate();
         mShelfIcons = findViewById(R.id.content);
+        mShelfIcons.setIsShelf(true);
         mShelfIcons.setClipChildren(false);
         mShelfIcons.setClipToPadding(false);
 

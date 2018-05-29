@@ -125,6 +125,8 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
     private ArrayMap<String, ArrayList<StatusBarIcon>> mReplacingIcons;
     private int mDarkOffsetX;
 
+    private boolean mIsShelf = false;
+
     public NotificationIconContainer(Context context, AttributeSet attrs) {
         super(context, attrs);
         initDimens();
@@ -210,7 +212,7 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
             }
         }
         if (mDark && child instanceof StatusBarIconView) {
-            ((StatusBarIconView) child).setDark(mDark, false, 0);
+            ((StatusBarIconView) child).setDark(mDark, false, 0, mIsShelf);
         }
     }
 
@@ -467,9 +469,16 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof StatusBarIconView) {
-                ((StatusBarIconView) view).setDark(dark, fade, delay);
+                ((StatusBarIconView) view).setDark(dark, fade, delay, mIsShelf);
             }
         }
+    }
+
+    public void setDarkIfAmbient() {
+        if (!mDark) {
+            return;
+        }
+        setDark(true, false, 0);
     }
 
     public IconState getIconState(StatusBarIconView icon) {
@@ -525,6 +534,10 @@ public class NotificationIconContainer extends AlphaOptimizedFrameLayout {
 
     public void setReplacingIcons(ArrayMap<String, ArrayList<StatusBarIcon>> replacingIcons) {
         mReplacingIcons = replacingIcons;
+    }
+
+    public void setIsShelf(boolean isShelf) {
+        mIsShelf = isShelf;
     }
 
     public class IconState extends ViewState {
