@@ -511,8 +511,8 @@ public class KeyguardIndicationController {
     }
 
     private int getNormalTextColor() {
-        final boolean lockDarkText = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
-        return lockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
+        final boolean isThemeLight = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
+        return isThemeLight && !mDozing ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
                 : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
     }
 

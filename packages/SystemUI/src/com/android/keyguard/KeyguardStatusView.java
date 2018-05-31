@@ -80,7 +80,6 @@ public class KeyguardStatusView extends GridLayout implements
     private int mTextColorPrimary;
     private int mTextColorSecondary;
     private int mIconColor;
-    private boolean mLockDarkText = false;
 
     private int mActiveWidget = KeyguardWidgetScroller.TIME_WIDGET;
 
@@ -188,39 +187,23 @@ public class KeyguardStatusView extends GridLayout implements
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mLockDarkText = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
-        mTextColorPrimary = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
-                : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
-        mTextColorSecondary = mLockDarkText ? LockScreenColorHelper.getSecondaryTextColorLight(mContext)
-                : LockScreenColorHelper.getSecondaryTextColorDark(mContext);
-
-        mIconColor = mLockDarkText ? LockScreenColorHelper.getNormalIconColorLight(mContext)
-                : LockScreenColorHelper.getNormalIconColorDark(mContext);
-
         mClockContainer = findViewById(R.id.keyguard_clock_container);
         mAlarmStatusView = findViewById(R.id.alarm_status);
-        mAlarmStatusView.setTextColor(mTextColorSecondary);
-        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(mTextColorSecondary));
         mWeatherStatusView = findViewById(R.id.weather_status);
-        mWeatherStatusView.setTextColor(mTextColorSecondary);
         mDateView = findViewById(R.id.date_view);
-        mDateView.setTextColor(mTextColorPrimary);
         mKeyguardWidgetScroller = (KeyguardWidgetScroller) findViewById(R.id.widget_scroller);
         mClockView = findViewById(R.id.clock_view);
-        mClockView.setTextColor(mTextColorPrimary);
         mClockView.setShowCurrentUserTime(true);
         if (KeyguardClockAccessibilityDelegate.isNeeded(mContext)) {
             mClockView.setAccessibilityDelegate(new KeyguardClockAccessibilityDelegate(mContext));
         }
         mWeatherWidgetHourForecast =
                 (KeyguardWeatherWidget) findViewById(R.id.weather_widget_hour_forecast);
-        mWeatherWidgetHourForecast.setColors(mTextColorPrimary, mIconColor, mTextColorSecondary);
         mWeatherWidgetDayForecast =
                 (KeyguardWeatherWidget) findViewById(R.id.weather_widget_day_forecast);
-        mWeatherWidgetDayForecast.setColors(mTextColorPrimary, mIconColor, mTextColorSecondary);
         mOwnerInfo = findViewById(R.id.owner_info);
-        mOwnerInfo.setTextColor(mTextColorSecondary);
         mKeyguardStatusArea = findViewById(R.id.keyguard_status_area);
+        updateColors();
         mVisibleInDoze = new View[]{mKeyguardWidgetScroller, mKeyguardStatusArea};
         boolean shouldMarquee = KeyguardUpdateMonitor.getInstance(mContext).isDeviceInteractive();
         setEnableMarquee(shouldMarquee);
@@ -445,28 +428,8 @@ public class KeyguardStatusView extends GridLayout implements
         if (mOwnerInfo != null) {
             mOwnerInfo.setAlpha(dark ? 0 : 1);
         }
-
+        updateColors();
         updateDozeVisibleViews();
-
-        final int textColorPrimaryDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
-        final int textColorSecondaryDark = LockScreenColorHelper.getSecondaryTextColorDark(mContext);
-        final int iconColorDark = LockScreenColorHelper.getNormalIconColorDark(mContext);
-        final int blendedTextColorPrimary =
-                ColorUtils.blendARGB(mTextColorPrimary, textColorPrimaryDark, darkAmount);
-        final int blendedTextColorSecondary =
-                ColorUtils.blendARGB(mTextColorSecondary, textColorSecondaryDark, darkAmount);
-        final int blendedIconColor =
-                ColorUtils.blendARGB(mIconColor, iconColorDark, darkAmount);
-
-        mClockView.setTextColor(blendedTextColorPrimary);
-        mWeatherWidgetHourForecast.setColors(blendedTextColorPrimary, blendedIconColor,
-                blendedTextColorSecondary);
-        mWeatherWidgetDayForecast.setColors(blendedTextColorPrimary, blendedIconColor,
-                blendedTextColorSecondary);
-        mDateView.setTextColor(blendedTextColorPrimary);
-        mAlarmStatusView.setTextColor(blendedTextColorSecondary);
-        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(blendedTextColorSecondary));
-        mWeatherStatusView.setTextColor(blendedTextColorSecondary);
     }
 
     public void setWeatherServiceController(WeatherServiceController weatherServiceController) {
@@ -486,19 +449,39 @@ public class KeyguardStatusView extends GridLayout implements
     }
 
     private void updateColors() {
-        mTextColorPrimary = mLockDarkText ? LockScreenColorHelper.getPrimaryTextColorLight(mContext)
-                : LockScreenColorHelper.getPrimaryTextColorDark(mContext);
-        mTextColorSecondary = mLockDarkText ? LockScreenColorHelper.getSecondaryTextColorLight(mContext)
-                : LockScreenColorHelper.getSecondaryTextColorDark(mContext);
-        mIconColor = mLockDarkText ? LockScreenColorHelper.getNormalIconColorLight(mContext)
-                : LockScreenColorHelper.getNormalIconColorDark(mContext);
-        mAlarmStatusView.setTextColor(mTextColorSecondary);
-        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(mTextColorSecondary));
-        mWeatherStatusView.setTextColor(mTextColorSecondary);
-        mDateView.setTextColor(mTextColorPrimary);
+        final boolean isThemeLight = mContext.getThemeResId() == R.style.Theme_SystemUI_Light;
+        final int textColorPrimaryLight = LockScreenColorHelper.getPrimaryTextColorLight(mContext);
+        final int textColorSecondaryLight = LockScreenColorHelper.getSecondaryTextColorLight(mContext);
+        final int iconColorLight = LockScreenColorHelper.getNormalIconColorLight(mContext);
+        final int textColorPrimaryDark = LockScreenColorHelper.getPrimaryTextColorDark(mContext);
+        final int textColorSecondaryDark = LockScreenColorHelper.getSecondaryTextColorDark(mContext);
+        final int iconColorDark = LockScreenColorHelper.getNormalIconColorDark(mContext);
+
+        if (isThemeLight) {
+            if (mDarkAmount > 0) {
+                mTextColorPrimary =
+                        ColorUtils.blendARGB(textColorPrimaryLight, textColorPrimaryDark, mDarkAmount);
+                mTextColorSecondary =
+                        ColorUtils.blendARGB(textColorSecondaryLight, textColorSecondaryDark, mDarkAmount);
+                mIconColor = ColorUtils.blendARGB(iconColorLight, iconColorDark, mDarkAmount);
+            } else {
+                mTextColorPrimary = textColorPrimaryLight;
+                mTextColorSecondary = textColorSecondaryLight;
+                mIconColor = iconColorLight;
+            }
+        } else {
+            mTextColorPrimary = textColorPrimaryDark;
+            mTextColorSecondary = textColorSecondaryDark;
+            mIconColor = iconColorDark;
+        }
+
         mClockView.setTextColor(mTextColorPrimary);
         mWeatherWidgetHourForecast.setColors(mTextColorPrimary, mIconColor, mTextColorSecondary);
         mWeatherWidgetDayForecast.setColors(mTextColorPrimary, mIconColor, mTextColorSecondary);
+        mDateView.setTextColor(mTextColorPrimary);
+        mAlarmStatusView.setTextColor(mTextColorSecondary);
+        mAlarmStatusView.setCompoundDrawableTintList(ColorStateList.valueOf(mTextColorSecondary));
+        mWeatherStatusView.setTextColor(mTextColorSecondary);
         mOwnerInfo.setTextColor(mTextColorSecondary);
     }
 
