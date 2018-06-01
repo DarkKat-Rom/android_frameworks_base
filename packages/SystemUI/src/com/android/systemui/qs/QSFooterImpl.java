@@ -75,7 +75,9 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
     private ActivityStarter mActivityStarter;
     private NextAlarmController mNextAlarmController;
     private UserInfoController mUserInfoController;
+    private ImageView mDKSettingsButton;
     private SettingsButton mSettingsButton;
+    protected View mDKSettingsContainer;
     protected View mSettingsContainer;
 
     private TextView mAlarmStatus;
@@ -123,8 +125,11 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
         mDate = findViewById(R.id.date);
 
         mExpandIndicator = findViewById(R.id.expand_indicator);
+        mDKSettingsButton = findViewById(R.id.dk_settings_button);
         mSettingsButton = findViewById(R.id.settings_button);
+        mDKSettingsContainer = findViewById(R.id.dk_settings_button_container);
         mSettingsContainer = findViewById(R.id.settings_button_container);
+        mDKSettingsButton.setOnClickListener(this);
         mSettingsButton.setOnClickListener(this);
 
         mAlarmStatusCollapsed = findViewById(R.id.alarm_status_collapsed);
@@ -136,6 +141,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
 
         // RenderThread is doing more harm than good when touching the header (to expand quick
         // settings), so disable it for this view
+        ((RippleDrawable) mDKSettingsButton.getBackground()).setForceSoftware(true);
         ((RippleDrawable) mSettingsButton.getBackground()).setForceSoftware(true);
         ((RippleDrawable) mExpandIndicator.getBackground()).setForceSoftware(true);
 
@@ -156,7 +162,9 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
         int defSpace = mContext.getResources().getDimensionPixelOffset(R.dimen.default_gear_space);
 
         mAnimator = new Builder()
+                .addFloat(mDKSettingsContainer, "translationX", -(remaining - defSpace), 0)
                 .addFloat(mSettingsContainer, "translationX", -(remaining - defSpace), 0)
+                .addFloat(mDKSettingsButton, "rotation", -360, 0)
                 .addFloat(mSettingsButton, "rotation", -120, 0)
                 .build();
         if (mAlarmShowing) {
@@ -345,7 +353,14 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
 
     @Override
     public void onClick(View v) {
-        if (v == mSettingsButton) {
+        if (v == mDKSettingsButton) {
+            if (!Dependency.get(DeviceProvisionedController.class).isCurrentUserSetup()) {
+                // If user isn't setup just unlock the device and dump them back at SUW.
+                mActivityStarter.postQSRunnableDismissingKeyguard(() -> { });
+                return;
+            }
+            startDKSettingsActivity();
+        } else if (v == mSettingsButton) {
             if (!Dependency.get(DeviceProvisionedController.class).isCurrentUserSetup()) {
                 // If user isn't setup just unlock the device and dump them back at SUW.
                 mActivityStarter.postQSRunnableDismissingKeyguard(() -> { });
@@ -383,6 +398,11 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
                         AlarmClock.ACTION_SHOW_ALARMS), 0);
             }
         }
+    }
+
+    private void startDKSettingsActivity() {
+        mActivityStarter.startActivity(mContext.getPackageManager()
+                .getLaunchIntentForPackage("net.darkkatrom.dksettings"), true /* dismissShade */);
     }
 
     private void startSettingsActivity() {
