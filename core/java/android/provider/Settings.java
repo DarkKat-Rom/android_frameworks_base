@@ -6898,6 +6898,24 @@ public final class Settings {
         public static final String UI_DAY_THEME = "ui_day_theme";
 
         /**
+         * Wether to customize theme colors
+         * @hide
+         */
+        public static final String CUSTOMIZE_THEME_COLORS = "customize_theme_colors";
+
+        /**
+         * Color to use for the theme primary color
+         * @hide
+         */
+        public static final String THEME_PRIMARY_COLOR = "theme_primnary_color";
+
+        /**
+         * Wether to colorize the navigation bar background using the theme primary color
+         * @hide
+         */
+        public static final String COLORIZE_NAVIGATION_BAR = "colorize_navigation_bar";
+
+        /**
          * Wether to use an optional light status and action bar
          * Supported themes:
          * Theme.Material.Light (Whiteout-DarkKat version)
