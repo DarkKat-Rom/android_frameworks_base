@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018 DarkKat
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+
+    <!-- Variant of the Theme.Material.DayNight that has a light action bar background with dark
+         action bar contents. -->
+    <style name="Theme.Material.DayNight.LightActionBar" parent="Theme.Material.DayNight">
+        <item name="android:actionBarTheme">@style/ThemeOverlay.Material.DayNight.LightActionBar</item>
+    </style>
+
+    <!-- Variant of the Theme.Material.DayNight.LightActionBar that has a light status bar background
+         with dark status bar contents. -->
+    <style name="Theme.Material.DayNight.LightStatusBar" parent="Theme.Material.DayNight.LightActionBar">
+        <item name="colorPrimaryDark">@color/primary_dark_material_light_light_status_bar</item>
+        <item name="windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.Material.DayNight that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.Material.DayNight.LightNavigationBar" parent="Theme.Material.DayNight">
+        <item name="navigationBarColor">@color/primary_material_light</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.Material.DayNight.DarkActionBar that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar" parent="Theme.Material.DayNight">
+        <item name="navigationBarColor">@color/primary_material_light</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.Material.DayNight.LightActionBar that has a light navigation bar background
+         with dark navigation bar contents. -->
+    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar" parent="Theme.Material.DayNight.LightActionBar">
+        <item name="navigationBarColor">@color/primary_material_light</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.Material.DayNight.LightStatusBar that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" parent="Theme.Material.DayNight.LightStatusBar">
+        <item name="navigationBarColor">@color/primary_dark_material_light_light_status_bar</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+</resources>

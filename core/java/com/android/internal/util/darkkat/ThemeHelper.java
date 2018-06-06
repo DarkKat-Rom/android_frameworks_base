@@ -44,6 +44,14 @@ public class ThemeHelper {
                 Settings.Secure.UI_NIGHT_THEME, UiModeManager.MODE_NIGHT_YES);
     }
 
+    public static boolean isBlackoutTheme(Context context) {
+        return getTheme(context) == UiModeManager.MODE_NIGHT_YES_BLACKOUT;
+    }
+
+    public static boolean isWhiteoutTheme(Context context) {
+        return getTheme(context) == UiModeManager.MODE_NIGHT_NO_WHITEOUT;
+    }
+
     public static boolean themeSupportsOptionalĹightSB(Context context) {
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(
                 Context.UI_MODE_SERVICE);
