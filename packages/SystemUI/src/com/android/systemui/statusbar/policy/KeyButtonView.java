@@ -44,6 +44,7 @@ import android.widget.ImageView;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.darkkat.NavigationBarColorHelper;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.plugins.statusbar.phone.NavBarButtonProvider.ButtonInterface;
@@ -303,6 +304,20 @@ public class KeyButtonView extends ImageView implements ButtonInterface {
     @Override
     public void setVertical(boolean vertical) {
         //no op
+    }
+
+    @Override
+    public void updateColors() {
+        Drawable drawable = getDrawable();
+        if (drawable != null) {
+            int colorLight = NavigationBarColorHelper.getIconColorLightMode(getContext());
+            int colorDark = NavigationBarColorHelper.getIconColorDarkMode(getContext());
+            ((KeyButtonDrawable) getDrawable()).updateColors(colorLight, colorDark);
+
+            // Since we reuse the same drawable for multiple views, we need to invalidate the view
+            // manually.
+            invalidate();
+        }
     }
 }
 

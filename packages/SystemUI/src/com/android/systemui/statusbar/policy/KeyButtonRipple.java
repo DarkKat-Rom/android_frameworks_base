@@ -31,6 +31,8 @@ import android.view.RenderNodeAnimator;
 import android.view.View;
 import android.view.animation.Interpolator;
 
+import com.android.internal.util.darkkat.NavigationBarColorHelper;
+
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 
@@ -45,6 +47,7 @@ public class KeyButtonRipple extends Drawable {
     private static final int ANIMATION_DURATION_SCALE = 350;
     private static final int ANIMATION_DURATION_FADE = 450;
 
+    private Context mContext;
     private Paint mRipplePaint;
     private CanvasProperty<Float> mLeftProp;
     private CanvasProperty<Float> mTopProp;
@@ -69,6 +72,7 @@ public class KeyButtonRipple extends Drawable {
     private final ArrayList<Animator> mTmpArray = new ArrayList<>();
 
     public KeyButtonRipple(Context ctx, View targetView) {
+        mContext = ctx;
         mMaxWidth =  ctx.getResources().getDimensionPixelSize(R.dimen.key_button_ripple_max_width);
         mTargetView = targetView;
     }
@@ -81,9 +85,21 @@ public class KeyButtonRipple extends Drawable {
         if (mRipplePaint == null) {
             mRipplePaint = new Paint();
             mRipplePaint.setAntiAlias(true);
-            mRipplePaint.setColor(mLastDark ? 0xff000000 : 0xffffffff);
+            mRipplePaint.setColor(getColor());
         }
+        mRipplePaint.setColor(getColor());
         return mRipplePaint;
+    }
+
+    private int getColor() {
+        boolean iconColorForRipple = NavigationBarColorHelper.iconColorForRipple(mContext);
+        int colorLight = iconColorForRipple
+                ? NavigationBarColorHelper.getIconColorLightMode(mContext)
+                : NavigationBarColorHelper.getRippleColorLightMode(mContext);
+        int colorDark = iconColorForRipple
+                ? NavigationBarColorHelper.getIconColorDarkMode(mContext)
+                : NavigationBarColorHelper.getRippleColorDarkMode(mContext);
+        return mLastDark ? colorDark : colorLight;
     }
 
     private void drawSoftware(Canvas canvas) {

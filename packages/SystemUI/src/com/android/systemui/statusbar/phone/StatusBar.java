@@ -4842,6 +4842,12 @@ public class StatusBar extends SystemUI implements DemoMode,
         mKeyguardStatusBar.updateColors();
     }
 
+    private void updateNavigationBarColors() {
+        if (getNavigationBarView() != null) {
+            getNavigationBarView().updateColors();
+        }
+    }
+
     private void setThemeOverlay(String packageName) {
         setThemeOverlay(packageName, true);
     }
@@ -6038,6 +6044,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR_LIGHT_MODE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR_DARK_MODE),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -6069,6 +6081,11 @@ public class StatusBar extends SystemUI implements DemoMode,
                 || uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR_DARK_MODE))) {
                 updateStatusbarColors();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR_LIGHT_MODE))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_ICON_COLOR_DARK_MODE))) {
+                updateNavigationBarColors();
             }
         }
     }
