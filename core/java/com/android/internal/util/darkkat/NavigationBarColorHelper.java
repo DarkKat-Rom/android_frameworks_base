@@ -16,12 +16,8 @@
 
 package com.android.internal.util.darkkat;
 
-import android.animation.ArgbEvaluator;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.provider.Settings;
-import android.view.View;
 
 public class NavigationBarColorHelper {
 
