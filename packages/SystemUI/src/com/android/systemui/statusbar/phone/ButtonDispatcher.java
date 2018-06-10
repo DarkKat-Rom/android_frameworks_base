@@ -94,6 +94,7 @@ public class ButtonDispatcher {
         final int N = mViews.size();
         for (int i = 0; i < N; i++) {
             ((ButtonInterface) mViews.get(i)).setImageDrawable(mImageDrawable);
+            ((ButtonInterface) mViews.get(i)).updateColors();
         }
     }
 
@@ -127,6 +128,13 @@ public class ButtonDispatcher {
         final int N = mViews.size();
         for (int i = 0; i < N; i++) {
             ((ButtonInterface) mViews.get(i)).setDarkIntensity(darkIntensity);
+        }
+    }
+
+    public void updateColors() {
+        final int N = mViews.size();
+        for (int i = 0; i < N; i++) {
+            ((ButtonInterface) mViews.get(i)).updateColors();
         }
     }
 

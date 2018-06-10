@@ -4045,6 +4045,41 @@ public final class Settings {
                 "status_bar_battery_text_color_dark_mode";
 
         /**
+         * Whether to use the icon color for the ripple effecton the navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_ICON_COLOR_FOR_RIPPLE =
+                "navigation_bar_icon_color_for_ripple";
+
+        /**
+         * Color of the icons on the navigation bar, (light mode)
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_ICON_COLOR_LIGHT_MODE =
+                "navigation_bar_icon_color_light_mode";
+
+        /**
+         * Color of the ripple effect on the navigation bar, (light mode)
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_RIPPLE_COLOR_LIGHT_MODE =
+            "navigation_bar_ripple_color_light_mode";
+
+        /**
+         * Color of the icons on the navigation bar, (dark mode)
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_ICON_COLOR_DARK_MODE =
+            "navigation_bar_icon_color_dark_mode";
+
+        /**
+         * Color of the ripple effect on the navigation bar, (dark mode)
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_RIPPLE_COLOR_DARK_MODE =
+            "navigation_bar_ripple_color_dark_mode";
+
+        /**
          *  Whether to show the music visualizer on the lock screen
          * @hide
          */

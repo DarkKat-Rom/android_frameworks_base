@@ -300,6 +300,12 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         return mButtonDispatchers;
     }
 
+    public void updateColors() {
+        for (int i = 0; i < mButtonDispatchers.size(); i++) {
+            mButtonDispatchers.valueAt(i).updateColors();
+        }
+    }
+
     private void updateCarModeIcons(Context ctx) {
         mBackCarModeIcon = getDrawable(ctx,
                 R.drawable.ic_sysbar_back_carmode, R.drawable.ic_sysbar_back_carmode);

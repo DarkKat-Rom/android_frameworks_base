@@ -57,4 +57,11 @@ public class KeyButtonDrawable extends LayerDrawable {
         getDrawable(1).setAlpha((int) (intensity * 255f));
         invalidateSelf();
     }
+
+    public void updateColors(int colorLight, int colorDark) {
+        getDrawable(0).setTint(colorLight);
+        if (mHasDarkDrawable) {
+            getDrawable(1).setTint(colorDark);
+        }
+    }
 }
