@@ -34,6 +34,16 @@ public class ThemeColorHelper {
             Settings.Secure.THEME_PRIMARY_COLOR, defaultColor);
     }
 
+    public static int getIndexForAccentColor(Context context) {
+        if (ThemeHelper.isWhiteoutTheme(context) || ThemeHelper.isBlackoutTheme(context)
+                || !customizeColors(context)) {
+            return 0;
+        } else {
+            return Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.THEME_ACCENT_COLOR, 0);
+        }
+    }
+
     public static boolean colorizeNavigationBar(Context context) {
         return Settings.Secure.getInt(context.getContentResolver(),
             Settings.Secure.COLORIZE_NAVIGATION_BAR, 0) == 1;
