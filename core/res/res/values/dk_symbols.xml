@@ -44,4 +44,32 @@
     <java-symbol type="string" name="advanced_restart_reboot_to_recovery_message" />
     <java-symbol type="string" name="advanced_restart_reboot_to_bootloader_message" />
     <java-symbol type="style" name="Theme.ShutdownThreadDialog" />
+
+    <!-- Accent color theme overlays -->
+    <java-symbol type="style" name="ThemeOverlay.Accent.HoloBlueLight" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialBlueGray500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialBlue500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialLightBlue500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialCyan500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialDeepTeal500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialIndigo500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialPurple500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialDeepPurple500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialPink500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialOrange500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialDeepOrange500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialRed500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialYellow500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialAmber500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialGreen500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialLightGreen500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialLime500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Black" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.White" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Blue" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Purple" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Orange" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Red" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Yellow" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.Green" />
 </resources>

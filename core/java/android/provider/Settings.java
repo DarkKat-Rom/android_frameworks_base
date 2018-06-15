@@ -6945,6 +6945,40 @@ public final class Settings {
         public static final String THEME_PRIMARY_COLOR = "theme_primnary_color";
 
         /**
+         * Color to use for the theme accent color
+         *  0 - Accent Darkkat
+         *  1 - Holo Blue Light
+         *  2 - Material Blue Grey 500
+         *  3 - Material Blue 500
+         *  4 - Material Light Blue 500
+         *  5 - Material Cyan 500
+         *  6 - Material Deep Teal 500
+         *  7 - Material Indigo 500
+         *  8 - Material Purple 500
+         *  9 - Material Deep Purple 500
+         * 10 - Material Pink 500
+         * 11 - Material Orange 500
+         * 12 - Material Deep Orange 500
+         * 13 - Material Red 500
+         * 14 - Material Yellow 500
+         * 15 - Material Amber 500
+         * 16 - Material Green 500
+         * 17 - Material Light Green 500
+         * 18 - Material Lime 500
+         * 19 - Black
+         * 20 - White
+         * 21 - Blue
+         * 22 - Purple
+         * 23 - Orange
+         * 24 - Red
+         * 25 - Yellow
+         * 26 - Green
+         * default: 0
+         * @hide
+         */
+        public static final String THEME_ACCENT_COLOR = "theme_accent_color";
+
+        /**
          * Wether to colorize the navigation bar background using the theme primary color
          * @hide
          */
