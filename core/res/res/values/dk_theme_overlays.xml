@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018 DarkKat
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+
+    <!-- Accent color theme overlays -->
+    <style name="ThemeOverlay.Accent" />
+
+    <style name="ThemeOverlay.Accent.HoloBlueLight">
+        <item name="colorAccent">@color/holo_blue_light</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialBlueGray500">
+        <item name="colorAccent">@color/material_blue_grey_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialBlue500">
+        <item name="colorAccent">@color/material_blue_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialLightBlue500">
+        <item name="colorAccent">@color/material_light_blue_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialCyan500">
+        <item name="colorAccent">@color/material_cyan_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialDeepTeal500">
+        <item name="colorAccent">@color/material_deep_teal_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialIndigo500">
+        <item name="colorAccent">@color/material_indigo_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialPurple500">
+        <item name="colorAccent">@color/material_purple_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialDeepPurple500">
+        <item name="colorAccent">@color/material_deep_purple_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialPink500">
+        <item name="colorAccent">@color/material_pink_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialOrange500">
+        <item name="colorAccent">@color/material_orange_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialDeepOrange500">
+        <item name="colorAccent">@color/material_deep_orange_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialRed500">
+        <item name="colorAccent">@color/material_red_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialYellow500">
+        <item name="colorAccent">@color/material_yellow_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialAmber500">
+        <item name="colorAccent">@color/material_amber_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialGreen500">
+        <item name="colorAccent">@color/material_green_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialLightGreen500">
+        <item name="colorAccent">@color/material_light_green_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.MaterialLime500">
+        <item name="colorAccent">@color/material_lime_500</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Black">
+        <item name="colorAccent">@color/black</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.White">
+        <item name="colorAccent">@color/white</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Blue">
+        <item name="colorAccent">@color/blue</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Purple">
+        <item name="colorAccent">@color/purple</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Orange">
+        <item name="colorAccent">@color/orange</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Red">
+        <item name="colorAccent">@color/red</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Yellow">
+        <item name="colorAccent">@color/yellow</item>
+    </style>
+
+    <style name="ThemeOverlay.Accent.Green">
+        <item name="colorAccent">@color/green</item>
+    </style>
+
+</resources>

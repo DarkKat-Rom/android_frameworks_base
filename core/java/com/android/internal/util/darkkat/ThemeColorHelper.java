@@ -19,6 +19,8 @@ package com.android.internal.util.darkkat;
 import android.content.Context;
 import android.provider.Settings;
 
+import com.android.internal.R;
+
 public class ThemeColorHelper {
 
 
@@ -42,6 +44,66 @@ public class ThemeColorHelper {
             return Settings.Secure.getInt(context.getContentResolver(),
                 Settings.Secure.THEME_ACCENT_COLOR, 0);
         }
+    }
+
+    public static int getThemeOverlayAccentResId(Context context) {
+        int index = getIndexForAccentColor(context);
+
+        int resId = 0;
+        if (index == 1) {
+            resId = R.style.ThemeOverlay_Accent_HoloBlueLight;
+        } else if (index == 2) {
+            resId = R.style.ThemeOverlay_Accent_MaterialBlueGray500;
+        } else if (index == 3) {
+            resId = R.style.ThemeOverlay_Accent_MaterialBlue500;
+        } else if (index == 4) {
+            resId = R.style.ThemeOverlay_Accent_MaterialLightBlue500;
+        } else if (index == 5) {
+            resId = R.style.ThemeOverlay_Accent_MaterialCyan500;
+        } else if (index == 6) {
+            resId = R.style.ThemeOverlay_Accent_MaterialDeepTeal500;
+        } else if (index == 7) {
+            resId = R.style.ThemeOverlay_Accent_MaterialIndigo500;
+        } else if (index == 8) {
+            resId = R.style.ThemeOverlay_Accent_MaterialPurple500;
+        } else if (index == 9) {
+            resId = R.style.ThemeOverlay_Accent_MaterialDeepPurple500;
+        } else if (index == 10) {
+            resId = R.style.ThemeOverlay_Accent_MaterialPink500;
+        } else if (index == 11) {
+            resId = R.style.ThemeOverlay_Accent_MaterialOrange500;
+        } else if (index == 12) {
+            resId = R.style.ThemeOverlay_Accent_MaterialDeepOrange500;
+        } else if (index == 13) {
+            resId = R.style.ThemeOverlay_Accent_MaterialRed500;
+        } else if (index == 14) {
+            resId = R.style.ThemeOverlay_Accent_MaterialYellow500;
+        } else if (index == 15) {
+            resId = R.style.ThemeOverlay_Accent_MaterialAmber500;
+        } else if (index == 16) {
+            resId = R.style.ThemeOverlay_Accent_MaterialGreen500;
+        } else if (index == 17) {
+            resId = R.style.ThemeOverlay_Accent_MaterialLightGreen500;
+        } else if (index == 18) {
+            resId = R.style.ThemeOverlay_Accent_MaterialLime500;
+        } else if (index == 19) {
+            resId = R.style.ThemeOverlay_Accent_Black;
+        } else if (index == 20) {
+            resId = R.style.ThemeOverlay_Accent_White;
+        } else if (index == 21) {
+            resId = R.style.ThemeOverlay_Accent_Blue;
+        } else if (index == 22) {
+            resId = R.style.ThemeOverlay_Accent_Purple;
+        } else if (index == 23) {
+            resId = R.style.ThemeOverlay_Accent_Orange;
+        } else if (index == 24) {
+            resId = R.style.ThemeOverlay_Accent_Red;
+        } else if (index == 25) {
+            resId = R.style.ThemeOverlay_Accent_Yellow;
+        } else if (index == 26) {
+            resId = R.style.ThemeOverlay_Accent_Green;
+        }
+        return resId;
     }
 
     public static boolean colorizeNavigationBar(Context context) {
