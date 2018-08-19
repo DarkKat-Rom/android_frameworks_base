@@ -31,21 +31,24 @@
 
     <!-- Variant of Theme.Material.DayNight.DarkActionBar that has a light navigation bar background with dark
          navigation bar contents. -->
-    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar" parent="Theme.Material.DayNight.DarkActionBar">
+    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.DarkActionBar">
         <item name="navigationBarColor">@color/primary_material_light</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
 
     <!-- Variant of Theme.Material.DayNight that has a light navigation bar background with dark
          navigation bar contents. -->
-    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar" parent="Theme.Material.DayNight.LightActionBar">
+    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.LightActionBar">
         <item name="navigationBarColor">@color/primary_material_light</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
 
     <!-- Variant of Theme.Material.DayNight.LightStatusBar that has a light navigation bar background
          with dark navigation bar contents. -->
-    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" parent="Theme.Material.DayNight.LightStatusBar">
+    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.LightStatusBar">
         <item name="navigationBarColor">@color/primary_dark_material_light_light_status_bar</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
@@ -53,7 +56,63 @@
     <!-- Theme overlay that replaces the normal control color, which by default is the same as the
          secondary text color, with the primary text color. -->
     <style name="ThemeOverlay.Material.DayNight.LightActionBar" parent="ThemeOverlay.Material.Light">
-        <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="colorControlNormal">?attr/textColorPrimary</item>
+        <item name="searchViewStyle">@style/Widget.Material.SearchView.ActionBar</item>
+    </style>
+
+    <!-- Variant of currently applied Theme.Material.DayNight.DarkActionBar
+         that changes the following default theme attributes:
+             colorPrimary: Material blue 500
+             colorPrimaryDark: Material blue 700
+             colorAccent: Accent DarkKat (12% holo blue light over material blue grey 500) -->
+    <style name="Theme.DarkKat.DayNight"  parent="Theme.Material.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/primary_color_darkkat</item>
+        <item name="colorPrimaryDark">@color/primary_color_dark_darkkat</item>
+        <item name="colorAccent">@color/accent_darkkat</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.Material.Dark.ActionBar</item>
+    </style>
+
+    <!-- Theme.DarkKat.DayNight -->
+    <style name="Theme.DarkKat.DayNight.DarkActionBar" />
+
+    <!-- Variant of the Theme.DarkKat.DayNight that has a light action bar background with dark
+         action bar contents. -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar">
+        <item name="actionBarTheme">@style/ThemeOverlay.DarkKat.DayNight.LightActionBar</item>
+    </style>
+
+    <!-- Variant of the Theme.DarkKat.DayNight.LightActionBar that has a light status bar background
+         with dark status bar contents. -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar" parent="Theme.DarkKat.DayNight.LightActionBar">
+        <item name="colorPrimaryDark">@color/primary_dark_material_light_light_status_bar</item>
+        <item name="windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.DarkKat.DayNight that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.DarkKat.DayNight.LightNavigationBar">
+        <item name="navigationBarColor">@color/primary_material_light</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.DarkKat.DayNight.LightActionBar that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar.LightNavigationBar">
+        <item name="navigationBarColor">@color/primary_material_light</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Variant of Theme.DarkKat.DayNight.LightStatusBar that has a light navigation bar background with dark
+         navigation bar contents. -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar">
+        <item name="navigationBarColor">@color/primary_dark_material_light_light_status_bar</item>
+        <item name="windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Light ActionBar theme overlay that replaces the normal control color, which by default is the same as the
+         secondary text color, with the primary text color. -->
+    <style name="ThemeOverlay.DarkKat.DayNight.LightActionBar" parent="Theme.Material.Light">
+        <item name="colorControlNormal">?attr/textColorPrimary</item>
         <item name="searchViewStyle">@style/Widget.Material.SearchView.ActionBar</item>
     </style>
 </resources>

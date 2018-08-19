@@ -20,6 +20,8 @@ import android.app.UiModeManager;
 import android.content.Context;
 import android.provider.Settings;
 
+import com.android.internal.R;
+
 public class ThemeHelper {
 
     public static int getNightMode(Context context) {
@@ -74,5 +76,30 @@ public class ThemeHelper {
         } else {
             return false;
         }
+    }
+
+    public static int getDKThemeResId(Context context) {
+        int defaultPrimaryColor = context.getColor(R.color.primary_color_darkkat);
+        int resId = 0;
+        boolean lightStatusBar = ThemeColorHelper.lightStatusBar(context, defaultPrimaryColor);
+        boolean lightActionBar = ThemeColorHelper.lightActionBar(context, defaultPrimaryColor);
+        boolean lightNavigationBar = ThemeColorHelper.lightNavigationBar(context, defaultPrimaryColor);
+
+        if (!isBlackoutTheme(context) && !isWhiteoutTheme(context)) {
+            if (lightActionBar && lightNavigationBar) {
+                resId = lightStatusBar
+                        ? R.style.Theme_DarkKat_DayNight_LightStatusBar_LightNavigationBar
+                        : R.style.Theme_DarkKat_DayNight_LightActionBar_LightNavigationBar;
+            } else if (lightActionBar) {
+                resId = lightStatusBar
+                        ? R.style.Theme_DarkKat_DayNight_LightStatusBar
+                        : R.style.Theme_DarkKat_DayNight_LightActionBar;
+            } else if (lightNavigationBar) {
+                resId = R.style.Theme_DarkKat_DayNight_LightNavigationBar;
+            } else {
+                resId = R.style.Theme_DarkKat_DayNight;
+            }
+        }
+        return resId;
     }
 }

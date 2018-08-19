@@ -2881,4 +2881,42 @@
     <public type="style" name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar" />
     <public type="style" name="Theme.Material.DayNight.LightActionBar.LightNavigationBar" />
     <public type="style" name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <public type="style" name="Theme.DarkKat.DayNight" />
+    <public type="style" name="Theme.DarkKat.DayNight.LightActionBar" />
+    <public type="style" name="Theme.DarkKat.DayNight.LightStatusBar" />
+    <public type="style" name="Theme.DarkKat.DayNight.LightNavigationBar" />
+    <public type="style" name="Theme.DarkKat.DayNight.LightActionBar.LightNavigationBar" />
+    <public type="style" name="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <public type="color" name="darkkat_blue_grey" />
+    <public type="color" name="darkkat_blue_blue_grey" />
+    <public type="color" name="primary_color_darkkat" />
+    <public type="color" name="primary_color_dark_darkkat" />
+    <public type="color" name="accent_darkkat" />
+
+    <public type="color" name="material_blue_grey_500" />
+    <public type="color" name="material_blue_500" />
+    <public type="color" name="material_blue_700" />
+    <public type="color" name="material_light_blue_500" />
+    <public type="color" name="material_cyan_500" />
+    <public type="color" name="material_indigo_500" />
+    <public type="color" name="material_indigo_700" />
+    <public type="color" name="material_purple_500" />
+    <public type="color" name="material_deep_purple_500" />
+    <public type="color" name="material_pink_500" />
+    <public type="color" name="material_orange_500" />
+    <public type="color" name="material_deep_orange_500" />
+    <public type="color" name="material_red_500" />
+    <public type="color" name="material_yellow_500" />
+    <public type="color" name="material_amber_500" />
+    <public type="color" name="material_green_500" />
+    <public type="color" name="material_light_green_500" />
+    <public type="color" name="material_lime_500" />
+
+    <public type="color" name="blue" />
+    <public type="color" name="purple" />
+    <public type="color" name="orange" />
+    <public type="color" name="yellow" />
+    <public type="color" name="green" />
 </resources>

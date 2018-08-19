@@ -28,11 +28,37 @@
     <style name="Theme.Material.DayNight.LightNavigationBar" parent="Theme.Material.DayNight" />
 
     <!-- Theme.Material.DayNight -->
-    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar" parent="Theme.Material.DayNight" />
+    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight" />
 
     <!-- Theme.Material.DayNight -->
-    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar" parent="Theme.Material.DayNight" />
+    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight" />
 
     <!-- Theme.Material.DayNight -->
-    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" parent="Theme.Material.DayNight" />
+    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.Material.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight" parent="Theme.Material.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.DarkActionBar" parent="Theme.Material.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar" parent="Theme.DarkKat.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar" parent="Theme.DarkKat.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.LightNavigationBar" parent="Theme.DarkKat.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar.LightNavigationBar"
+            parent="Theme.DarkKat.DayNight" />
+
+    <!-- Theme.Material.DayNight -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.DarkKat.DayNight" />
 </resources>

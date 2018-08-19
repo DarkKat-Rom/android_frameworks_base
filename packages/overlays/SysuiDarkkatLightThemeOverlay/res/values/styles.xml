@@ -16,6 +16,6 @@
 <resources>
 
     <style name="qs_base" parent="@*android:style/Theme.DeviceDefault.QuickSettings">
-        <item name="android:colorAccent">@*android:color/darkkat_accent</item>
+        <item name="android:colorAccent">@android:color/accent_darkkat</item>
     </style>
 </resources>
