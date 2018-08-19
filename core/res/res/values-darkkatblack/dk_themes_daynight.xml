@@ -24,7 +24,8 @@
 
     <!-- Variant of the Theme.Material.DayNight.LightActionBar that has a light status bar background
          with dark status bar contents. -->
-    <style name="Theme.Material.DayNight.LightStatusBar" parent="Theme.Material.DayNight.LightActionBar">
+    <style name="Theme.Material.DayNight.LightStatusBar"
+            parent="Theme.Material.DayNight.LightActionBar">
         <item name="colorPrimaryDark">@color/primary_dark_material_light_light_status_bar</item>
         <item name="windowLightStatusBar">true</item>
     </style>
@@ -38,21 +39,24 @@
 
     <!-- Variant of Theme.Material.DayNight.DarkActionBar that has a light navigation bar background with dark
          navigation bar contents. -->
-    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar" parent="Theme.Material.DayNight">
+    <style name="Theme.Material.DayNight.DarkActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight">
         <item name="navigationBarColor">@color/primary_material_light</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
 
     <!-- Variant of Theme.Material.DayNight.LightActionBar that has a light navigation bar background
          with dark navigation bar contents. -->
-    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar" parent="Theme.Material.DayNight.LightActionBar">
+    <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.LightActionBar">
         <item name="navigationBarColor">@color/primary_material_light</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
 
     <!-- Variant of Theme.Material.DayNight.LightStatusBar that has a light navigation bar background with dark
          navigation bar contents. -->
-    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" parent="Theme.Material.DayNight.LightStatusBar">
+    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.LightStatusBar">
         <item name="navigationBarColor">@color/primary_dark_material_light_light_status_bar</item>
         <item name="windowLightNavigationBar">true</item>
     </style>

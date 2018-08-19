@@ -45,9 +45,57 @@
     <java-symbol type="string" name="advanced_restart_reboot_to_bootloader_message" />
     <java-symbol type="style" name="Theme.ShutdownThreadDialog" />
 
+    <!-- Darkkat themes -->
+
+    <!-- Colors -->
+
+    <!-- Default theme colors  -->
+    <java-symbol type="color" name="primary_color_darkkat" />
+    <java-symbol type="color" name="primary_color_dark_darkkat" />
+    <java-symbol type="color" name="accent_darkkat" />
+
+    <!-- DarkKat colors  -->
+    <java-symbol type="color" name="darkkat_blue_grey" />
+    <java-symbol type="color" name="darkkat_blue_blue_grey" />
+
+    <!-- Material colors  -->
+    <java-symbol type="color" name="material_blue_grey_500" />
+    <java-symbol type="color" name="material_blue_500" />
+    <java-symbol type="color" name="material_blue_700" />
+    <java-symbol type="color" name="material_light_blue_500" />
+    <java-symbol type="color" name="material_cyan_500" />
+    <java-symbol type="color" name="material_indigo_500" />
+    <java-symbol type="color" name="material_indigo_700" />
+    <java-symbol type="color" name="material_purple_500" />
+    <java-symbol type="color" name="material_deep_purple_500" />
+    <java-symbol type="color" name="material_pink_500" />
+    <java-symbol type="color" name="material_orange_500" />
+    <java-symbol type="color" name="material_deep_orange_500" />
+    <java-symbol type="color" name="material_red_500" />
+    <java-symbol type="color" name="material_yellow_500" />
+    <java-symbol type="color" name="material_amber_500" />
+    <java-symbol type="color" name="material_green_500" />
+    <java-symbol type="color" name="material_light_green_500" />
+    <java-symbol type="color" name="material_lime_500" />
+
+    <!-- RGB colors  -->
+    <java-symbol type="color" name="blue" />
+    <java-symbol type="color" name="purple" />
+    <java-symbol type="color" name="orange" />
+    <java-symbol type="color" name="yellow" />
+    <java-symbol type="color" name="green" />
+
+    <!-- Themes -->
+    <java-symbol type="style" name="Theme.DarkKat.DayNight" />
+    <java-symbol type="style" name="Theme.DarkKat.DayNight.LightActionBar" />
+    <java-symbol type="style" name="Theme.DarkKat.DayNight.LightStatusBar" />
+    <java-symbol type="style" name="Theme.DarkKat.DayNight.LightNavigationBar" />
+    <java-symbol type="style" name="Theme.DarkKat.DayNight.LightActionBar.LightNavigationBar" />
+    <java-symbol type="style" name="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
     <!-- Accent color theme overlays -->
     <java-symbol type="style" name="ThemeOverlay.Accent.HoloBlueLight" />
-    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialBlueGray500" />
+    <java-symbol type="style" name="ThemeOverlay.Accent.MaterialBlueGrey500" />
     <java-symbol type="style" name="ThemeOverlay.Accent.MaterialBlue500" />
     <java-symbol type="style" name="ThemeOverlay.Accent.MaterialLightBlue500" />
     <java-symbol type="style" name="ThemeOverlay.Accent.MaterialCyan500" />

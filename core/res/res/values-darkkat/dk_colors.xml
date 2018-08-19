@@ -22,12 +22,12 @@
 
     <color name="primary_material_dark">@color/material_blue_grey_950</color>
 
-    <color name="accent_material_dark">@color/darkkat_accent</color>
+    <color name="accent_material_dark">@color/accent_darkkat</color>
 
-    <color name="timepicker_default_ampm_selected_background_color_material">@color/darkkat_accent</color>
-    <color name="timepicker_default_selector_color_material">@color/darkkat_accent</color>
+    <color name="timepicker_default_ampm_selected_background_color_material">@color/accent_darkkat</color>
+    <color name="timepicker_default_selector_color_material">@color/accent_darkkat</color>
 
-    <color name="datepicker_default_circle_background_color_material_dark">@color/darkkat_accent</color>
+    <color name="datepicker_default_circle_background_color_material_dark">@color/accent_darkkat</color>
 
     <color name="notification_primary_text_color_light">@color/primary_text_default_material_dark</color>
     <color name="notification_secondary_text_color_light">@color/secondary_text_material_dark</color>
@@ -35,7 +35,7 @@
     <color name="notification_progress_background_color">@color/secondary_text_material_dark</color>
     <color name="notification_action_list">@color/darkkat_blue_grey_4</color>
     <color name="notification_action_list_dark">@color/darkkat_blue_grey</color>
-    <color name="system_notification_accent_color">@color/darkkat_accent</color>
+    <color name="system_notification_accent_color">@color/accent_darkkat</color>
 
     <color name="notification_legacy_background_color">@color/darkkat_blue_blue_grey</color>
     <color name="notification_material_background_dimmed_color">#cc1b1f23</color>

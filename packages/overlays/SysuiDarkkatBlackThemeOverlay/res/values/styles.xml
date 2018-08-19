@@ -19,7 +19,7 @@
         <item name="android:colorPrimary">@*android:color/primary_color_blackout</item>
         <item name="android:colorPrimaryDark">@android:color/black</item>
         <item name="android:colorSecondary">@android:color/black</item>
-        <item name="android:colorAccent">@*android:color/darkkat_accent</item>
+        <item name="android:colorAccent">@android:color/accent_darkkat</item>
         <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
         <item name="android:colorBackgroundFloating">@android:color/black</item>
     </style>

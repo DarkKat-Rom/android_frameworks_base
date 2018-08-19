@@ -22,12 +22,12 @@
 
     <color name="primary_material_dark">@color/primary_color_blackout</color>
 
-    <color name="accent_material_dark">@color/darkkat_accent</color>
+    <color name="accent_material_dark">@color/accent_darkkat</color>
 
-    <color name="timepicker_default_ampm_selected_background_color_material">@color/darkkat_accent</color>
-    <color name="timepicker_default_selector_color_material">@color/darkkat_accent</color>
+    <color name="timepicker_default_ampm_selected_background_color_material">@color/accent_darkkat</color>
+    <color name="timepicker_default_selector_color_material">@color/accent_darkkat</color>
 
-    <color name="datepicker_default_circle_background_color_material_dark">@color/darkkat_accent</color>
+    <color name="datepicker_default_circle_background_color_material_dark">@color/accent_darkkat</color>
 
     <color name="notification_primary_text_color_light">@color/primary_text_default_material_dark</color>
     <color name="notification_secondary_text_color_light">@color/secondary_text_material_dark</color>

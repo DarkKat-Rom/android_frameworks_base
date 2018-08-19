@@ -20,7 +20,8 @@
 
     <!-- Variant of Theme.Material.DayNight.LightStatusBar that has a light navigation bar background
          with dark navigation bar contents. -->
-    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" parent="Theme.Material.Light.LightStatusBar">
+    <style name="Theme.Material.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.Material.Light.LightStatusBar">
         <item name="navigationBarColor">@color/primary_material_light</item>
         <item name="windowLightNavigationBar">true</item>
     </style>
@@ -44,4 +45,32 @@
     <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
     <style name="Theme.Material.DayNight.LightActionBar.LightNavigationBar"
             parent="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar"
+            parent="Theme.Material.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.DarkActionBar"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.LightStatusBar"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.LightNavigationBar"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
+
+    <!-- Theme.Material.DayNight.LightStatusBar.LightNavigationBar -->
+    <style name="Theme.DarkKat.DayNight.LightActionBar.LightNavigationBar"
+            parent="Theme.DarkKat.DayNight.LightStatusBar.LightNavigationBar" />
 </resources>

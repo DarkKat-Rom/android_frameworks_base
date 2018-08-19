@@ -53,7 +53,7 @@ public class ThemeColorHelper {
         if (index == 1) {
             resId = R.style.ThemeOverlay_Accent_HoloBlueLight;
         } else if (index == 2) {
-            resId = R.style.ThemeOverlay_Accent_MaterialBlueGray500;
+            resId = R.style.ThemeOverlay_Accent_MaterialBlueGrey500;
         } else if (index == 3) {
             resId = R.style.ThemeOverlay_Accent_MaterialBlue500;
         } else if (index == 4) {

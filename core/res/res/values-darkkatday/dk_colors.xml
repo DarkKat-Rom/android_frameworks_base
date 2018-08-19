@@ -21,8 +21,8 @@
 
     <color name="primary_material_dark">@color/material_blue_grey_950</color>
 
-    <color name="accent_material_dark">@color/darkkat_accent</color>
-    <color name="accent_material_light">@color/darkkat_accent</color>
+    <color name="accent_material_dark">@color/accent_darkkat</color>
+    <color name="accent_material_light">@color/accent_darkkat</color>
 
     <color name="system_notification_accent_color">@color/accent_darkkat</color>
 </resources>

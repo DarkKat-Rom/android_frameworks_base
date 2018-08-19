@@ -16,6 +16,6 @@
 <resources>
 
     <style name="Theme.ShutdownThreadDialog" parent="@android:style/Theme.Material.Light.Dialog.Alert">
-        <item name="android:colorAccent">@*android:color/darkkat_accent</item>
+        <item name="android:colorAccent">@android:color/accent_darkkat</item>
     </style>
 </resources>
